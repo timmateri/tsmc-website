@@ -80,7 +80,8 @@
     9: [[18, 16, [16, 30, 44]], [42, 16, [16, 30, 44]], [66, 16, [16, 30, 44]]],
   };
   // batang merah per angka (indeks urut baris atas→bawah, kiri→kanan) — sesuai set standar
-  const SOK_RED = { 5: [2], 7: [0], 9: [3, 4, 5] };
+  // 9 sok: KOLOM tengah merah (garis vertikal di tengah)
+  const SOK_RED = { 5: [2], 7: [0], 9: [1, 4, 7] };
 
   // 1 sok: burung (ciri khas set standar)
   function sokBird() {
@@ -120,18 +121,38 @@
 
   const WINDS = { e: '東', s: '南', w: '西', n: '北' };
 
-  // bunga: kelopak seperti tile bunga asli + huruf kecil di pojok
-  function flowerFace() {
+  // ---- tile bonus: 4 bunga (梅蘭菊竹) & 4 musim (春夏秋冬), bernomor 1-4 ----
+  const FLOWERS = ['', '梅', '蘭', '菊', '竹'];
+  const SEASONS = ['', '春', '夏', '秋', '冬'];
+  function blossom(cx, cy, scale) {
     let s = '';
     for (let i = 0; i < 8; i++) {
-      s += `<ellipse cx="30" cy="47" rx="4.6" ry="12" fill="${GREEN}" opacity="0.9"
-        transform="rotate(${i * 45} 30 47) translate(0 -10.5)"/>`;
+      s += `<ellipse cx="${cx}" cy="${cy}" rx="${3.2 * scale}" ry="${8 * scale}" fill="${GREEN}" opacity="0.9"
+        transform="rotate(${i * 45} ${cx} ${cy}) translate(0 ${-7 * scale})"/>`;
     }
-    s += `<circle cx="30" cy="47" r="6.4" fill="${RED}"/>` +
-      `<circle cx="27.8" cy="45" r="1.5" fill="#fff"/><circle cx="32.2" cy="45" r="1.5" fill="#fff"/>` +
-      `<circle cx="27.8" cy="49" r="1.5" fill="#fff"/><circle cx="32.2" cy="49" r="1.5" fill="#fff"/>` +
-      text(13, 18, 12, RED, '花');
+    s += `<circle cx="${cx}" cy="${cy}" r="${4.4 * scale}" fill="${RED}"/>` +
+      `<circle cx="${cx}" cy="${cy}" r="${1.6 * scale}" fill="#fff"/>`;
     return s;
+  }
+  function flowerFace(v) {
+    if (!v) { // versi lama tanpa nomor — tetap didukung
+      return blossom(30, 47, 1.5) + text(13, 18, 12, RED, '花');
+    }
+    return text(12, 20, 13, RED, v, 800) +           // nomor merah di pojok (1-4)
+      text(30, 44, 26, GREEN, FLOWERS[v]) +          // nama bunga
+      blossom(30, 66, 0.9);
+  }
+  function seasonFace(v) {
+    let sun = `<circle cx="30" cy="66" r="6" fill="none" stroke="${RED}" stroke-width="2"/>` +
+      `<circle cx="30" cy="66" r="2" fill="${RED}"/>`;
+    for (let i = 0; i < 8; i++) {
+      const a = Math.PI / 4 * i;
+      sun += `<line x1="${30 + Math.cos(a) * 8.5}" y1="${66 + Math.sin(a) * 8.5}"
+        x2="${30 + Math.cos(a) * 11}" y2="${66 + Math.sin(a) * 11}" stroke="${RED}" stroke-width="2" stroke-linecap="round"/>`;
+    }
+    return text(12, 20, 13, BLUE, v, 800) +          // nomor biru di pojok (1-4)
+      text(30, 44, 26, RED, SEASONS[v]) +            // nama musim
+      sun;
   }
 
   function tileSVG(spec) {
@@ -154,8 +175,11 @@
       else { inner = `<rect x="14" y="20" width="32" height="44" rx="4" fill="none" stroke="${BLUE}" stroke-width="3"/>` +
         `<rect x="20" y="27" width="20" height="30" rx="2" fill="none" stroke="${BLUE}" stroke-width="2"/>`; label = 'naga putih'; }
     } else if (kind === 'flower') {
-      inner = flowerFace();
-      label = 'bunga';
+      inner = flowerFace(v);
+      label = 'bunga ' + (FLOWERS[v] || '');
+    } else if (kind === 'season') {
+      inner = seasonFace(v || 1);
+      label = 'musim ' + (SEASONS[v] || '');
     } else if (kind === 'back') {
       inner = `<rect x="7" y="7" width="46" height="70" rx="6" fill="${GREEN}"/>` +
         `<rect x="12" y="12" width="36" height="60" rx="4" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.5"/>`;
