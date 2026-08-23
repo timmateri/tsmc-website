@@ -67,22 +67,38 @@
     <div class="table-scroll">
     <table class="faan">
       <tr><th>TANGAN / KONDISI</th><th>CARA DAPATNYA</th><th>FAAN</th></tr>
-      <tr><td class="fn">Ping Wu<small>平和 · semua chow</small></td><td>4 set semuanya urutan (chow), tanpa pong.</td><td class="fv2">1</td></tr>
-      <tr><td class="fn">Zi Mo<small>自摸 · ambil sendiri</small></td><td>Tile kemenangan diambil sendiri dari tembok, bukan dari buangan lawan.</td><td class="fv2">1</td></tr>
-      <tr><td class="fn">Pong naga<small>中 · 發 · 白</small></td><td>Tiap set pong/gong naga dihitung terpisah.</td><td class="fv2">1</td></tr>
-      <tr><td class="fn">Pong angin duduk<small>atau angin putaran</small></td><td>Pong angin yang sesuai posisi dudukmu / putaran saat itu.</td><td class="fv2">1</td></tr>
-      <tr><td class="fn">Bunga posisi<small>bunga/musim sesuai arah duduk</small></td><td>Tile bunga atau musim bernomor sama dengan posisi dudukmu (Timur=1, dst).</td><td class="fv2">1</td></tr>
-      <tr><td class="fn">Mou Fa<small>tanpa bunga sama sekali</small></td><td>Sampai menang tidak pernah dapat satu pun tile bunga.</td><td class="fv2">1</td></tr>
-      <tr><td class="fn">Dui Dui Wu<small>對對和 · semua pong</small></td><td>4 set semuanya kembar (pong/gong), tanpa chow.</td><td class="fv2">3</td></tr>
-      <tr><td class="fn">Wun Yat Sik<small>混一色 · campur satu keluarga</small></td><td>Seluruh tangan hanya 1 keluarga angka + angin/naga.</td><td class="fv2">3</td></tr>
-      <tr><td class="fn">Wun Yiu Gau<small>混幺九 · campur ujung</small></td><td>Semua tile hanya 1, 9, dan angin/naga. Otomatis semua pong (+3), jadi praktiknya minimal 6 faan.</td><td class="fv2">3</td></tr>
-      <tr><td class="fn">Chat Deui Zi<small>七對子 · seven pairs</small></td><td>Tangan berisi 7 pasang kembar — struktur khusus, tanpa pola 4 set + mata. Varian modern (antar meja 4–6 faan); di TSMC dihitung 4.</td><td class="fv2">4</td></tr>
-      <tr><td class="fn">Siu Sam Yun<small>小三元 · naga kecil</small></td><td>2 pong naga + pasang naga ketiga sebagai mata.</td><td class="fv2">5</td></tr>
-      <tr><td class="fn">Ching Yat Sik<small>清一色 · murni satu keluarga</small></td><td>Seluruh tangan hanya 1 keluarga angka, tanpa angin/naga.</td><td class="fv2">7</td></tr>
-      <tr><td class="fn">Dai Sam Yun<small>大三元 · naga besar</small></td><td>3 pong naga lengkap: 中 + 發 + 白.</td><td class="fv2">8</td></tr>
-      <tr><td class="fn">Ching Yiu Gau<small>清幺九 · all terminals</small></td><td>Seluruh tangan hanya tile 1 dan 9, tanpa angin/naga sama sekali. Nyaris mustahil — limit.</td><td class="fv2">13</td></tr>
-      <tr><td class="fn">Sap Sam Yiu<small>十三幺 · thirteen orphans</small></td><td>Satu dari tiap 1, 9, angin, dan naga + satu kembarannya.</td><td class="fv2">13</td></tr>
-      <tr><td class="fn">Dai Sei Hei<small>大四喜 · empat angin besar</small></td><td>4 pong angin lengkap. Hampir mustahil. Hampir.</td><td class="fv2">13</td></tr>
+      <tr><td class="fn">Ping Wu<small>平和 · semua chow</small></td><td>4 set semuanya urutan (chow), tanpa pong.
+        <div class="tile-row xs" data-tiles="wan:1,wan:2,wan:3,|,tung:4,tung:5,tung:6,|,sok:6,sok:7,sok:8,|,wan:7,wan:8,wan:9,|,tung:2,tung:2"></div></td><td class="fv2">1</td></tr>
+      <tr><td class="fn">Zi Mo<small>自摸 · ambil sendiri</small></td><td>Tile kemenangan diambil sendiri dari tembok, bukan dari buangan lawan.
+        <div class="tile-row xs" data-tiles="back,back,back,+,sok:5"></div></td><td class="fv2">1</td></tr>
+      <tr><td class="fn">Pong naga<small>中 · 發 · 白</small></td><td>Tiap set pong/gong naga dihitung terpisah.
+        <div class="tile-row xs" data-tiles="dragon:c,dragon:c,dragon:c"></div></td><td class="fv2">1</td></tr>
+      <tr><td class="fn">Pong angin duduk<small>atau angin putaran</small></td><td>Pong angin yang sesuai posisi dudukmu / putaran saat itu (contoh: kamu duduk Timur).
+        <div class="tile-row xs" data-tiles="wind:e,wind:e,wind:e"></div></td><td class="fv2">1</td></tr>
+      <tr><td class="fn">Bunga posisi<small>bunga/musim sesuai arah duduk</small></td><td>Tile bunga atau musim bernomor sama dengan posisi dudukmu (contoh: duduk Timur = nomor 1).
+        <div class="tile-row xs" data-tiles="flower:1,season:1"></div></td><td class="fv2">1</td></tr>
+      <tr><td class="fn">Mou Fa<small>tanpa bunga sama sekali</small></td><td>Sampai menang tidak pernah dapat satu pun tile bunga/musim.
+        <div class="tile-row xs"><span class="tile-x"><span data-tile="flower:2"></span></span><span class="tile-x"><span data-tile="season:3"></span></span></div></td><td class="fv2">1</td></tr>
+      <tr><td class="fn">Dui Dui Wu<small>對對和 · semua pong</small></td><td>4 set semuanya kembar (pong/gong), tanpa chow.
+        <div class="tile-row xs" data-tiles="wan:2,wan:2,wan:2,|,sok:5,sok:5,sok:5,|,tung:7,tung:7,tung:7,|,wind:n,wind:n,wind:n,|,wan:9,wan:9"></div></td><td class="fv2">3</td></tr>
+      <tr><td class="fn">Wun Yat Sik<small>混一色 · campur satu keluarga</small></td><td>Seluruh tangan hanya 1 keluarga angka + angin/naga.
+        <div class="tile-row xs" data-tiles="sok:1,sok:2,sok:3,|,sok:4,sok:5,sok:6,|,sok:7,sok:7,sok:7,|,dragon:f,dragon:f,dragon:f,|,wind:w,wind:w"></div></td><td class="fv2">3</td></tr>
+      <tr><td class="fn">Wun Yiu Gau<small>混幺九 · campur ujung</small></td><td>Semua tile hanya 1, 9, dan angin/naga. Otomatis semua pong (+3), jadi praktiknya minimal 6 faan.
+        <div class="tile-row xs" data-tiles="wan:1,wan:1,wan:1,|,sok:9,sok:9,sok:9,|,tung:1,tung:1,tung:1,|,wind:n,wind:n,wind:n,|,dragon:c,dragon:c"></div></td><td class="fv2">3</td></tr>
+      <tr><td class="fn">Chat Deui Zi<small>七對子 · seven pairs</small></td><td>Tangan berisi 7 pasang kembar — struktur khusus, tanpa pola 4 set + mata. Varian modern (antar meja 4–6 faan); di TSMC dihitung 4.
+        <div class="tile-row xs" data-tiles="wan:3,wan:3,|,sok:6,sok:6,|,tung:9,tung:9,|,wind:e,wind:e,|,dragon:f,dragon:f,|,wan:8,wan:8,|,tung:2,tung:2"></div></td><td class="fv2">4</td></tr>
+      <tr><td class="fn">Siu Sam Yun<small>小三元 · naga kecil</small></td><td>2 pong naga + pasang naga ketiga sebagai mata.
+        <div class="tile-row xs" data-tiles="dragon:c,dragon:c,dragon:c,|,dragon:f,dragon:f,dragon:f,|,dragon:b,dragon:b,|,sok:3,sok:4,sok:5,|,tung:6,tung:7,tung:8"></div></td><td class="fv2">5</td></tr>
+      <tr><td class="fn">Ching Yat Sik<small>清一色 · murni satu keluarga</small></td><td>Seluruh tangan hanya 1 keluarga angka, tanpa angin/naga.
+        <div class="tile-row xs" data-tiles="tung:1,tung:2,tung:3,|,tung:4,tung:5,tung:6,|,tung:7,tung:8,tung:9,|,tung:5,tung:5,tung:5,|,tung:9,tung:9"></div></td><td class="fv2">7</td></tr>
+      <tr><td class="fn">Dai Sam Yun<small>大三元 · naga besar</small></td><td>3 pong naga lengkap: 中 + 發 + 白.
+        <div class="tile-row xs" data-tiles="dragon:c,dragon:c,dragon:c,|,dragon:f,dragon:f,dragon:f,|,dragon:b,dragon:b,dragon:b,|,sok:5,sok:6,sok:7,|,wan:2,wan:2"></div></td><td class="fv2">8</td></tr>
+      <tr><td class="fn">Ching Yiu Gau<small>清幺九 · all terminals</small></td><td>Seluruh tangan hanya tile 1 dan 9, tanpa angin/naga sama sekali. Nyaris mustahil — limit.
+        <div class="tile-row xs" data-tiles="wan:1,wan:1,wan:1,|,wan:9,wan:9,wan:9,|,sok:1,sok:1,sok:1,|,tung:9,tung:9,tung:9,|,tung:1,tung:1"></div></td><td class="fv2">13</td></tr>
+      <tr><td class="fn">Sap Sam Yiu<small>十三幺 · thirteen orphans</small></td><td>Satu dari tiap 1, 9, angin, dan naga + satu kembarannya.
+        <div class="tile-row xs" data-tiles="wan:1,wan:9,sok:1,sok:9,tung:1,tung:9,wind:e,wind:s,wind:w,wind:n,dragon:c,dragon:f,dragon:b,|,wan:1"></div></td><td class="fv2">13</td></tr>
+      <tr><td class="fn">Dai Sei Hei<small>大四喜 · empat angin besar</small></td><td>4 pong angin lengkap. Hampir mustahil. Hampir.
+        <div class="tile-row xs" data-tiles="wind:e,wind:e,wind:e,|,wind:s,wind:s,wind:s,|,wind:w,wind:w,wind:w,|,wind:n,wind:n,wind:n,|,tung:5,tung:5"></div></td><td class="fv2">13</td></tr>
     </table>
     </div>
     <div class="info-note">Faan bisa ditumpuk: misalnya semua pong (3) + campur satu keluarga (3) + zi mo (1) dihitung semuanya. Maksimum tetap 13.</div>

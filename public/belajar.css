@@ -78,6 +78,16 @@ section.blok p b{color:var(--ink)}
 .mtile{width:46px;height:auto;filter:drop-shadow(0 2.5px 0 rgba(4,51,31,.25))}
 .tile-row.sm .mtile{width:36px}
 .tile-row.lg .mtile{width:56px}
+.tile-row.xs{gap:3px}
+.tile-row.xs .mtile{width:25px}
+.tile-row.xs .tile-gap{width:10px}
+.tile-row.xs .tile-plus{font-size:18px;padding:0 3px}
+table.faan .tile-row{margin-top:7px;flex-wrap:nowrap;width:max-content}
+/* tile dicoret (contoh "tanpa bunga") */
+.tile-x{position:relative;display:inline-block}
+.tile-x::after{content:"✕";position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;color:var(--red);font-size:19px;font-weight:800;
+  text-shadow:0 0 5px #fff,0 0 5px #fff}
 .tile-plus{font-family:'DM Serif Display',serif;font-size:26px;color:var(--mut-lt);padding:0 6px}
 .tile-gap{width:16px}
 @media(max-width:560px){.mtile{width:36px}.tile-row.lg .mtile{width:44px}}
