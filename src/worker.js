@@ -110,6 +110,31 @@ async function schedulesWithAvailability(db) {
   return results.map((s) => ({ ...s, left: Math.max(0, s.capacity - s.booked) }));
 }
 
+// ---------- Proteksi brute-force login admin ----------
+// Batasi percobaan login gagal per-IP memakai D1 (tabel dibuat otomatis).
+const LOGIN_MAX = 8;              // maksimum percobaan gagal
+const LOGIN_WINDOW = '-15 minutes'; // dalam jendela waktu ini
+async function ensureLoginTable(db) {
+  await db.prepare(`CREATE TABLE IF NOT EXISTS login_attempts (
+    ip TEXT NOT NULL, at TEXT DEFAULT (datetime('now')))`).run();
+}
+async function loginBlocked(db, ip) {
+  await ensureLoginTable(db);
+  // bersihkan catatan lama sekalian (hemat baris)
+  await db.prepare(`DELETE FROM login_attempts WHERE at < datetime('now','-1 day')`).run();
+  const row = await db.prepare(
+    `SELECT COUNT(*) AS n FROM login_attempts WHERE ip = ? AND at > datetime('now', ?)`
+  ).bind(ip, LOGIN_WINDOW).first();
+  return (row?.n || 0) >= LOGIN_MAX;
+}
+async function recordLoginFail(db, ip) {
+  await ensureLoginTable(db);
+  await db.prepare(`INSERT INTO login_attempts (ip) VALUES (?)`).bind(ip).run();
+}
+async function clearLoginFails(db, ip) {
+  try { await db.prepare(`DELETE FROM login_attempts WHERE ip = ?`).bind(ip).run(); } catch (e) {}
+}
+
 // ---------- Autentikasi admin ----------
 async function requireAdmin(req, env) {
   const auth = req.headers.get('authorization') || '';
@@ -133,7 +158,13 @@ export default {
     }
 
     if (!path.startsWith('/api/')) {
-      return env.ASSETS.fetch(req); // file statis (index.html, dll)
+      const res = await env.ASSETS.fetch(req); // file statis (index.html, dll)
+      // Halaman ramah untuk route yang tidak ada (mis. salah ketik URL)
+      if (res.status === 404 && method === 'GET') {
+        const nf = await env.ASSETS.fetch(new Request(new URL('/404.html', url), req));
+        return new Response(nf.body, { status: 404, headers: nf.headers });
+      }
+      return res;
     }
 
     try {
@@ -286,9 +317,17 @@ export default {
       // ======================= LOGIN ADMIN =======================
 
       if (path === '/api/admin/login' && method === 'POST') {
+        const ip = req.headers.get('CF-Connecting-IP') || 'unknown';
+        if (await loginBlocked(env.DB, ip)) {
+          return err('Terlalu banyak percobaan login. Coba lagi dalam 15 menit.', 429);
+        }
         const b = await req.json();
         if (!env.ADMIN_PASSWORD) return err('ADMIN_PASSWORD belum diset di server.', 500);
-        if (b.password !== env.ADMIN_PASSWORD) return err('Password salah.', 401);
+        if (b.password !== env.ADMIN_PASSWORD) {
+          await recordLoginFail(env.DB, ip);
+          return err('Password salah.', 401);
+        }
+        await clearLoginFails(env.DB, ip); // login sukses → reset hitungan
         const token = crypto.randomUUID() + crypto.randomUUID();
         await env.DB.prepare('INSERT INTO sessions (token) VALUES (?)').bind(token).run();
         return json({ ok: true, token });

@@ -70,6 +70,13 @@ CREATE TABLE IF NOT EXISTS sessions (
   created_at  TEXT DEFAULT (datetime('now'))
 );
 
+-- Catatan percobaan login admin (untuk proteksi brute-force per-IP).
+-- Dibuat otomatis oleh worker juga; didefinisikan di sini agar rapi.
+CREATE TABLE IF NOT EXISTS login_attempts (
+  ip  TEXT NOT NULL,
+  at  TEXT DEFAULT (datetime('now'))
+);
+
 -- Koreksi manual stempel loyalty per anggota (kasus refund, dsb).
 -- delta bisa negatif; dijumlahkan ke kehadiran hasil hitung otomatis.
 CREATE TABLE IF NOT EXISTS loyalty_adj (
