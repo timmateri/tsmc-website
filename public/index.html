@@ -903,6 +903,11 @@ async function renderMyBookings(){
 }
 
 loadSite();
+// datang dari halaman lain lewat tombol "Cek Booking" (/#cek) → langsung buka pencarian status
+if(location.hash === '#cek'){
+  openLookup();
+  history.replaceState(null, '', location.pathname);
+}
 </script>
 </body>
 </html>
