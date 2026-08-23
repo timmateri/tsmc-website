@@ -202,6 +202,37 @@ Nanti bisa ditambahkan payment gateway (Midtrans/Xendit). Butuh pendaftaran akun
 
 ---
 
+## Menyimpan Kode di GitHub (Backup & Riwayat)
+
+Folder ini sudah menjadi repo Git — setiap perubahan kode bisa dilacak dan dikembalikan. Supaya kodenya juga ter-backup online, push ke GitHub (sekali setup):
+
+**Setup (±5 menit):**
+
+1. Buat akun di https://github.com (gratis) kalau belum punya.
+2. Buka https://github.com/new → Repository name: `tsmc-website` → pilih **Private** → **jangan** centang "Add a README" → klik **Create repository**.
+3. Di Terminal (dari folder website), jalankan dua baris ini — ganti `USERNAME` dengan username GitHub kamu:
+   ```
+   git remote add origin https://github.com/USERNAME/tsmc-website.git
+   git push -u origin main
+   ```
+   Saat diminta login, ikuti petunjuk di layar (biasanya membuka browser untuk otorisasi).
+
+   > 💡 Kalau cara di atas terasa ribet, cara paling mudah untuk pemula: install aplikasi **GitHub Desktop** (https://desktop.github.com) → File → Add local repository → pilih folder ini → klik **Publish repository**.
+
+**Rutinitas setiap selesai mengubah kode** (konten harian lewat dashboard admin TIDAK perlu ini):
+
+```
+git add -A
+git commit -m "tulis ringkasan perubahannya di sini"
+git push
+```
+
+Catatan: file `.dev.vars` (password lokal) dan `node_modules` otomatis dikecualikan dari Git — aman, tidak akan ikut ter-upload.
+
+Bonus untuk nanti: kalau repo sudah di GitHub, Cloudflare bisa disambungkan (dash.cloudflare.com → Workers & Pages → socialmahjong → Settings → Build) supaya setiap `git push` otomatis deploy — menggantikan `npm run deploy`. Minta bantuan Claude kalau mau mengaktifkan ini.
+
+---
+
 ## Rekomendasi Konten Agar Website Makin Menarik
 
 Yang sudah ada di website: jadwal + booking, berita & event, kalender turnamen, modul belajar, galeri, aturan & etika, direktori anggota.
