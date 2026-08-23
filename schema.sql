@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS bookings (
   name        TEXT NOT NULL,
   wa          TEXT NOT NULL,            -- nomor WhatsApp
   seats       INTEGER NOT NULL DEFAULT 1,
-  method      TEXT NOT NULL DEFAULT 'qris',   -- qris | transfer | venue
+  method      TEXT NOT NULL DEFAULT 'qris',   -- qris | transfer | venue | reward
+  level       TEXT NOT NULL DEFAULT '',       -- N (newbie) | B (beginner) | I (intermediate)
   status      TEXT NOT NULL DEFAULT 'pending',-- pending | verifying | confirmed | canceled | waitlist
   proof       TEXT,                     -- bukti bayar (data-URL base64, sudah dikompres)
   admin_note  TEXT DEFAULT '',

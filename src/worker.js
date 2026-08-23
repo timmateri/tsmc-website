@@ -60,6 +60,17 @@ const TIERS = [
   { min: 0, name: 'Chicken Hand', icon: '🐣' },
 ];
 
+// kolom level bermain (N/B/I) — ditambahkan otomatis ke database lama
+// yang dibuat sebelum fitur ini ada, tanpa perlu migrasi manual
+let levelColumnEnsured = false;
+async function ensureLevelColumn(db) {
+  if (levelColumnEnsured) return;
+  try {
+    await db.prepare(`ALTER TABLE bookings ADD COLUMN level TEXT NOT NULL DEFAULT ''`).run();
+  } catch (e) { /* kolom sudah ada */ }
+  levelColumnEnsured = true;
+}
+
 // tabel koreksi manual stempel (dibuat otomatis kalau belum ada —
 // aman untuk database yang sudah terlanjur di-setup tanpa tabel ini)
 async function ensureAdjTable(db) {
@@ -173,6 +184,7 @@ export default {
       // Semua data untuk halaman depan dalam satu panggilan
       if (path === '/api/site' && method === 'GET') {
         const db = env.DB;
+        await ensureLevelColumn(db);
         const [schedules, news, events, gallery, settings] = await Promise.all([
           schedulesWithAvailability(db),
           db.prepare(`SELECT id, tag, title, blurb, date, image FROM news
@@ -190,7 +202,7 @@ export default {
         if (schedules.length) {
           const ids = schedules.map((s) => s.id);
           const { results: parts } = await db.prepare(`
-            SELECT schedule_id, name, seats, status FROM bookings
+            SELECT schedule_id, name, seats, status, level FROM bookings
             WHERE status IN ('confirmed','verifying')
               AND schedule_id IN (${ids.map(() => '?').join(',')})
             ORDER BY id ASC
@@ -201,6 +213,7 @@ export default {
               n: shortName(p.name),
               x: Math.max(0, p.seats - 1),   // kursi ekstra yang dia bawa
               v: p.status === 'verifying' ? 1 : 0,
+              l: p.level || '',              // level bermain (N/B/I)
             });
           }
           for (const s of schedules) s.players = byId[s.id] || [];
@@ -232,6 +245,9 @@ export default {
           : (['qris', 'transfer', 'venue'].includes(b.method) ? b.method : 'qris');
         if (!name || name.length > 60) return err('Nama wajib diisi (maks. 60 karakter).');
         if (wa.length < 9 || wa.length > 16) return err('Nomor WhatsApp tidak valid.');
+        const level = ['N', 'B', 'I'].includes(b.level) ? b.level : null;
+        if (!level) return err('Pilih level bermain kamu dulu ya.');
+        await ensureLevelColumn(env.DB);
 
         // klaim gratis: pastikan stempelnya memang cukup
         if (useReward) {
@@ -260,9 +276,9 @@ export default {
           code = makeCode();
         }
         await env.DB.prepare(`
-          INSERT INTO bookings (code, schedule_id, name, wa, seats, method, status)
-          VALUES (?, ?, ?, ?, ?, ?, ?)
-        `).bind(code, sched.id, name, wa, seats, methodPay, status).run();
+          INSERT INTO bookings (code, schedule_id, name, wa, seats, method, level, status)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).bind(code, sched.id, name, wa, seats, methodPay, level, status).run();
 
         const settings = await getSettings(env.DB);
         return json({
@@ -346,6 +362,7 @@ export default {
 
         // ---- Booking ----
         if (path === '/api/admin/bookings' && method === 'GET') {
+          await ensureLevelColumn(db);
           const sid = url.searchParams.get('schedule_id');
           const q = `
             SELECT b.*, s.date, s.time_start, s.venue, s.fee

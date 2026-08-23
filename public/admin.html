@@ -308,6 +308,7 @@ let SCHEDULES = [];
 const ST = {pending:['MENUNGGU BAYAR','#C9A54A'], verifying:['CEK BUKTI ➜','#1E4D8C'],
   confirmed:['TERKONFIRMASI','#087048'], canceled:['DIBATALKAN','#6B7A66'], waitlist:['WAITING LIST','#C02028']};
 const METHOD_LABEL = {qris:'QRIS', transfer:'transfer', venue:'bayar di tempat', reward:'🎁 KLAIM REWARD'};
+const LVL = {N:['N · Newbie','#C9A54A'], B:['B · Beginner','#1E4D8C'], I:['I · Intermediate','#087048']};
 async function loadBookings(){
   const sid = $('bk-filter').value;
   const d = await api('/api/admin/bookings' + (sid ? '?schedule_id=' + sid : ''));
@@ -321,6 +322,7 @@ async function loadBookings(){
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
         <b>${esc(b.code)}</b> · ${esc(b.name)} · ${b.seats} kursi ·
         ${isReward ? '<b style="color:var(--red)">' + METHOD_LABEL.reward + '</b>' : (METHOD_LABEL[b.method] || b.method)}
+        ${b.level && LVL[b.level] ? `<span class="pill" style="background:${LVL[b.level][1]}">${LVL[b.level][0]}</span>` : ''}
         <span class="pill" style="background:${color}">${label}</span>
       </div>
       <div class="mut">${fmtTgl(b.date)} ${esc(b.time_start)} · ${esc(b.venue)} · total ${isReward ? 'GRATIS (5 stempel)' : rupiah(b.fee * b.seats)}
