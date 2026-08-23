@@ -1,0 +1,13 @@
+{
+  "name": "socialmahjong",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:setup": "wrangler d1 execute tsmc-db --remote --file=schema.sql",
+    "db:setup-local": "wrangler d1 execute tsmc-db --local --file=schema.sql"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

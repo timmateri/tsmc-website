@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard Admin — TSMC</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Schibsted+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#EAF3DF;--paper:#FAFCF5;--green:#087048;--green-dk:#04552F;--ink:#04331F;
+  --red:#C02028;--gold:#BCD96A;--mut:#4E5C4B;--blue:#1E4D8C}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:'Schibsted Grotesk',sans-serif;line-height:1.5;font-size:15px}
+h1,h2,h3{font-family:'DM Serif Display',serif;font-weight:400}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px}
+.btn{display:inline-block;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:14px;
+  padding:10px 18px;border-radius:10px;background:var(--green);color:var(--cream);box-shadow:0 3px 0 var(--green-dk)}
+.btn:active{transform:translateY(1px);box-shadow:none}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.btn.red{background:var(--red);box-shadow:0 3px 0 #8f1f1f}
+.btn.sm{padding:6px 12px;font-size:12.5px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;font-weight:800;letter-spacing:.05em;margin-bottom:4px;color:var(--mut)}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;font-family:inherit;font-size:15px;
+  border:1.5px solid rgba(5,42,27,.3);border-radius:9px;background:#fff;color:var(--ink)}
+.field textarea{min-height:110px;resize:vertical}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:640px){.row3{grid-template-columns:1fr 1fr}}
+.card{background:#fff;border:1.5px solid rgba(5,42,27,.15);border-radius:14px;padding:18px;margin-bottom:14px;
+  box-shadow:0 3px 0 rgba(5,42,27,.07)}
+.pill{font-size:11px;font-weight:800;letter-spacing:.06em;padding:3px 10px;border-radius:99px;color:#fff;display:inline-block}
+.mut{color:var(--mut);font-size:13.5px}
+.hidden{display:none!important}
+.topbar{background:var(--ink);color:var(--cream);padding:14px 0;margin-bottom:0}
+.topbar .wrap{display:flex;align-items:center;gap:14px}
+.topbar h1{font-size:20px}
+.topbar .btn{margin-left:auto}
+.tabs{position:sticky;top:0;background:var(--paper);z-index:10;border-bottom:1.5px solid rgba(5,42,27,.15);
+  overflow-x:auto;white-space:nowrap;padding:10px 0}
+.tabs .wrap{display:flex;gap:8px}
+.tab-btn{border:none;background:transparent;font-family:inherit;font-weight:800;font-size:14px;cursor:pointer;
+  padding:8px 16px;border-radius:99px;color:var(--mut)}
+.tab-btn.active{background:var(--ink);color:var(--gold)}
+main{padding:22px 0 60px}
+.flash{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--gold);
+  font-weight:800;padding:12px 24px;border-radius:12px;z-index:99;display:none}
+.proof-thumb{max-width:120px;border-radius:8px;border:1px solid rgba(5,42,27,.25);cursor:pointer;display:block;margin-top:6px}
+.imgview{position:fixed;inset:0;background:rgba(5,42,27,.85);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;cursor:pointer}
+.imgview img{max-width:100%;max-height:100%;border-radius:10px}
+.imgview.show{display:flex}
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.gal-grid .card{padding:10px;margin:0}
+.gal-grid img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px}
+.sec-note{background:var(--cream);border:1.5px dashed rgba(5,42,27,.3);border-radius:10px;padding:12px 16px;
+  font-size:13.5px;color:var(--mut);margin-bottom:16px}
+.bk-head{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.bk-head select{flex:1;min-width:200px;padding:10px;border-radius:9px;border:1.5px solid rgba(5,42,27,.3);font-family:inherit}
+.count-chip{font-weight:800;font-size:13px;background:var(--cream);border-radius:99px;padding:6px 14px}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div id="login-view" class="hidden" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px">
+  <div class="card" style="max-width:380px;width:100%;padding:28px">
+    <img src="/tsmc-logo.png" alt="The Social Mahjong Club" style="width:100%;max-width:280px;display:block;margin:0 auto 16px">
+    <h1 style="font-size:28px;margin-bottom:18px;text-align:center">Dashboard Admin</h1>
+    <div class="field"><label>Password Admin</label>
+      <input type="password" id="login-pass" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="btn" style="width:100%" onclick="doLogin()">Masuk</button>
+    <p class="mut" id="login-err" style="color:var(--red);margin-top:10px;min-height:18px"></p>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div id="dash-view" class="hidden">
+  <div class="topbar"><div class="wrap">
+    <img src="/favicon.png" alt="" style="height:30px"><h1>Admin TSMC</h1>
+    <a href="/" target="_blank" style="color:var(--gold);font-size:13.5px;font-weight:700">Lihat website ↗</a>
+    <button class="btn ghost sm" style="color:var(--cream);box-shadow:inset 0 0 0 1.5px var(--cream)" onclick="doLogout()">Keluar</button>
+  </div></div>
+
+  <div class="tabs"><div class="wrap">
+    <button class="tab-btn active" data-tab="booking" onclick="showTab('booking')">📋 Booking</button>
+    <button class="tab-btn" data-tab="anggota" onclick="showTab('anggota')">🀄 Anggota</button>
+    <button class="tab-btn" data-tab="jadwal" onclick="showTab('jadwal')">📅 Jadwal</button>
+    <button class="tab-btn" data-tab="berita" onclick="showTab('berita')">📰 Berita</button>
+    <button class="tab-btn" data-tab="event" onclick="showTab('event')">🏆 Event</button>
+    <button class="tab-btn" data-tab="galeri" onclick="showTab('galeri')">📷 Galeri</button>
+    <button class="tab-btn" data-tab="setting" onclick="showTab('setting')">⚙️ Pengaturan</button>
+  </div></div>
+
+  <main class="wrap">
+
+    <!-- BOOKING -->
+    <div id="tab-booking">
+      <div class="sec-note">Anggota yang sudah upload bukti bayar berstatus <b>SEDANG DIVERIFIKASI</b> — cek buktinya lalu tekan <b>Konfirmasi</b>. Slot yang belum dibayar &gt;24 jam otomatis dilepas dari hitungan kursi. Booking berlabel <b style="color:var(--red)">🎁 KLAIM REWARD</b> adalah anggota yang menukar 5 stempel loyalty dengan permainan gratis — cek dulu (mis. via WA) lalu Konfirmasi; stempelnya otomatis terpotong.</div>
+      <div class="bk-head">
+        <select id="bk-filter" onchange="loadBookings()"></select>
+        <span class="count-chip" id="bk-count"></span>
+        <button class="btn ghost sm" onclick="loadBookings()">↻ Refresh</button>
+      </div>
+      <div id="bk-list"></div>
+    </div>
+
+    <!-- ANGGOTA & STEMPEL -->
+    <div id="tab-anggota" class="hidden">
+      <div class="sec-note">Stempel dihitung otomatis dari sesi yang dihadiri (booking terkonfirmasi yang tanggalnya sudah lewat). Kalau ada <b>refund/batal</b>, cara paling rapi: batalkan booking-nya di tab Booking (stempel otomatis hilang). Tombol <b>−1 / +1</b> di bawah untuk koreksi manual — misalnya booking lama yang sudah terlanjur, atau bonus stempel event.</div>
+      <div class="bk-head">
+        <input id="mb-search" placeholder="🔍 Cari nama atau nomor WA…" oninput="filterMembers()" style="flex:1;min-width:200px;padding:10px;border-radius:9px;border:1.5px solid rgba(4,51,31,.3);font-family:inherit">
+        <span class="count-chip" id="mb-count"></span>
+        <button class="btn ghost sm" onclick="loadMembers()">↻ Refresh</button>
+      </div>
+      <div id="mb-list"></div>
+    </div>
+
+    <!-- JADWAL -->
+    <div id="tab-jadwal" class="hidden">
+      <div class="card">
+        <h3 style="margin-bottom:12px" id="sch-form-title">Tambah Jadwal Baru</h3>
+        <div class="row3">
+          <div class="field"><label>Tanggal</label><input type="date" id="sch-date"></div>
+          <div class="field"><label>Jam mulai</label><input id="sch-start" placeholder="18.30" value="18.30"></div>
+          <div class="field"><label>Jam selesai</label><input id="sch-end" placeholder="22.30" value="22.30"></div>
+        </div>
+        <div class="field"><label>Tempat / venue</label><input id="sch-venue" placeholder="Clubhouse TSMC, Jakarta Barat"></div>
+        <div class="field"><label>Catatan (opsional)</label><input id="sch-note" placeholder="Sesi reguler mingguan"></div>
+        <div class="row3">
+          <div class="field"><label>Jumlah meja</label><input type="number" id="sch-tables" value="4" min="1" onchange="document.getElementById('sch-cap').value=this.value*4"></div>
+          <div class="field"><label>Total kursi</label><input type="number" id="sch-cap" value="16" min="1"></div>
+          <div class="field"><label>Fee / orang (Rp)</label><input type="number" id="sch-fee" value="75000" step="5000"></div>
+        </div>
+        <div class="field"><label>Status</label>
+          <select id="sch-status"><option value="open">Open (bisa dibooking)</option><option value="closed">Ditutup</option></select></div>
+        <button class="btn" onclick="saveSchedule()" id="sch-save">Simpan Jadwal</button>
+        <button class="btn ghost hidden" id="sch-cancel" onclick="resetSchedForm()">Batal Edit</button>
+      </div>
+      <div id="sch-list"></div>
+    </div>
+
+    <!-- BERITA -->
+    <div id="tab-berita" class="hidden">
+      <div class="card">
+        <h3 style="margin-bottom:12px" id="news-form-title">Tulis Berita Baru</h3>
+        <div class="row3">
+          <div class="field"><label>Kategori</label>
+            <select id="nw-tag"><option>KOMUNITAS</option><option>EVENT</option><option>RECAP</option><option>PENGUMUMAN</option></select></div>
+          <div class="field"><label>Tanggal</label><input type="date" id="nw-date"></div>
+          <div class="field"><label>Tampilkan?</label>
+            <select id="nw-pub"><option value="1">Ya, publikasikan</option><option value="0">Draft (sembunyikan)</option></select></div>
+        </div>
+        <div class="field"><label>Judul</label><input id="nw-title" maxlength="150"></div>
+        <div class="field"><label>Ringkasan singkat (tampil di kartu berita)</label><input id="nw-blurb" maxlength="200"></div>
+        <div class="field"><label>Isi lengkap berita</label><textarea id="nw-body"></textarea></div>
+        <div class="field"><label>Foto berita (opsional)</label><input type="file" id="nw-img" accept="image/*">
+          <img id="nw-img-prev" class="proof-thumb hidden"></div>
+        <button class="btn" onclick="saveNews()" id="nw-save">Publikasikan</button>
+        <button class="btn ghost hidden" id="nw-cancel" onclick="resetNewsForm()">Batal Edit</button>
+      </div>
+      <div id="nw-list"></div>
+    </div>
+
+    <!-- EVENT -->
+    <div id="tab-event" class="hidden">
+      <div class="sec-note">Kalender event tampil di kotak hijau tua bagian "Berita &amp; Event" di website. Cocok untuk turnamen, friendly match, atau sesi spesial.</div>
+      <div class="card">
+        <h3 style="margin-bottom:12px">Tambah Event</h3>
+        <div class="row3">
+          <div class="field"><label>Label tanggal (tampil)</label><input id="ev-label" placeholder="12 Sep"></div>
+          <div class="field"><label>Tanggal (untuk urutan)</label><input type="date" id="ev-date"></div>
+          <div class="field"><label>&nbsp;</label><button class="btn" style="width:100%" onclick="saveEvent()">Tambah</button></div>
+        </div>
+        <div class="field"><label>Nama event</label><input id="ev-title" placeholder="TSMC Open 2026 · babak kualifikasi"></div>
+      </div>
+      <div id="ev-list"></div>
+    </div>
+
+    <!-- GALERI -->
+    <div id="tab-galeri" class="hidden">
+      <div class="card">
+        <h3 style="margin-bottom:12px">Upload Foto</h3>
+        <div class="field"><label>Pilih foto (bisa lebih dari satu — otomatis dikompres)</label>
+          <input type="file" id="gal-files" accept="image/*" multiple></div>
+        <div class="field"><label>Keterangan (opsional, berlaku untuk semua foto yang dipilih)</label>
+          <input id="gal-caption" placeholder="Sesi Sabtu malam, 29 Agustus"></div>
+        <button class="btn" onclick="uploadGallery()" id="gal-btn">Upload</button>
+      </div>
+      <div class="gal-grid" id="gal-list"></div>
+    </div>
+
+    <!-- PENGATURAN -->
+    <div id="tab-setting" class="hidden">
+      <div class="card">
+        <h3 style="margin-bottom:12px">Pengumuman &amp; Statistik</h3>
+        <div class="field"><label>Teks pengumuman (bar hitam paling atas — kosongkan untuk sembunyikan)</label>
+          <input id="st-announcement"></div>
+        <div class="row2">
+          <div class="field"><label>Jumlah anggota aktif</label><input id="st-stat_members"></div>
+          <div class="field"><label>Jumlah sesi sejak 2023</label><input id="st-stat_sessions"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:12px">Pembayaran</h3>
+        <div class="row3">
+          <div class="field"><label>Nama bank</label><input id="st-bank_name"></div>
+          <div class="field"><label>Nomor rekening</label><input id="st-bank_account"></div>
+          <div class="field"><label>Atas nama</label><input id="st-bank_holder"></div>
+        </div>
+        <div class="field"><label>Gambar QRIS (screenshot kode QR dari aplikasi merchant)</label>
+          <input type="file" id="st-qris-file" accept="image/*">
+          <img id="st-qris-prev" class="proof-thumb hidden"></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:12px">Kontak</h3>
+        <div class="row2">
+          <div class="field"><label>📱 WA admin — konfirmasi pembayaran (format 628xxx)</label><input id="st-wa_admin" placeholder="6281234567890"></div>
+          <div class="field"><label>👥 Link undangan grup WA komunitas</label><input id="st-wa_group" placeholder="https://chat.whatsapp.com/..."></div>
+          <div class="field"><label>Link Instagram</label><input id="st-instagram"></div>
+          <div class="field"><label>Email</label><input id="st-email"></div>
+        </div>
+      </div>
+      <button class="btn" onclick="saveSettings()">Simpan Semua Pengaturan</button>
+    </div>
+
+  </main>
+</div>
+
+<div class="flash" id="flash"></div>
+<div class="imgview" id="imgview" onclick="this.classList.remove('show')"><img id="imgview-img"></div>
+
+<script>
+'use strict';
+let TOKEN = localStorage.getItem('tsmc_admin_token') || '';
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rupiah = n => 'Rp ' + Number(n).toLocaleString('id-ID');
+const HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+function fmtTgl(iso){ if(!iso) return ''; const [y,m,d] = iso.split('-').map(Number);
+  const dt = new Date(y, m-1, d); return `${HARI[dt.getDay()]}, ${d}/${m}/${y}`; }
+
+function flash(msg){ const f = $('flash'); f.textContent = msg; f.style.display='block';
+  setTimeout(() => f.style.display='none', 2200); }
+function viewImg(src){ $('imgview-img').src = src; $('imgview').classList.add('show'); }
+
+async function api(path, opts = {}){
+  opts.headers = Object.assign({'content-type':'application/json',
+    'authorization':'Bearer ' + TOKEN}, opts.headers || {});
+  const r = await fetch(path, opts);
+  const d = await r.json();
+  if(r.status === 401){ showLogin(); throw new Error(d.error || 'Sesi berakhir, login ulang.'); }
+  if(!d.ok) throw new Error(d.error || 'Gagal');
+  return d;
+}
+function compressImage(file, maxSide = 1280, quality = 0.78){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width*scale); c.height = Math.round(img.height*scale);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      resolve(c.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+/* ===== login ===== */
+function showLogin(){ $('login-view').classList.remove('hidden'); $('dash-view').classList.add('hidden'); }
+function showDash(){ $('login-view').classList.add('hidden'); $('dash-view').classList.remove('hidden');
+  loadSchedules().then(loadBookings); }
+async function doLogin(){
+  $('login-err').textContent = '';
+  try{
+    const d = await (await fetch('/api/admin/login', {method:'POST',
+      headers:{'content-type':'application/json'},
+      body: JSON.stringify({password: $('login-pass').value})})).json();
+    if(!d.ok) throw new Error(d.error);
+    TOKEN = d.token; localStorage.setItem('tsmc_admin_token', TOKEN);
+    showDash();
+  }catch(e){ $('login-err').textContent = e.message; }
+}
+async function doLogout(){
+  try{ await api('/api/admin/logout', {method:'POST', body:'{}'}); }catch(e){}
+  TOKEN = ''; localStorage.removeItem('tsmc_admin_token'); showLogin();
+}
+
+/* ===== tab ===== */
+function showTab(name){
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  ['booking','anggota','jadwal','berita','event','galeri','setting'].forEach(t =>
+    $('tab-' + t).classList.toggle('hidden', t !== name));
+  if(name === 'booking') loadBookings();
+  if(name === 'anggota') loadMembers();
+  if(name === 'jadwal') loadSchedules();
+  if(name === 'berita') loadNews();
+  if(name === 'event') loadEvents();
+  if(name === 'galeri') loadGallery();
+  if(name === 'setting') loadSettings();
+}
+
+/* ===== booking ===== */
+let SCHEDULES = [];
+const ST = {pending:['MENUNGGU BAYAR','#C9A54A'], verifying:['CEK BUKTI ➜','#1E4D8C'],
+  confirmed:['TERKONFIRMASI','#087048'], canceled:['DIBATALKAN','#6B7A66'], waitlist:['WAITING LIST','#C02028']};
+const METHOD_LABEL = {qris:'QRIS', transfer:'transfer', venue:'bayar di tempat', reward:'🎁 KLAIM REWARD'};
+async function loadBookings(){
+  const sid = $('bk-filter').value;
+  const d = await api('/api/admin/bookings' + (sid ? '?schedule_id=' + sid : ''));
+  const list = d.bookings;
+  $('bk-count').textContent = list.length + ' booking';
+  $('bk-list').innerHTML = list.length ? list.map(b => {
+    const [label, color] = ST[b.status] || [b.status, '#6B7A66'];
+    const wa = b.wa.replace(/[^0-9]/g,'').replace(/^0/, '62');
+    const isReward = b.method === 'reward';
+    return `<div class="card"${isReward ? ' style="border-color:var(--red)"' : ''}>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <b>${esc(b.code)}</b> · ${esc(b.name)} · ${b.seats} kursi ·
+        ${isReward ? '<b style="color:var(--red)">' + METHOD_LABEL.reward + '</b>' : (METHOD_LABEL[b.method] || b.method)}
+        <span class="pill" style="background:${color}">${label}</span>
+      </div>
+      <div class="mut">${fmtTgl(b.date)} ${esc(b.time_start)} · ${esc(b.venue)} · total ${isReward ? 'GRATIS (5 stempel)' : rupiah(b.fee * b.seats)}
+        · <a href="https://wa.me/${wa}" target="_blank" style="color:var(--green);font-weight:800">WA ${esc(b.wa)} ↗</a></div>
+      ${b.proof ? `<img src="${b.proof}" class="proof-thumb" onclick="viewImg(this.src)" title="Klik untuk perbesar">`
+        : '<div class="mut" style="font-style:italic">Belum ada bukti bayar</div>'}
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        ${b.status !== 'confirmed' ? `<button class="btn sm" onclick="setBooking(${b.id},'confirmed')">✓ Konfirmasi</button>` : ''}
+        ${b.status !== 'canceled' ? `<button class="btn red sm" onclick="if(confirm('Batalkan booking ${esc(b.code)}?'))setBooking(${b.id},'canceled')">✕ Batalkan</button>` : ''}
+        ${b.status === 'canceled' ? `<button class="btn ghost sm" onclick="setBooking(${b.id},'pending')">Aktifkan lagi</button>` : ''}
+      </div>
+    </div>`;
+  }).join('') : '<p class="mut">Belum ada booking.</p>';
+}
+async function setBooking(id, status){
+  await api('/api/admin/bookings/' + id, {method:'POST', body: JSON.stringify({status})});
+  flash(status === 'confirmed' ? 'Booking dikonfirmasi ✓' : 'Booking diperbarui');
+  loadBookings();
+}
+
+/* ===== anggota & stempel ===== */
+let MEMBERS = [];
+async function loadMembers(){
+  const d = await api('/api/admin/members');
+  MEMBERS = d.members;
+  filterMembers();
+}
+function filterMembers(){
+  const q = ($('mb-search').value || '').toLowerCase();
+  const list = MEMBERS.filter(m =>
+    !q || m.name.toLowerCase().includes(q) || m.wa.includes(q.replace(/[^0-9+]/g,'') || ' '));
+  $('mb-count').textContent = list.length + ' anggota';
+  $('mb-list').innerHTML = list.length ? list.map(m => {
+    const waLink = m.wa.replace(/[^0-9]/g,'').replace(/^0/, '62');
+    const stamps = '✿'.repeat(m.card) + '·'.repeat(5 - m.card);
+    return `<div class="card">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <b>${m.tier.icon} ${esc(m.name)}</b>
+        <span class="pill" style="background:var(--ink)">${esc(m.tier.name)}</span>
+        <a href="https://wa.me/${waLink}" target="_blank" style="color:var(--green);font-weight:800;font-size:13px">WA ${esc(m.wa)} ↗</a>
+      </div>
+      <div class="mut" style="margin-top:4px">
+        ${m.total}x main (otomatis ${m.plays}${m.delta ? ', koreksi ' + (m.delta > 0 ? '+' : '') + m.delta : ''})
+        · kartu: <b style="letter-spacing:3px">${stamps}</b> ${m.card}/5
+        ${m.rewards_ready > 0 ? ' · <b style="color:var(--red)">🎁 ' + m.rewards_ready + ' gratis siap</b>' : ''}
+        ${m.rewards_used > 0 ? ' · ' + m.rewards_used + 'x reward terpakai' : ''}
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+        <button class="btn red sm" onclick="adjustMember('${esc(m.wa)}',-1)">− 1 stempel</button>
+        <button class="btn sm" onclick="adjustMember('${esc(m.wa)}',1)">+ 1 stempel</button>
+        <span class="mut" style="font-size:12px">koreksi berlaku ke stempel &amp; hitungan tier sekaligus</span>
+      </div>
+    </div>`;
+  }).join('') : '<p class="mut">Belum ada anggota yang pernah booking.</p>';
+}
+async function adjustMember(wa, change){
+  await api('/api/admin/members/adjust', {method:'POST', body: JSON.stringify({wa, change})});
+  flash(change > 0 ? 'Stempel ditambah +1 ✓' : 'Stempel dikurangi −1 ✓');
+  loadMembers();
+}
+
+/* ===== jadwal ===== */
+let editSchedId = null;
+async function loadSchedules(){
+  const d = await api('/api/admin/schedules');
+  SCHEDULES = d.schedules;
+  $('bk-filter').innerHTML = '<option value="">Semua jadwal</option>' +
+    SCHEDULES.map(s => `<option value="${s.id}">${fmtTgl(s.date)} · ${esc(s.venue)}</option>`).join('');
+  $('sch-list').innerHTML = SCHEDULES.map(s => `<div class="card">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <b>${fmtTgl(s.date)}</b> ${esc(s.time_start)}–${esc(s.time_end)}
+      <span class="pill" style="background:${s.status==='open' ? '#087048' : '#6B7A66'}">${s.status.toUpperCase()}</span>
+    </div>
+    <div class="mut">${esc(s.venue)}${s.note ? ' · ' + esc(s.note) : ''} · ${s.tables} meja ·
+      ${s.booked}/${s.capacity} kursi terisi · fee ${rupiah(s.fee)}</div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn ghost sm" onclick="editSchedule(${s.id})">✎ Edit</button>
+      <button class="btn red sm" onclick="if(confirm('Hapus jadwal ini beserta semua bookingnya?'))delSchedule(${s.id})">Hapus</button>
+    </div></div>`).join('') || '<p class="mut">Belum ada jadwal.</p>';
+}
+function editSchedule(id){
+  const s = SCHEDULES.find(x => x.id === id); if(!s) return;
+  editSchedId = id;
+  $('sch-form-title').textContent = 'Edit Jadwal';
+  $('sch-save').textContent = 'Simpan Perubahan';
+  $('sch-cancel').classList.remove('hidden');
+  $('sch-date').value = s.date; $('sch-start').value = s.time_start; $('sch-end').value = s.time_end;
+  $('sch-venue').value = s.venue; $('sch-note').value = s.note || '';
+  $('sch-tables').value = s.tables; $('sch-cap').value = s.capacity;
+  $('sch-fee').value = s.fee; $('sch-status').value = s.status;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function resetSchedForm(){
+  editSchedId = null;
+  $('sch-form-title').textContent = 'Tambah Jadwal Baru';
+  $('sch-save').textContent = 'Simpan Jadwal';
+  $('sch-cancel').classList.add('hidden');
+  ['sch-date','sch-venue','sch-note'].forEach(i => $(i).value = '');
+}
+async function saveSchedule(){
+  const body = JSON.stringify({
+    date: $('sch-date').value, time_start: $('sch-start').value, time_end: $('sch-end').value,
+    venue: $('sch-venue').value, note: $('sch-note').value, tables: $('sch-tables').value,
+    capacity: $('sch-cap').value, fee: $('sch-fee').value, status: $('sch-status').value });
+  try{
+    if(editSchedId) await api('/api/admin/schedules/' + editSchedId, {method:'PUT', body});
+    else await api('/api/admin/schedules', {method:'POST', body});
+    flash('Jadwal tersimpan ✓'); resetSchedForm(); loadSchedules();
+  }catch(e){ alert(e.message); }
+}
+async function delSchedule(id){
+  await api('/api/admin/schedules/' + id, {method:'DELETE'}); flash('Jadwal dihapus'); loadSchedules();
+}
+
+/* ===== berita ===== */
+let editNewsId = null, newsImgData = null, NEWS = [];
+$('nw-img').addEventListener('change', async e => {
+  if(!e.target.files[0]) return;
+  newsImgData = await compressImage(e.target.files[0]);
+  $('nw-img-prev').src = newsImgData; $('nw-img-prev').classList.remove('hidden');
+});
+async function loadNews(){
+  const d = await api('/api/admin/news');
+  NEWS = d.news;
+  $('nw-list').innerHTML = NEWS.map(n => `<div class="card">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <span class="pill" style="background:var(--ink)">${esc(n.tag)}</span>
+      <b>${esc(n.title)}</b>
+      ${n.published ? '' : '<span class="pill" style="background:#C9A54A">DRAFT</span>'}
+    </div>
+    <div class="mut">${esc(n.date)} · ${esc(n.blurb)}</div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn ghost sm" onclick="editNews(${n.id})">✎ Edit</button>
+      <button class="btn red sm" onclick="if(confirm('Hapus berita ini?'))delNews(${n.id})">Hapus</button>
+    </div></div>`).join('') || '<p class="mut">Belum ada berita.</p>';
+}
+function editNews(id){
+  const n = NEWS.find(x => x.id === id); if(!n) return;
+  editNewsId = id; newsImgData = n.image || null;
+  $('news-form-title').textContent = 'Edit Berita';
+  $('nw-save').textContent = 'Simpan Perubahan';
+  $('nw-cancel').classList.remove('hidden');
+  $('nw-tag').value = n.tag; $('nw-date').value = n.date; $('nw-pub').value = String(n.published);
+  $('nw-title').value = n.title; $('nw-blurb').value = n.blurb || ''; $('nw-body').value = n.body || '';
+  if(n.image){ $('nw-img-prev').src = n.image; $('nw-img-prev').classList.remove('hidden'); }
+  else $('nw-img-prev').classList.add('hidden');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function resetNewsForm(){
+  editNewsId = null; newsImgData = null;
+  $('news-form-title').textContent = 'Tulis Berita Baru';
+  $('nw-save').textContent = 'Publikasikan';
+  $('nw-cancel').classList.add('hidden');
+  ['nw-title','nw-blurb','nw-body'].forEach(i => $(i).value = '');
+  $('nw-img').value = ''; $('nw-img-prev').classList.add('hidden');
+}
+async function saveNews(){
+  const body = JSON.stringify({
+    tag: $('nw-tag').value, date: $('nw-date').value || undefined,
+    published: $('nw-pub').value === '1', title: $('nw-title').value,
+    blurb: $('nw-blurb').value, body: $('nw-body').value, image: newsImgData });
+  try{
+    if(editNewsId) await api('/api/admin/news/' + editNewsId, {method:'PUT', body});
+    else await api('/api/admin/news', {method:'POST', body});
+    flash('Berita tersimpan ✓'); resetNewsForm(); loadNews();
+  }catch(e){ alert(e.message); }
+}
+async function delNews(id){ await api('/api/admin/news/' + id, {method:'DELETE'}); flash('Berita dihapus'); loadNews(); }
+
+/* ===== event ===== */
+async function loadEvents(){
+  const d = await api('/api/admin/events');
+  $('ev-list').innerHTML = d.events.map(e => `<div class="card" style="display:flex;gap:12px;align-items:center">
+    <b style="min-width:60px">${esc(e.date_label)}</b> <span style="flex:1">${esc(e.title)}</span>
+    <button class="btn red sm" onclick="if(confirm('Hapus event ini?'))delEvent(${e.id})">Hapus</button>
+    </div>`).join('') || '<p class="mut">Belum ada event.</p>';
+}
+async function saveEvent(){
+  try{
+    await api('/api/admin/events', {method:'POST', body: JSON.stringify({
+      date_label: $('ev-label').value, title: $('ev-title').value, sort_date: $('ev-date').value })});
+    flash('Event ditambahkan ✓');
+    $('ev-label').value = ''; $('ev-title').value = '';
+    loadEvents();
+  }catch(e){ alert(e.message); }
+}
+async function delEvent(id){ await api('/api/admin/events/' + id, {method:'DELETE'}); flash('Event dihapus'); loadEvents(); }
+
+/* ===== galeri ===== */
+async function loadGallery(){
+  const d = await (await fetch('/api/site')).json();
+  $('gal-list').innerHTML = d.gallery.map(g => `<div class="card">
+    <img src="${g.image}" onclick="viewImg(this.src)">
+    ${g.caption ? `<div class="mut" style="margin-top:6px">${esc(g.caption)}</div>` : ''}
+    <button class="btn red sm" style="margin-top:8px" onclick="if(confirm('Hapus foto ini?'))delGallery(${g.id})">Hapus</button>
+    </div>`).join('') || '<p class="mut">Belum ada foto.</p>';
+}
+async function uploadGallery(){
+  const files = $('gal-files').files;
+  if(!files.length) return alert('Pilih foto dulu.');
+  const btn = $('gal-btn'); btn.disabled = true;
+  try{
+    for(let i = 0; i < files.length; i++){
+      btn.textContent = `Mengupload ${i+1}/${files.length}…`;
+      const image = await compressImage(files[i]);
+      await api('/api/admin/gallery', {method:'POST',
+        body: JSON.stringify({image, caption: $('gal-caption').value})});
+    }
+    flash('Foto terupload ✓');
+    $('gal-files').value = ''; $('gal-caption').value = '';
+    loadGallery();
+  }catch(e){ alert(e.message); }
+  btn.disabled = false; btn.textContent = 'Upload';
+}
+async function delGallery(id){ await api('/api/admin/gallery/' + id, {method:'DELETE'}); flash('Foto dihapus'); loadGallery(); }
+
+/* ===== pengaturan ===== */
+let qrisData = undefined; // undefined = tidak diubah
+$('st-qris-file').addEventListener('change', async e => {
+  if(!e.target.files[0]) return;
+  qrisData = await compressImage(e.target.files[0], 900, 0.85);
+  $('st-qris-prev').src = qrisData; $('st-qris-prev').classList.remove('hidden');
+});
+const ST_KEYS = ['announcement','stat_members','stat_sessions','bank_name','bank_account',
+  'bank_holder','wa_admin','wa_group','instagram','email'];
+async function loadSettings(){
+  const d = await api('/api/admin/settings');
+  ST_KEYS.forEach(k => { const el = $('st-' + k); if(el) el.value = d.settings[k] || ''; });
+  if(d.settings.qris_image){ $('st-qris-prev').src = d.settings.qris_image; $('st-qris-prev').classList.remove('hidden'); }
+}
+async function saveSettings(){
+  const body = {};
+  ST_KEYS.forEach(k => body[k] = $('st-' + k).value);
+  if(qrisData !== undefined) body.qris_image = qrisData;
+  try{
+    await api('/api/admin/settings', {method:'POST', body: JSON.stringify(body)});
+    flash('Pengaturan tersimpan ✓');
+  }catch(e){ alert(e.message); }
+}
+
+/* ===== start ===== */
+if(TOKEN){
+  api('/api/admin/settings').then(showDash).catch(() => showLogin());
+}else showLogin();
+</script>
+</body>
+</html>

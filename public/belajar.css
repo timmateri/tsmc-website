@@ -1,0 +1,147 @@
+/* ============================================================
+   TSMC — Gaya halaman Belajar Mahjong (Modul 01–03)
+   ============================================================ */
+:root{
+  --cream:#EAF3DF; --paper:#FAFCF5; --green:#087048; --green-dk:#04552F;
+  --ink:#04331F; --red:#C02028; --gold:#78A818; --gold-lt:#BCD96A;
+  --mut:#4E5C4B; --mut-lt:#7E8C77;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:'Schibsted Grotesk',sans-serif;line-height:1.6}
+h1,h2,h3{font-family:'DM Serif Display',serif;font-weight:400;line-height:1.15}
+img{max-width:100%}
+.wrap{max-width:860px;margin:0 auto;padding:0 20px}
+
+/* nav */
+nav.top{position:sticky;top:0;z-index:50;background:rgba(250,252,245,.95);backdrop-filter:blur(8px);
+  border-bottom:1.5px solid rgba(4,51,31,.12)}
+nav.top .wrap{display:flex;align-items:center;gap:16px;height:60px;max-width:1100px}
+nav.top img{height:30px;display:block}
+nav.top .crumbs{margin-left:auto;display:flex;gap:14px;font-size:13.5px;font-weight:800}
+nav.top .crumbs a{text-decoration:none;color:var(--mut);padding:6px 12px;border-radius:99px}
+nav.top .crumbs a.active{background:var(--ink);color:var(--gold-lt)}
+nav.top .crumbs a:hover{color:var(--green)}
+@media(max-width:560px){nav.top .crumbs a span{display:none}}
+
+/* hero modul */
+header.mod{background:var(--cream);border-bottom:1.5px solid rgba(4,51,31,.12);padding:44px 0 38px}
+header.mod .no{font-size:12px;font-weight:800;letter-spacing:.22em;color:var(--red)}
+header.mod h1{font-size:clamp(32px,5vw,48px);margin:10px 0 12px}
+header.mod p{font-size:16.5px;color:var(--mut);max-width:58ch}
+
+main{padding:40px 0 30px}
+section.blok{margin-bottom:44px}
+section.blok h2{font-size:clamp(24px,3.5vw,32px);margin-bottom:6px}
+section.blok h2 .em{color:var(--green)}
+section.blok > p{color:var(--mut);font-size:15.5px;max-width:64ch;margin-bottom:14px}
+section.blok p b{color:var(--ink)}
+
+/* panel infografis */
+.info{background:#fff;border:1.5px solid rgba(4,51,31,.15);border-radius:16px;padding:22px;
+  box-shadow:0 4px 0 rgba(4,51,31,.08);margin:14px 0}
+.info .cap{font-size:11.5px;font-weight:800;letter-spacing:.14em;color:var(--mut-lt);margin-bottom:12px}
+.info-note{font-size:13px;color:var(--mut);background:var(--cream);border-radius:10px;
+  padding:10px 14px;margin-top:12px;border:1.5px dashed rgba(4,51,31,.25)}
+
+/* baris tile */
+.tile-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.mtile{width:46px;height:auto;filter:drop-shadow(0 2.5px 0 rgba(4,51,31,.25))}
+.tile-row.sm .mtile{width:36px}
+.tile-row.lg .mtile{width:56px}
+.tile-plus{font-family:'DM Serif Display',serif;font-size:26px;color:var(--mut-lt);padding:0 6px}
+.tile-gap{width:16px}
+@media(max-width:560px){.mtile{width:36px}.tile-row.lg .mtile{width:44px}}
+
+/* keluarga tile */
+.fam{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px dashed rgba(4,51,31,.15);flex-wrap:wrap}
+.fam:last-of-type{border-bottom:none}
+.fam .fmeta{min-width:150px;flex:0 0 150px}
+.fam .fmeta b{font-size:15.5px;display:block}
+.fam .fmeta small{color:var(--mut);font-size:12.5px}
+.fam .count{margin-left:auto;align-self:center;background:var(--ink);color:var(--gold-lt);
+  font-weight:800;font-size:12.5px;padding:5px 12px;border-radius:99px;white-space:nowrap}
+.total-band{background:var(--green);color:#fff;border-radius:12px;padding:14px 18px;margin-top:14px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-weight:700}
+.total-band b{font-family:'DM Serif Display',serif;font-size:28px}
+
+/* langkah bernomor */
+.steps-v{display:grid;gap:12px}
+.step{display:flex;gap:14px;background:#fff;border:1.5px solid rgba(4,51,31,.15);border-radius:14px;
+  padding:16px 18px;box-shadow:0 3px 0 rgba(4,51,31,.07)}
+.step .n{flex:0 0 38px;height:38px;border-radius:50%;background:var(--green);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:19px}
+.step b{display:block;margin-bottom:2px}
+.step p{font-size:14px;color:var(--mut)}
+
+/* callout */
+.callout{background:var(--ink);color:var(--cream);border-radius:14px;padding:18px 22px;margin:16px 0;font-size:15px}
+.callout b{color:var(--gold-lt)}
+.callout.red{background:var(--red);color:#fff}
+.callout.red b{color:#fff;text-decoration:underline}
+
+/* tangga faan */
+.ladder{display:grid;gap:8px}
+.rung{display:flex;align-items:center;gap:14px;background:#fff;border:1.5px solid rgba(4,51,31,.15);
+  border-radius:12px;padding:10px 14px}
+.rung .fv{flex:0 0 64px;text-align:center;font-family:'DM Serif Display',serif;font-size:22px;
+  border-radius:10px;padding:6px 0;color:#fff}
+.rung .fv small{display:block;font-family:'Schibsted Grotesk',sans-serif;font-size:9.5px;
+  font-weight:800;letter-spacing:.1em;margin-top:-3px}
+.rung b{font-size:15px}
+.rung small.d{display:block;color:var(--mut);font-size:12.5px;font-weight:400}
+
+/* tabel faan */
+table.faan{width:100%;border-collapse:collapse;font-size:14px}
+table.faan th{text-align:left;font-size:11.5px;letter-spacing:.1em;color:var(--mut-lt);
+  border-bottom:2px solid var(--ink);padding:8px 10px}
+table.faan td{padding:9px 10px;border-bottom:1px dashed rgba(4,51,31,.15);vertical-align:top}
+table.faan tr:last-child td{border-bottom:none}
+table.faan .fn{font-weight:800;white-space:nowrap}
+table.faan .fn small{display:block;font-weight:400;color:var(--mut);font-size:12px}
+table.faan .fv2{font-family:'DM Serif Display',serif;font-size:19px;color:var(--green);text-align:center;white-space:nowrap}
+.table-scroll{overflow-x:auto}
+
+/* hitungan contoh */
+.calc{display:grid;gap:6px;margin-top:12px}
+.calc .line{display:flex;justify-content:space-between;gap:12px;font-size:14.5px;
+  padding:7px 12px;background:var(--cream);border-radius:9px}
+.calc .line b.v{color:var(--green);font-family:'DM Serif Display',serif;font-size:17px}
+.calc .tot{display:flex;justify-content:space-between;align-items:center;background:var(--green);
+  color:#fff;border-radius:9px;padding:10px 12px;font-weight:800}
+.calc .tot b{font-family:'DM Serif Display',serif;font-size:24px}
+
+/* do & don't */
+.dodont{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:640px){.dodont{grid-template-columns:1fr}}
+.dd{border-radius:14px;padding:18px;border:2px solid}
+.dd.do{border-color:var(--green);background:#fff}
+.dd.dont{border-color:var(--red);background:#fff}
+.dd h3{font-size:19px;margin-bottom:10px}
+.dd.do h3{color:var(--green)}.dd.dont h3{color:var(--red)}
+.dd ul{list-style:none}
+.dd li{font-size:14px;color:var(--mut);padding:7px 0 7px 26px;position:relative;border-bottom:1px dashed rgba(4,51,31,.12)}
+.dd li:last-child{border-bottom:none}
+.dd.do li::before{content:"✓";color:var(--green);font-weight:800;position:absolute;left:2px}
+.dd.dont li::before{content:"✕";color:var(--red);font-weight:800;position:absolute;left:2px}
+
+/* gelembung ucapan */
+.bubbles{display:flex;gap:14px;flex-wrap:wrap}
+.bub{background:#fff;border:2px solid var(--ink);border-radius:16px;padding:14px 18px;position:relative;
+  box-shadow:0 3px 0 rgba(4,51,31,.2);flex:1;min-width:200px}
+.bub b{font-family:'DM Serif Display',serif;font-size:22px;color:var(--green)}
+.bub.r b{color:var(--red)}
+.bub p{font-size:13px;color:var(--mut);margin-top:4px}
+
+/* navigasi modul bawah */
+.mod-nav{display:flex;gap:14px;margin:36px 0 50px;flex-wrap:wrap}
+.mod-nav a{flex:1;min-width:220px;text-decoration:none;background:#fff;border:1.5px solid rgba(4,51,31,.2);
+  border-radius:14px;padding:16px 18px;color:var(--ink);box-shadow:0 3px 0 rgba(4,51,31,.1)}
+.mod-nav a:hover{border-color:var(--green)}
+.mod-nav small{font-size:11px;font-weight:800;letter-spacing:.14em;color:var(--mut-lt)}
+.mod-nav b{display:block;font-family:'DM Serif Display',serif;font-size:18px;font-weight:400}
+.mod-nav a.next{background:var(--green);color:#fff;border-color:var(--green-dk);box-shadow:0 3px 0 var(--green-dk)}
+.mod-nav a.next small{color:var(--gold-lt)}
+
+footer.foot{background:var(--ink);color:var(--cream);padding:28px 0;text-align:center;font-size:13.5px}
+footer.foot a{color:var(--gold-lt);font-weight:800}

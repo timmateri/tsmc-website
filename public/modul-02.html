@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modul 02: Menghitung Faan — TSMC</title>
+<meta name="description" content="Cara menghitung faan mahjong Hong Kong style: tangga faan, tabel lengkap yang dipakai komunitas TSMC, dan contoh hitung langkah demi langkah.">
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="theme-color" content="#087048">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Schibsted+Grotesk:wght@400;500;700;800&family=Noto+Serif+TC:wght@600;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/belajar.css">
+</head>
+<body>
+
+<nav class="top"><div class="wrap">
+  <a href="/"><img src="/tsmc-logo.png" alt="The Social Mahjong Club"></a>
+  <div class="crumbs">
+    <a href="/modul-01">01<span> · Tile &amp; Meja</span></a>
+    <a href="/modul-02" class="active">02<span> · Faan</span></a>
+    <a href="/modul-03">03<span> · Etika</span></a>
+  </div>
+</div></nav>
+
+<header class="mod"><div class="wrap">
+  <div class="no">MODUL 02 · NAIK LEVEL</div>
+  <h1>Menghitung Faan</h1>
+  <p>Menang itu satu hal — tapi menang <i>berapa</i>, itu urusan faan. Modul ini bikin kamu bisa menghitung nilai tanganmu sendiri, dari chicken hand yang malu-maluin sampai limit hand yang bakal diceritakan orang bertahun-tahun.</p>
+</div></header>
+
+<main class="wrap">
+
+<section class="blok">
+  <h2>Faan itu <span class="em">apa?</span></h2>
+  <p><b>Faan (番)</b> adalah "nilai" tangan kemenanganmu. Makin sulit dan makin rapi pola tanganmu, makin banyak faan-nya. Satu tangan bisa mengumpulkan faan dari beberapa sumber sekaligus — polanya, cara menangnya, sampai tile bunga yang kamu dapat. Tinggal dijumlah semua.</p>
+  <div class="callout">📌 <b>House rule TSMC:</b> minimal <b>3 faan</b> untuk boleh menyatakan menang, dan maksimum dihitung <b>13 faan</b> (limit). Kita tidak main uang — faan dipakai untuk poin di papan skor dan gengsi di grup WA. 😎</div>
+</section>
+
+<section class="blok">
+  <h2>Tangga <span class="em">faan</span></h2>
+  <p>Supaya kebayang petanya, ini tangga nilai dari terendah sampai tertinggi:</p>
+  <div class="ladder">
+    <div class="rung"><div class="fv" style="background:#7E8C77">0<small>FAAN</small></div><div><b>Gai Wu — "chicken hand"</b><small class="d">Menang tapi tanpa pola apa pun. Sah secara bentuk, tapi di bawah minimum — siap-siap diketawain semeja.</small></div></div>
+    <div class="rung"><div class="fv" style="background:#78A818">1<small>FAAN</small></div><div><b>Bonus-bonus kecil</b><small class="d">Semua chow, menang ambil sendiri, pong naga, bunga sesuai posisi duduk, dan kawan-kawannya. Ditumpuk-tumpuk biar tembus minimum.</small></div></div>
+    <div class="rung"><div class="fv" style="background:#087048">3<small>FAAN</small></div><div><b>Pola serius pertama</b><small class="d">Semua pong, atau satu keluarga campur honor. Ini target paling realistis buat pemula.</small></div></div>
+    <div class="rung"><div class="fv" style="background:#04552F">5–8<small>FAAN</small></div><div><b>Tangan bergengsi</b><small class="d">Little three dragons, satu keluarga murni, great three dragons. Semeja mulai berhenti mengobrol kalau kamu terlihat mengejar ini.</small></div></div>
+    <div class="rung"><div class="fv" style="background:#C02028">13<small>LIMIT</small></div><div><b>Tangan legendaris</b><small class="d">Thirteen orphans, great four winds. Sekali seumur hidup — wajib difoto buat galeri TSMC. 📸</small></div></div>
+  </div>
+</section>
+
+<section class="blok">
+  <h2>Tabel faan <span class="em">standar TSMC</span></h2>
+  <p>Ini tabel yang kita pakai di semua sesi. (Tiap rumah/komunitas bisa sedikit beda — kalau main di luar, tanya dulu aturannya!)</p>
+  <div class="info">
+    <div class="table-scroll">
+    <table class="faan">
+      <tr><th>TANGAN / KONDISI</th><th>CARA DAPATNYA</th><th>FAAN</th></tr>
+      <tr><td class="fn">Ping Wu<small>平和 · semua chow</small></td><td>4 set semuanya urutan (chow), tanpa pong.</td><td class="fv2">1</td></tr>
+      <tr><td class="fn">Zi Mo<small>自摸 · ambil sendiri</small></td><td>Tile kemenangan diambil sendiri dari tembok, bukan dari buangan lawan.</td><td class="fv2">1</td></tr>
+      <tr><td class="fn">Pong naga<small>中 · 發 · 白</small></td><td>Tiap set pong/gong naga dihitung terpisah.</td><td class="fv2">1</td></tr>
+      <tr><td class="fn">Pong angin duduk<small>atau angin putaran</small></td><td>Pong angin yang sesuai posisi dudukmu / putaran saat itu.</td><td class="fv2">1</td></tr>
+      <tr><td class="fn">Bunga posisi<small>花 sesuai arah duduk</small></td><td>Tile bunga bernomor sama dengan posisi dudukmu (Timur=1, dst).</td><td class="fv2">1</td></tr>
+      <tr><td class="fn">Mou Fa<small>tanpa bunga sama sekali</small></td><td>Sampai menang tidak pernah dapat satu pun tile bunga.</td><td class="fv2">1</td></tr>
+      <tr><td class="fn">Dui Dui Wu<small>對對和 · semua pong</small></td><td>4 set semuanya kembar (pong/gong), tanpa chow.</td><td class="fv2">3</td></tr>
+      <tr><td class="fn">Wun Yat Sik<small>混一色 · campur satu keluarga</small></td><td>Seluruh tangan hanya 1 keluarga angka + angin/naga.</td><td class="fv2">3</td></tr>
+      <tr><td class="fn">Siu Sam Yun<small>小三元 · naga kecil</small></td><td>2 pong naga + pasang naga ketiga sebagai mata.</td><td class="fv2">5</td></tr>
+      <tr><td class="fn">Ching Yat Sik<small>清一色 · murni satu keluarga</small></td><td>Seluruh tangan hanya 1 keluarga angka, tanpa angin/naga.</td><td class="fv2">7</td></tr>
+      <tr><td class="fn">Dai Sam Yun<small>大三元 · naga besar</small></td><td>3 pong naga lengkap: 中 + 發 + 白.</td><td class="fv2">8</td></tr>
+      <tr><td class="fn">Sap Sam Yiu<small>十三幺 · thirteen orphans</small></td><td>Satu dari tiap 1, 9, angin, dan naga + satu kembarannya.</td><td class="fv2">13</td></tr>
+      <tr><td class="fn">Dai Sei Hei<small>大四喜 · empat angin besar</small></td><td>4 pong angin lengkap. Hampir mustahil. Hampir.</td><td class="fv2">13</td></tr>
+    </table>
+    </div>
+    <div class="info-note">Faan bisa ditumpuk: misalnya semua pong (3) + campur satu keluarga (3) + zi mo (1) dihitung semuanya. Maksimum tetap 13.</div>
+  </div>
+</section>
+
+<section class="blok">
+  <h2>Latihan: <span class="em">hitung bareng</span></h2>
+  <p>Teori tanpa contoh itu seperti pong tanpa tile ketiga. Ayo hitung dua tangan ini:</p>
+
+  <div class="info">
+    <div class="cap">CONTOH 1 — TANGAN PEMULA YANG LOLOS MINIMUM (3 FAAN)</div>
+    <div class="tile-row" data-tiles="sok:1,sok:2,sok:3,|,sok:5,sok:6,sok:7,|,sok:8,sok:8,sok:8,|,wind:w,wind:w,wind:w,|,dragon:b,dragon:b"></div>
+    <div class="calc">
+      <div class="line"><span>Semua tile cuma bambu + angin/naga → <b>Wun Yat Sik</b></span><b class="v">+3</b></div>
+      <div class="tot"><span>TOTAL — lolos minimum, sah menang!</span><b>3 FAAN</b></div>
+    </div>
+  </div>
+
+  <div class="info">
+    <div class="cap">CONTOH 2 — TANGAN YANG BIKIN SEMEJA TEPUK TANGAN</div>
+    <div class="tile-row" data-tiles="tung:3,tung:3,tung:3,|,tung:5,tung:5,tung:5,|,tung:9,tung:9,tung:9,|,dragon:c,dragon:c,dragon:c,|,wind:e,wind:e"></div>
+    <div class="calc">
+      <div class="line"><span>Empat set semuanya kembar → <b>Dui Dui Wu</b></span><b class="v">+3</b></div>
+      <div class="line"><span>Hanya lingkaran + honor → <b>Wun Yat Sik</b></span><b class="v">+3</b></div>
+      <div class="line"><span>Ada pong naga merah 中 → <b>pong naga</b></span><b class="v">+1</b></div>
+      <div class="line"><span>Tile terakhir diambil sendiri → <b>Zi Mo</b></span><b class="v">+1</b></div>
+      <div class="tot"><span>TOTAL</span><b>8 FAAN</b></div>
+    </div>
+  </div>
+
+  <div class="callout">🎯 <b>Strategi pemula:</b> jangan pusing mengejar tangan legendaris. Dua jalan paling gampang menuju 3 faan: kumpulkan <b>satu keluarga saja</b> (Wun Yat Sik), atau <b>kembar semua</b> (Dui Dui Wu). Pilih satu arah sejak awal, buang keluarga lain lebih dulu.</div>
+</section>
+
+<div class="mod-nav">
+  <a href="/modul-01"><small>← MODUL 01</small><b>Kenali Tile &amp; Meja</b></a>
+  <a href="/modul-03" class="next"><small>LANJUT · MODUL 03 →</small><b>Etika &amp; Ritme Permainan</b></a>
+</div>
+
+</main>
+
+<footer class="foot"><div class="wrap">
+  Sudah bisa berhitung? <a href="/#jadwal">Buktikan di meja — book slot →</a>
+</div></footer>
+
+<script src="/belajar.js"></script>
+</body>
+</html>
