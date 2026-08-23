@@ -1,5 +1,9 @@
 // ============================================================
-// TSMC — Penggambar tile mahjong (SVG)
+// TSMC — Penggambar tile mahjong (SVG), mengikuti set standar:
+//  · 1 sok = burung (bukan batang)
+//  · 5 sok batang tengah merah · 7 sok batang atas merah
+//  · 8 sok susunan miring M/W · 9 sok baris tengah merah
+//  · pola warna lingkaran (tung) mengikuti set klasik
 // Pakai: <span data-tile="wan:3"></span>  atau
 //        <div class="tile-row" data-tiles="tung:1,tung:2,sok:5"></div>
 // Jenis: wan:1-9 · tung:1-9 · sok:1-9 · wind:e/s/w/n ·
@@ -9,7 +13,6 @@
 (function () {
   const INK = '#04331F', RED = '#C02028', GREEN = '#087048', BLUE = '#1E4D8C';
   const NUM_CN = ['', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
-  const DOT_COLORS = [GREEN, RED, BLUE];
 
   function text(x, y, size, fill, ch, weight) {
     return `<text x="${x}" y="${y}" font-size="${size}" text-anchor="middle" ` +
@@ -23,7 +26,6 @@
       `<circle cx="${x}" cy="${y}" r="${r * 0.18}" fill="${col}"/>`;
   }
   const TUNG = {
-    1: [[30, 42, 15]],
     2: [[30, 25, 9], [30, 59, 9]],
     3: [[17, 21, 8], [30, 42, 8], [43, 63, 8]],
     4: [[19, 25, 8], [41, 25, 8], [19, 59, 8], [41, 59, 8]],
@@ -33,39 +35,104 @@
     8: [[19, 17, 6], [41, 17, 6], [19, 34, 6], [41, 34, 6], [19, 51, 6], [41, 51, 6], [19, 68, 6], [41, 68, 6]],
     9: [[16, 21, 6], [30, 21, 6], [44, 21, 6], [16, 42, 6], [30, 42, 6], [44, 42, 6], [16, 63, 6], [30, 63, 6], [44, 63, 6]],
   };
+  // pola warna per angka, mengikuti set klasik
+  const TUNG_COLS = {
+    2: [GREEN, BLUE],
+    3: [BLUE, RED, GREEN],
+    4: [BLUE, GREEN, GREEN, BLUE],
+    5: [BLUE, GREEN, RED, GREEN, BLUE],
+    6: [GREEN, GREEN, RED, RED, RED, RED],
+    7: [GREEN, GREEN, GREEN, RED, RED, RED, RED],
+    8: [BLUE, BLUE, BLUE, BLUE, BLUE, BLUE, BLUE, BLUE],
+    9: [GREEN, GREEN, GREEN, RED, RED, RED, BLUE, BLUE, BLUE],
+  };
   function circles(n) {
-    return (TUNG[n] || []).map((d, i) =>
-      dot(d[0], d[1], d[2], DOT_COLORS[i % 3])).join('');
+    if (n === 1) {
+      // 1 tung: satu lingkaran besar berhias
+      let s = `<circle cx="30" cy="42" r="17" fill="${GREEN}"/>` +
+        `<circle cx="30" cy="42" r="12" fill="#fff"/>` +
+        `<circle cx="30" cy="42" r="7" fill="${RED}"/>` +
+        `<circle cx="30" cy="42" r="2.2" fill="#fff"/>`;
+      for (let i = 0; i < 8; i++) {
+        const a = Math.PI / 4 * i;
+        s += `<circle cx="${30 + Math.cos(a) * 9.6}" cy="${42 + Math.sin(a) * 9.6}" r="1.5" fill="${GREEN}"/>`;
+      }
+      return s;
+    }
+    const cols = TUNG_COLS[n] || [];
+    return (TUNG[n] || []).map((d, i) => dot(d[0], d[1], d[2], cols[i] || GREEN)).join('');
   }
 
   // ---- batang bambu (sok) ----
-  function stick(x, y, h, col) {
+  function stick(x, y, h, col, rot) {
     const w = 8;
-    return `<rect x="${x - w / 2}" y="${y - h / 2}" width="${w}" height="${h}" rx="3.5" fill="${col}"/>` +
+    const r = `<rect x="${x - w / 2}" y="${y - h / 2}" width="${w}" height="${h}" rx="3.5" fill="${col}"/>` +
       `<rect x="${x - w / 2}" y="${y - 2}" width="${w}" height="4" fill="#fff" opacity="0.55"/>`;
+    return rot ? `<g transform="rotate(${rot} ${x} ${y})">${r}</g>` : r;
   }
   const SOK = { // baris: [y, tinggi, [x...]]
-    1: [[42, 34, [30]]],
     2: [[25, 24, [30]], [59, 24, [30]]],
     3: [[24, 24, [30]], [60, 24, [19, 41]]],
     4: [[25, 24, [19, 41]], [59, 24, [19, 41]]],
     5: [[21, 20, [18, 42]], [42, 20, [30]], [63, 20, [18, 42]]],
     6: [[25, 24, [16, 30, 44]], [59, 24, [16, 30, 44]]],
     7: [[17, 16, [30]], [42, 18, [16, 30, 44]], [65, 18, [16, 30, 44]]],
-    8: [[21, 20, [13, 24.5, 35.5, 47]], [63, 20, [13, 24.5, 35.5, 47]]],
     9: [[18, 16, [16, 30, 44]], [42, 16, [16, 30, 44]], [66, 16, [16, 30, 44]]],
   };
+  // batang merah per angka (indeks urut baris atas→bawah, kiri→kanan) — sesuai set standar
+  const SOK_RED = { 5: [2], 7: [0], 9: [3, 4, 5] };
+
+  // 1 sok: burung (ciri khas set standar)
+  function sokBird() {
+    return `
+      <g>
+        <path d="M40 60 q9 3 13 -3" stroke="${GREEN}" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+        <path d="M39 64 q8 7 13 5" stroke="${RED}" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+        <path d="M37 68 q5 9 11 10" stroke="${GREEN}" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+        <ellipse cx="31" cy="47" rx="11.5" ry="15.5" fill="${GREEN}" transform="rotate(-18 31 47)"/>
+        <path d="M33 40 q11 -3 14 6 q-9 4 -14 0 z" fill="${RED}"/>
+        <circle cx="22" cy="26" r="7.2" fill="${GREEN}"/>
+        <path d="M15.5 24.5 L6.5 27.5 L15.5 30 z" fill="${RED}"/>
+        <circle cx="21" cy="24.5" r="1.7" fill="#fff"/>
+        <path d="M22 19.5 l2.5 -5 M25 20.5 l4 -3.5" stroke="${RED}" stroke-width="2" stroke-linecap="round"/>
+        <path d="M26 62 l-2.5 11 M31.5 63 l0.5 10.5" stroke="${INK}" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M20 73 h7 M28.5 73.5 h7" stroke="${INK}" stroke-width="2.2" stroke-linecap="round"/>
+      </g>`;
+  }
+
   function sticks(n) {
+    if (n === 1) return sokBird();
+    if (n === 8) {
+      // 8 sok: dua kelompok miring membentuk M / W
+      const top = [stick(16, 25, 22, GREEN, 16), stick(26.5, 25, 22, GREEN, -16),
+        stick(33.5, 25, 22, GREEN, 16), stick(44, 25, 22, GREEN, -16)];
+      const bot = [stick(16, 59, 22, GREEN, -16), stick(26.5, 59, 22, GREEN, 16),
+        stick(33.5, 59, 22, GREEN, -16), stick(44, 59, 22, GREEN, 16)];
+      return top.join('') + bot.join('');
+    }
     const rows = SOK[n] || [];
     const all = [];
     rows.forEach(r => r[2].forEach(x => all.push([x, r[0], r[1]])));
-    // batang paling tengah dibuat merah pada jumlah ganjil (gaya set klasik)
-    const midIdx = n % 2 === 1 ? Math.floor(all.length / 2) : -1;
+    const reds = SOK_RED[n] || [];
     return all.map((s, i) =>
-      stick(s[0], s[1], s[2], i === midIdx ? RED : GREEN)).join('');
+      stick(s[0], s[1], s[2], reds.includes(i) ? RED : GREEN)).join('');
   }
 
   const WINDS = { e: '東', s: '南', w: '西', n: '北' };
+
+  // bunga: kelopak seperti tile bunga asli + huruf kecil di pojok
+  function flowerFace() {
+    let s = '';
+    for (let i = 0; i < 8; i++) {
+      s += `<ellipse cx="30" cy="47" rx="4.6" ry="12" fill="${GREEN}" opacity="0.9"
+        transform="rotate(${i * 45} 30 47) translate(0 -10.5)"/>`;
+    }
+    s += `<circle cx="30" cy="47" r="6.4" fill="${RED}"/>` +
+      `<circle cx="27.8" cy="45" r="1.5" fill="#fff"/><circle cx="32.2" cy="45" r="1.5" fill="#fff"/>` +
+      `<circle cx="27.8" cy="49" r="1.5" fill="#fff"/><circle cx="32.2" cy="49" r="1.5" fill="#fff"/>` +
+      text(13, 18, 12, RED, '花');
+    return s;
+  }
 
   function tileSVG(spec) {
     const [kind, val] = spec.split(':');
@@ -87,7 +154,7 @@
       else { inner = `<rect x="14" y="20" width="32" height="44" rx="4" fill="none" stroke="${BLUE}" stroke-width="3"/>` +
         `<rect x="20" y="27" width="20" height="30" rx="2" fill="none" stroke="${BLUE}" stroke-width="2"/>`; label = 'naga putih'; }
     } else if (kind === 'flower') {
-      inner = text(30, 48, 30, RED, '花') + text(30, 72, 13, GREEN, '❀', 400);
+      inner = flowerFace();
       label = 'bunga';
     } else if (kind === 'back') {
       inner = `<rect x="7" y="7" width="46" height="70" rx="6" fill="${GREEN}"/>` +
