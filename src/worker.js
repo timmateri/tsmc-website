@@ -16,8 +16,11 @@ function err(message, status = 400) {
   return json({ ok: false, error: message }, status);
 }
 
-// Booking yang belum dibayar lebih dari 24 jam tidak lagi menahan kursi
+// Booking yang belum dibayar lebih dari 24 jam tidak lagi menahan kursi —
+// KECUALI metode "bayar di tempat": kursinya ditahan sampai hari sesi,
+// karena memang baru dibayar di venue.
 const HOLD_EXPR = `(b.status IN ('confirmed','verifying')
+  OR (b.status = 'pending' AND b.method = 'venue')
   OR (b.status = 'pending' AND b.created_at > datetime('now','-1 day')))`;
 
 // Kode booking acak, contoh: TSMC-7KQ4
@@ -211,13 +214,15 @@ export default {
             .then((r) => r.results),
           getSettings(db),
         ]);
-        // daftar peserta per jadwal (hanya yang sudah bayar / terkonfirmasi),
-        // nama sudah disingkat di server demi privasi
+        // daftar peserta per jadwal: yang sudah bayar/terkonfirmasi + yang
+        // memilih bayar di tempat (langsung tampil dengan keterangan).
+        // Nama sudah disingkat di server demi privasi.
         if (schedules.length) {
           const ids = schedules.map((s) => s.id);
           const { results: parts } = await db.prepare(`
-            SELECT schedule_id, name, seats, status, level FROM bookings
-            WHERE status IN ('confirmed','verifying')
+            SELECT schedule_id, name, seats, status, method, level FROM bookings
+            WHERE (status IN ('confirmed','verifying')
+                   OR (status = 'pending' AND method = 'venue'))
               AND schedule_id IN (${ids.map(() => '?').join(',')})
             ORDER BY id ASC
           `).bind(...ids).all();
@@ -228,6 +233,10 @@ export default {
               x: Math.max(0, p.seats - 1),   // kursi ekstra yang dia bawa
               v: p.status === 'verifying' ? 1 : 0,
               l: p.level || '',              // level bermain (N/B/I)
+              // status bayar untuk badge di daftar peserta:
+              // 'l' = lunas (terkonfirmasi) · 'v' = bayar di tempat · '' = lainnya
+              pay: p.status === 'confirmed' ? 'l'
+                : (p.status === 'pending' && p.method === 'venue') ? 'v' : '',
             });
           }
           for (const s of schedules) s.players = byId[s.id] || [];

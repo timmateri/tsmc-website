@@ -175,6 +175,11 @@ section{padding:64px 0}
 .players ol{margin:5px 0 0;padding-left:22px}
 .players ol li{padding:1.5px 0}
 .players .pend{margin-top:5px;font-size:12px;opacity:.8}
+/* keterangan pembayaran di kanan level */
+.players .paidmark{height:13px;width:auto;vertical-align:-2px;margin-left:7px}
+.players .venuemark{font-size:10.5px;font-weight:800;letter-spacing:.03em;color:#8a6d1c;
+  background:rgba(201,165,74,.16);border:1px solid rgba(201,165,74,.5);
+  border-radius:99px;padding:1.5px 8px;margin-left:7px;white-space:nowrap;vertical-align:1px}
 .lvl{display:inline-block;font-style:normal;font-weight:800;font-size:10px;line-height:1;
   padding:2.5px 5px;border-radius:5px;color:#fff;margin-left:3px;vertical-align:1px}
 .lvl-legend{font-size:12.5px;color:var(--mut);margin:-10px 0 22px;line-height:1.7}
@@ -384,7 +389,7 @@ footer small{opacity:.7;display:block;margin-top:4px}
       <div id="mybk-list"></div>
     </div>
     <div class="sched-grid" id="sched-grid"></div>
-    <div class="paynote">Pembayaran: QRIS, transfer bank, atau bayar di tempat. Slot dianggap hangus jika belum hadir 15 menit setelah sesi dimulai. Booking yang belum dibayar dalam 24 jam otomatis dilepas.</div>
+    <div class="paynote">Pembayaran: QRIS, transfer bank, atau bayar di tempat. Slot dianggap hangus jika belum hadir 15 menit setelah sesi dimulai. Booking QRIS/transfer yang belum dibayar dalam 24 jam otomatis dilepas; yang memilih bayar di tempat kursinya ditahan sampai hari sesi.</div>
   </div>
 </section>
 
@@ -662,14 +667,20 @@ function renderSchedules(list){
   }).join('');
 }
 
-// Daftar peserta terkonfirmasi sebagai list bernomor ke bawah.
+// Daftar peserta sebagai list bernomor ke bawah.
 // Kursi ekstra (+1) ditampilkan sebagai baris sendiri dengan nama yang sama.
-// Kursi yang masih menunggu pembayaran (pending) disebut jujur, tanpa nama.
+// Keterangan bayar di kanan level: stempel LUNAS (terkonfirmasi) atau
+// "bayar di tempat". Kursi pending QRIS/transfer disebut jujur, tanpa nama.
+function payMark(p){
+  if(p.pay === 'l') return '<img src="/lunas.png" class="paidmark" alt="LUNAS" title="Sudah bayar — terkonfirmasi">';
+  if(p.pay === 'v') return '<span class="venuemark" title="Membayar langsung di venue">bayar di tempat</span>';
+  return '';
+}
 function renderPlayers(s){
   const players = s.players || [];
   const seats = players.flatMap(p =>
     Array.from({length: 1 + (p.x || 0)}, () =>
-      `<li class="${p.v ? 'verif' : ''}">${esc(p.n)}${p.l ? `<i class="lvl" style="background:${LVL_COLOR[p.l] || '#6B7A66'}" title="${LVL_NAME[p.l] || ''}">${p.l}</i>` : ''}</li>`));
+      `<li class="${p.v ? 'verif' : ''}">${esc(p.n)}${p.l ? `<i class="lvl" style="background:${LVL_COLOR[p.l] || '#6B7A66'}" title="${LVL_NAME[p.l] || ''}">${p.l}</i>` : ''}${payMark(p)}</li>`));
   const pending = Math.max(0, s.booked - players.reduce((t, p) => t + 1 + (p.x || 0), 0));
   if(!seats.length){
     return `<div class="players">👥 ${pending > 0
