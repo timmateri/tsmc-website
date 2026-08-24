@@ -780,6 +780,7 @@ function openBooking(id){
   document.getElementById('bk-step2').classList.add('hidden');
   document.getElementById('bk-step3').classList.add('hidden');
   document.getElementById('bk-err').textContent = '';
+  document.getElementById('bk-submit').disabled = false; // pastikan tombol hidup lagi setelah booking sebelumnya
   // isi otomatis dari booking sebelumnya di perangkat ini
   const nm = document.getElementById('bk-name'), wan = document.getElementById('bk-wa');
   if(!nm.value) nm.value = stored('tsmc_name');
@@ -866,8 +867,12 @@ async function submitBooking(allowWaitlist){
     document.getElementById('bk-step1').classList.add('hidden');
     document.getElementById('bk-step2').classList.remove('hidden');
   }catch(e){ errEl.textContent = e.message; }
-  btn.disabled = false;
-  btn.textContent = useReward ? 'Klaim Permainan Gratis 🎁' : 'Lanjut ke Pembayaran';
+  finally{
+    // finally ikut berjalan pada jalur "return" dini (venue/waitlist/reward),
+    // jadi tombol tidak pernah tertinggal dalam keadaan mati
+    btn.disabled = false;
+    btn.textContent = useReward ? 'Klaim Permainan Gratis 🎁' : 'Lanjut ke Pembayaran';
+  }
 }
 
 function setWaAdmin(wa, text){
