@@ -315,10 +315,12 @@ async function loadBookings(){
   const d = await api('/api/admin/bookings' + (sid ? '?schedule_id=' + sid : ''));
   const list = d.bookings;
   $('bk-count').textContent = list.length + ' booking';
+  if(!PAY_SETTINGS){ try{ PAY_SETTINGS = (await api('/api/admin/settings')).settings || {}; }catch(e){ PAY_SETTINGS = {}; } }
   $('bk-list').innerHTML = list.length ? list.map(b => {
     const [label, color] = ST[b.status] || [b.status, '#6B7A66'];
     const wa = b.wa.replace(/[^0-9]/g,'').replace(/^0/, '62');
     const isReward = b.method === 'reward';
+    const canChgMethod = !isReward && ['pending','waitlist'].includes(b.status);
     return `<div class="card"${isReward ? ' style="border-color:var(--red)"' : ''}>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
         <b>${esc(b.code)}</b> · ${esc(b.name)} · ${b.seats} kursi ·
@@ -327,13 +329,18 @@ async function loadBookings(){
         <span class="pill" style="background:${color}">${label}</span>
       </div>
       <div class="mut">${fmtTgl(b.date)} ${esc(b.time_start)} · ${esc(b.venue)} · total ${isReward ? 'GRATIS (5 stempel)' : rupiah(b.fee * b.seats)}
-        · <a href="https://wa.me/${wa}" target="_blank" style="color:var(--green);font-weight:800">WA ${esc(b.wa)} ↗</a></div>
+        · <a href="https://wa.me/${wa}?text=${encodeURIComponent(waTemplate(b))}" target="_blank" style="color:var(--green);font-weight:800" title="Buka WA dengan pesan siap kirim sesuai status booking">WA ${esc(b.wa)} ↗</a></div>
       ${b.proof ? `<img src="${b.proof}" class="proof-thumb" onclick="viewImg(this.src)" title="Klik untuk perbesar">`
         : '<div class="mut" style="font-style:italic">Belum ada bukti bayar</div>'}
-      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center">
         ${b.status !== 'confirmed' ? `<button class="btn sm" onclick="setBooking(${b.id},'confirmed')">✓ Konfirmasi</button>` : ''}
         ${b.status !== 'canceled' ? `<button class="btn red sm" onclick="if(confirm('Batalkan booking ${esc(b.code)}?'))setBooking(${b.id},'canceled')">✕ Batalkan</button>` : ''}
         ${b.status === 'canceled' ? `<button class="btn ghost sm" onclick="setBooking(${b.id},'pending')">Aktifkan lagi</button>` : ''}
+        ${canChgMethod ? `<select onchange="if(this.value)changeMethod(${b.id}, this.value)" title="Ubah metode pembayaran (mis. user minta ganti via WA)"
+            style="padding:6px 10px;border-radius:9px;border:1.5px solid rgba(4,51,31,.3);font-family:inherit;font-size:13px">
+            <option value="">↔ Ubah metode…</option>
+            ${['qris','transfer','venue'].filter(x => x !== b.method).map(x => `<option value="${x}">jadi: ${METHOD_LABEL[x]}</option>`).join('')}
+          </select>` : ''}
       </div>
     </div>`;
   }).join('') : '<p class="mut">Belum ada booking.</p>';
@@ -342,6 +349,32 @@ async function setBooking(id, status){
   await api('/api/admin/bookings/' + id, {method:'POST', body: JSON.stringify({status})});
   flash(status === 'confirmed' ? 'Booking dikonfirmasi ✓' : 'Booking diperbarui');
   loadBookings();
+}
+async function changeMethod(id, m){
+  try{
+    await api('/api/admin/bookings/' + id, {method:'POST', body: JSON.stringify({method: m})});
+    flash('Metode pembayaran diubah → ' + METHOD_LABEL[m]);
+  }catch(e){ alert(e.message); }
+  loadBookings();
+}
+/* pesan WA siap kirim, menyesuaikan status booking */
+let PAY_SETTINGS = null;
+function waTemplate(b){
+  const s = PAY_SETTINGS || {};
+  const nama = b.name.trim().split(/\s+/)[0];
+  if(b.method === 'reward')
+    return `Halo, ${nama}. Klaim permainan gratis kamu (booking ${b.code}) sudah kami terima dan sedang kami cek. Terima kasih sudah rajin main bareng TSMC! 🀄`;
+  if(b.status === 'pending' && b.method === 'venue')
+    return `Halo, ${nama}. Booking nomor ${b.code} sudah kami terima dengan metode bayar di tempat — kursimu sudah dikunci. Pembayaran dilakukan di venue sebelum sesi dimulai ya. Sampai jumpa! 🀄`;
+  if(b.status === 'pending')
+    return `Halo, ${nama}. Kami sudah menerima booking nomor ${b.code} dan masih menunggu pembayaran darimu. Pembayaran dapat dilakukan dengan cara:\n- Transfer rekening ${s.bank_name || ''} an ${s.bank_holder || ''} ${s.bank_account || ''}\n- QRIS\n- Bayar di tempat\nMohon untuk dapat mengirimkan konfirmasi pembayaran sehingga kami dapat mengonfirmasi booking-anmu. Terima kasih`;
+  if(b.status === 'verifying')
+    return `Halo, ${nama}. Bukti pembayaran untuk booking ${b.code} sudah kami terima dan sedang diverifikasi. Konfirmasi menyusul sebentar lagi ya. Terima kasih!`;
+  if(b.status === 'waitlist')
+    return `Halo, ${nama}. Kamu saat ini ada di waiting list untuk booking ${b.code}. Begitu ada kursi kosong kami langsung kabari ya. Terima kasih sudah sabar menunggu! 🀄`;
+  if(b.status === 'confirmed')
+    return `Halo, ${nama}. Booking ${b.code} kamu sudah TERKONFIRMASI ✓ Sampai jumpa di meja! 🀄`;
+  return `Halo, ${nama}. Mengenai booking ${b.code} kamu di TSMC…`;
 }
 
 /* ===== anggota & stempel ===== */

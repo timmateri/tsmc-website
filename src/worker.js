@@ -347,6 +347,30 @@ export default {
         return json({ ok: true });
       }
 
+      // Ubah metode pembayaran oleh user sendiri — hanya booking miliknya
+      // (kode + nomor WA harus cocok) dan hanya selama belum dibayar.
+      if (path === '/api/bookings/change-method' && method === 'POST') {
+        const b = await req.json();
+        const code = (b.code || '').toUpperCase().trim();
+        const wa = (b.wa || '').replace(/[^0-9+]/g, '');
+        if (!['qris', 'transfer', 'venue'].includes(b.method)) return err('Metode tidak dikenal.');
+        if (!code || wa.length < 9) return err('Kode booking / nomor WA tidak valid.');
+        const row = await env.DB.prepare(
+          'SELECT id, method, status, wa FROM bookings WHERE code = ?'
+        ).bind(code).first();
+        if (!row || row.wa !== wa) return err('Booking tidak ditemukan.', 404);
+        if (row.method === 'reward') return err('Klaim reward tidak punya metode pembayaran.');
+        if (!['pending', 'waitlist'].includes(row.status)) {
+          return err('Metode hanya bisa diubah selama booking belum dibayar/dikonfirmasi.');
+        }
+        await env.DB.prepare('UPDATE bookings SET method = ? WHERE id = ?').bind(b.method, row.id).run();
+        const s = await getSettings(env.DB);
+        return json({ ok: true, method: b.method, payment: {
+          bank_name: s.bank_name, bank_account: s.bank_account,
+          bank_holder: s.bank_holder, qris_image: s.qris_image, wa_admin: s.wa_admin,
+        } });
+      }
+
       // Kartu loyalty berdasarkan nomor WA
       if (path === '/api/loyalty' && method === 'GET') {
         const wa = (url.searchParams.get('wa') || '').replace(/[^0-9+]/g, '');
@@ -416,6 +440,19 @@ export default {
           const m = path.match(/^\/api\/admin\/bookings\/(\d+)$/);
           if (m && method === 'POST') {
             const b = await req.json();
+            // ubah metode pembayaran (mis. user minta ganti via WA) —
+            // hanya untuk booking yang belum dibayar, bukan klaim reward
+            if (b.method !== undefined) {
+              if (!['qris', 'transfer', 'venue'].includes(b.method)) return err('Metode tidak dikenal.');
+              const row = await db.prepare('SELECT method, status FROM bookings WHERE id = ?').bind(m[1]).first();
+              if (!row) return err('Booking tidak ditemukan.', 404);
+              if (row.method === 'reward') return err('Klaim reward tidak punya metode pembayaran.');
+              if (!['pending', 'waitlist'].includes(row.status)) {
+                return err('Metode hanya bisa diubah selama booking belum dibayar/dikonfirmasi.');
+              }
+              await db.prepare('UPDATE bookings SET method = ? WHERE id = ?').bind(b.method, m[1]).run();
+              return json({ ok: true });
+            }
             const ok = ['pending', 'verifying', 'confirmed', 'canceled', 'waitlist'];
             if (!ok.includes(b.status)) return err('Status tidak dikenal.');
             await db.prepare('UPDATE bookings SET status = ?, admin_note = ? WHERE id = ?')
