@@ -381,7 +381,7 @@ function renderBookings(){
     const canChgMethod = !isReward && ['pending','waitlist'].includes(b.status);
     return `<div class="bk-row${b.status === 'canceled' ? ' off' : ''}${isReward ? ' rw' : ''}">
       <div class="bk-main">
-        <div class="l1"><b>${esc(b.code)}</b> · ${esc(b.name)} · ${b.seats}k
+        <div class="l1"><b>${esc(b.code)}</b> · ${esc(b.name)} · ${b.seats} kursi
           ${isReward ? '<b style="color:var(--red)">🎁</b>' : '· ' + (METHOD_LABEL[b.method] || b.method)}
           ${b.level && LVL[b.level] ? `<span class="pill xs" style="background:${LVL[b.level][1]}" title="${LVL[b.level][0]}">${b.level}</span>` : ''}
           <span class="pill xs" style="background:${color}">${label}</span></div>
@@ -508,12 +508,15 @@ async function toggleSchedDetail(id){
     if(!d.bookings.length){ box.innerHTML = '<span class="mut">Belum ada booking untuk jadwal ini.</span>'; return; }
     const aktif = d.bookings.filter(b => b.status !== 'canceled');
     const kursi = aktif.reduce((t, b) => t + b.seats, 0);
+    // urutan: terkonfirmasi → cek bukti → menunggu bayar → waiting list → dibatalkan
+    const ORD = {confirmed:0, verifying:1, pending:2, waitlist:3, canceled:4};
+    const urut = [...d.bookings].sort((a, b) => ((ORD[a.status] ?? 9) - (ORD[b.status] ?? 9)) || (b.id - a.id));
     box.innerHTML = `<div class="mut" style="margin-bottom:6px"><b>${aktif.length}</b> booking aktif · <b>${kursi}</b> kursi</div>` +
-      d.bookings.map(b => {
+      urut.map(b => {
         const [label, color] = ST[b.status] || [b.status, '#6B7A66'];
         const wa = b.wa.replace(/[^0-9]/g,'').replace(/^0/, '62');
         return `<div class="sdet-row${b.status === 'canceled' ? ' off' : ''}">
-          <b>${esc(b.code)}</b> ${esc(b.name)} · ${b.seats}k · ${b.method === 'reward' ? '🎁 reward' : (METHOD_LABEL[b.method] || b.method)}
+          <b>${esc(b.code)}</b> ${esc(b.name)} · ${b.seats} kursi · ${b.method === 'reward' ? '🎁 reward' : (METHOD_LABEL[b.method] || b.method)}
           ${b.level && LVL[b.level] ? `<span class="pill xs" style="background:${LVL[b.level][1]}" title="${LVL[b.level][0]}">${b.level}</span>` : ''}
           <span class="pill xs" style="background:${color}">${label}</span>
           ${b.proof ? `<img src="${b.proof}" class="mini-proof s" onclick="viewImg(this.src)" title="Lihat bukti bayar">` : ''}
