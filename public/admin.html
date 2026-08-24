@@ -59,6 +59,24 @@ main{padding:22px 0 60px}
 .bk-head{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
 .bk-head select{flex:1;min-width:200px;padding:10px;border-radius:9px;border:1.5px solid rgba(5,42,27,.3);font-family:inherit;font-size:16px}
 .count-chip{font-weight:800;font-size:13px;background:var(--cream);border-radius:99px;padding:6px 14px}
+/* chip filter status booking */
+.fchips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.fchip{border:1.5px solid rgba(4,51,31,.25);background:#fff;color:var(--mut);font-family:inherit;
+  font-weight:700;font-size:12.5px;padding:6px 12px;border-radius:99px;cursor:pointer}
+.fchip b{font-weight:800}
+.fchip.on{background:var(--ink);color:var(--gold);border-color:var(--ink)}
+/* baris booking ringkas */
+.bk-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+  background:#fff;border:1.5px solid rgba(4,51,31,.15);border-radius:12px;padding:10px 14px;margin-bottom:8px}
+.bk-row.off{opacity:.55}
+.bk-row.rw{border-color:var(--red)}
+.bk-row .l1{font-size:14px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.bk-row .l2{font-size:12.5px;margin-top:2px}
+.bk-row .bk-act{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-left:auto}
+.pill.xs{font-size:10px;padding:2.5px 8px}
+.mini-proof{width:38px;height:38px;object-fit:cover;border-radius:7px;border:1.5px solid rgba(4,51,31,.25);cursor:zoom-in}
+.mini-sel{padding:6px 4px;border-radius:9px;border:1.5px solid rgba(4,51,31,.3);font-family:inherit;font-size:13px;max-width:130px}
+@media(max-width:640px){.bk-row{align-items:flex-start}.bk-row .bk-act{margin-left:0}}
 </style>
 </head>
 <body>
@@ -97,12 +115,18 @@ main{padding:22px 0 60px}
 
     <!-- BOOKING -->
     <div id="tab-booking">
-      <div class="sec-note">Anggota yang sudah upload bukti bayar berstatus <b>SEDANG DIVERIFIKASI</b> — cek buktinya lalu tekan <b>Konfirmasi</b>. Slot yang belum dibayar &gt;24 jam otomatis dilepas dari hitungan kursi. Booking berlabel <b style="color:var(--red)">🎁 KLAIM REWARD</b> adalah anggota yang menukar 5 stempel loyalty dengan permainan gratis — cek dulu (mis. via WA) lalu Konfirmasi; stempelnya otomatis terpotong.</div>
+      <details class="sec-note" style="cursor:pointer">
+        <summary style="font-weight:800">ℹ️ Cara kerja verifikasi &amp; reward</summary>
+        <div style="margin-top:8px">Anggota yang sudah upload bukti bayar berstatus <b>SEDANG DIVERIFIKASI</b> — cek buktinya lalu tekan <b>Konfirmasi</b>. Slot QRIS/transfer yang belum dibayar &gt;24 jam otomatis dilepas; <b>bayar di tempat</b> ditahan sampai hari sesi. Booking berlabel <b style="color:var(--red)">🎁 KLAIM REWARD</b> adalah anggota yang menukar 5 stempel loyalty dengan permainan gratis — cek dulu (mis. via WA) lalu Konfirmasi; stempelnya otomatis terpotong.</div>
+      </details>
       <div class="bk-head">
         <select id="bk-filter" onchange="loadBookings()"></select>
+        <input id="bk-search" placeholder="🔍 Cari nama / WA / kode…" oninput="renderBookings()"
+          style="flex:1;min-width:170px;padding:10px;border-radius:9px;border:1.5px solid rgba(4,51,31,.3);font-family:inherit;font-size:16px">
         <span class="count-chip" id="bk-count"></span>
-        <button class="btn ghost sm" onclick="loadBookings()">↻ Refresh</button>
+        <button class="btn ghost sm" onclick="loadBookings()">↻</button>
       </div>
+      <div id="bk-chips" class="fchips"></div>
       <div id="bk-list"></div>
     </div>
 
@@ -310,40 +334,64 @@ const ST = {pending:['MENUNGGU BAYAR','#C9A54A'], verifying:['CEK BUKTI ➜','#1
   confirmed:['TERKONFIRMASI','#087048'], canceled:['DIBATALKAN','#6B7A66'], waitlist:['WAITING LIST','#C02028']};
 const METHOD_LABEL = {qris:'QRIS', transfer:'transfer', venue:'bayar di tempat', reward:'🎁 KLAIM REWARD'};
 const LVL = {N:['N · Newbie','#C9A54A'], B:['B · Beginner','#1E4D8C'], I:['I · Intermediate','#087048']};
+/* filter status booking — "venue" & "reward" berbasis metode, sisanya status */
+const BK_FILTERS = {
+  all:       {label:'Semua',              test: () => true},
+  verifying: {label:'🔎 Cek bukti',       test: b => b.status === 'verifying'},
+  pending:   {label:'⏳ Menunggu bayar',   test: b => b.status === 'pending' && b.method !== 'venue'},
+  venue:     {label:'🏠 Bayar di tempat', test: b => b.method === 'venue' && b.status !== 'canceled'},
+  confirmed: {label:'✓ Terkonfirmasi',    test: b => b.status === 'confirmed'},
+  waitlist:  {label:'⌛ Waiting list',     test: b => b.status === 'waitlist'},
+  reward:    {label:'🎁 Reward',          test: b => b.method === 'reward' && b.status !== 'canceled'},
+  canceled:  {label:'✕ Dibatalkan',       test: b => b.status === 'canceled'},
+};
+let BOOKINGS = [], BK_STATUS = 'all';
 async function loadBookings(){
   const sid = $('bk-filter').value;
   const d = await api('/api/admin/bookings' + (sid ? '?schedule_id=' + sid : ''));
-  const list = d.bookings;
-  $('bk-count').textContent = list.length + ' booking';
+  BOOKINGS = d.bookings;
   if(!PAY_SETTINGS){ try{ PAY_SETTINGS = (await api('/api/admin/settings')).settings || {}; }catch(e){ PAY_SETTINGS = {}; } }
+  renderBookings();
+}
+function setBkStatus(k){ BK_STATUS = k; renderBookings(); }
+function renderBookings(){
+  // chip filter status + jumlah masing-masing (chip kosong disembunyikan)
+  $('bk-chips').innerHTML = Object.entries(BK_FILTERS).map(([k, f]) => {
+    const n = k === 'all' ? BOOKINGS.length : BOOKINGS.filter(f.test).length;
+    if(!n && k !== 'all' && k !== BK_STATUS) return '';
+    return `<button class="fchip${k === BK_STATUS ? ' on' : ''}" onclick="setBkStatus('${k}')">${f.label} <b>${n}</b></button>`;
+  }).join('');
+  const q = ($('bk-search').value || '').toLowerCase();
+  const list = BOOKINGS.filter(BK_FILTERS[BK_STATUS].test).filter(b =>
+    !q || b.name.toLowerCase().includes(q) || b.wa.includes(q.replace(/[^0-9+]/g,'') || '###')
+      || b.code.toLowerCase().includes(q));
+  $('bk-count').textContent = list.length + ' booking';
   $('bk-list').innerHTML = list.length ? list.map(b => {
     const [label, color] = ST[b.status] || [b.status, '#6B7A66'];
     const wa = b.wa.replace(/[^0-9]/g,'').replace(/^0/, '62');
     const isReward = b.method === 'reward';
     const canChgMethod = !isReward && ['pending','waitlist'].includes(b.status);
-    return `<div class="card"${isReward ? ' style="border-color:var(--red)"' : ''}>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-        <b>${esc(b.code)}</b> · ${esc(b.name)} · ${b.seats} kursi ·
-        ${isReward ? '<b style="color:var(--red)">' + METHOD_LABEL.reward + '</b>' : (METHOD_LABEL[b.method] || b.method)}
-        ${b.level && LVL[b.level] ? `<span class="pill" style="background:${LVL[b.level][1]}">${LVL[b.level][0]}</span>` : ''}
-        <span class="pill" style="background:${color}">${label}</span>
+    return `<div class="bk-row${b.status === 'canceled' ? ' off' : ''}${isReward ? ' rw' : ''}">
+      <div class="bk-main">
+        <div class="l1"><b>${esc(b.code)}</b> · ${esc(b.name)} · ${b.seats}k
+          ${isReward ? '<b style="color:var(--red)">🎁</b>' : '· ' + (METHOD_LABEL[b.method] || b.method)}
+          ${b.level && LVL[b.level] ? `<span class="pill xs" style="background:${LVL[b.level][1]}" title="${LVL[b.level][0]}">${b.level}</span>` : ''}
+          <span class="pill xs" style="background:${color}">${label}</span></div>
+        <div class="l2 mut">${fmtTgl(b.date)} ${esc(b.time_start)} · ${esc(b.venue)} · ${isReward ? 'GRATIS' : rupiah(b.fee * b.seats)}</div>
       </div>
-      <div class="mut">${fmtTgl(b.date)} ${esc(b.time_start)} · ${esc(b.venue)} · total ${isReward ? 'GRATIS (5 stempel)' : rupiah(b.fee * b.seats)}
-        · <a href="https://wa.me/${wa}?text=${encodeURIComponent(waTemplate(b))}" target="_blank" style="color:var(--green);font-weight:800" title="Buka WA dengan pesan siap kirim sesuai status booking">WA ${esc(b.wa)} ↗</a></div>
-      ${b.proof ? `<img src="${b.proof}" class="proof-thumb" onclick="viewImg(this.src)" title="Klik untuk perbesar">`
-        : '<div class="mut" style="font-style:italic">Belum ada bukti bayar</div>'}
-      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center">
-        ${b.status !== 'confirmed' ? `<button class="btn sm" onclick="setBooking(${b.id},'confirmed')">✓ Konfirmasi</button>` : ''}
-        ${b.status !== 'canceled' ? `<button class="btn red sm" onclick="if(confirm('Batalkan booking ${esc(b.code)}?'))setBooking(${b.id},'canceled')">✕ Batalkan</button>` : ''}
-        ${b.status === 'canceled' ? `<button class="btn ghost sm" onclick="setBooking(${b.id},'pending')">Aktifkan lagi</button>` : ''}
-        ${canChgMethod ? `<select onchange="if(this.value)changeMethod(${b.id}, this.value)" title="Ubah metode pembayaran (mis. user minta ganti via WA)"
-            style="padding:6px 10px;border-radius:9px;border:1.5px solid rgba(4,51,31,.3);font-family:inherit;font-size:13px">
-            <option value="">↔ Ubah metode…</option>
+      <div class="bk-act">
+        ${b.proof ? `<img src="${b.proof}" class="mini-proof" onclick="viewImg(this.src)" title="Lihat bukti bayar">` : ''}
+        <a class="btn ghost sm" style="text-decoration:none" href="https://wa.me/${wa}?text=${encodeURIComponent(waTemplate(b))}" target="_blank" title="WA ${esc(b.wa)} — pesan siap kirim sesuai status">💬</a>
+        ${canChgMethod ? `<select class="mini-sel" onchange="if(this.value)changeMethod(${b.id}, this.value)" title="Ubah metode pembayaran">
+            <option value="">↔</option>
             ${['qris','transfer','venue'].filter(x => x !== b.method).map(x => `<option value="${x}">jadi: ${METHOD_LABEL[x]}</option>`).join('')}
           </select>` : ''}
+        ${b.status !== 'confirmed' && b.status !== 'canceled' ? `<button class="btn sm" onclick="setBooking(${b.id},'confirmed')">✓ Konfirmasi</button>` : ''}
+        ${b.status !== 'canceled' ? `<button class="btn red sm" onclick="if(confirm('Batalkan booking ${esc(b.code)}?'))setBooking(${b.id},'canceled')" title="Batalkan">✕</button>`
+          : `<button class="btn ghost sm" onclick="setBooking(${b.id},'pending')">Aktifkan lagi</button>`}
       </div>
     </div>`;
-  }).join('') : '<p class="mut">Belum ada booking.</p>';
+  }).join('') : '<p class="mut">Tidak ada booking yang cocok dengan filter.</p>';
 }
 async function setBooking(id, status){
   await api('/api/admin/bookings/' + id, {method:'POST', body: JSON.stringify({status})});
