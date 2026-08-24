@@ -75,6 +75,14 @@ main{padding:22px 0 60px}
 .bk-row .bk-act{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-left:auto}
 .pill.xs{font-size:10px;padding:2.5px 8px}
 .mini-proof{width:38px;height:38px;object-fit:cover;border-radius:7px;border:1.5px solid rgba(4,51,31,.25);cursor:zoom-in}
+.mini-proof.s{width:28px;height:28px}
+/* panel detail peserta di kartu jadwal */
+.sch-pill{cursor:pointer}
+.sch-det{margin-top:12px;border-top:1.5px dashed rgba(4,51,31,.2);padding-top:10px}
+.sdet-row{display:flex;gap:7px;align-items:center;flex-wrap:wrap;font-size:13.5px;
+  padding:5px 0;border-bottom:1px dashed rgba(4,51,31,.12)}
+.sdet-row:last-of-type{border-bottom:none}
+.sdet-row.off{opacity:.5}
 .mini-sel{padding:6px 4px;border-radius:9px;border:1.5px solid rgba(4,51,31,.3);font-family:inherit;font-size:13px;max-width:130px}
 @media(max-width:640px){.bk-row{align-items:flex-start}.bk-row .bk-act{margin-left:0}}
 </style>
@@ -476,14 +484,50 @@ async function loadSchedules(){
   $('sch-list').innerHTML = SCHEDULES.map(s => `<div class="card">
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
       <b>${fmtTgl(s.date)}</b> ${esc(s.time_start)}–${esc(s.time_end)}
-      <span class="pill" style="background:${s.status==='open' ? '#087048' : '#6B7A66'}">${s.status.toUpperCase()}</span>
+      <span class="pill sch-pill" style="background:${s.status==='open' ? '#087048' : '#6B7A66'}"
+        onclick="toggleSchedDetail(${s.id})" title="Klik untuk lihat peserta & status pembayaran">${s.status.toUpperCase()} ▾</span>
     </div>
     <div class="mut">${esc(s.venue)}${s.map_url ? ` <a href="${esc(s.map_url)}" target="_blank" rel="noopener" title="Buka di Google Maps">🗺️</a>` : ''}${s.note ? ' · ' + esc(s.note) : ''} · ${s.tables} meja ·
       ${s.booked}/${s.capacity} kursi terisi · fee ${rupiah(s.fee)}</div>
     <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn ghost sm" onclick="toggleSchedDetail(${s.id})">👥 Peserta ▾</button>
       <button class="btn ghost sm" onclick="editSchedule(${s.id})">✎ Edit</button>
       <button class="btn red sm" onclick="if(confirm('Hapus jadwal ini beserta semua bookingnya?'))delSchedule(${s.id})">Hapus</button>
-    </div></div>`).join('') || '<p class="mut">Belum ada jadwal.</p>';
+    </div>
+    <div class="sch-det hidden" id="sch-det-${s.id}"></div></div>`).join('') || '<p class="mut">Belum ada jadwal.</p>';
+}
+/* detail peserta per jadwal — expand/collapse di dalam kartu */
+async function toggleSchedDetail(id){
+  const box = $('sch-det-' + id);
+  if(!box.classList.contains('hidden')){ box.classList.add('hidden'); return; }
+  box.classList.remove('hidden');
+  box.innerHTML = '<span class="mut">Memuat peserta…</span>';
+  try{
+    if(!PAY_SETTINGS){ try{ PAY_SETTINGS = (await api('/api/admin/settings')).settings || {}; }catch(e){ PAY_SETTINGS = {}; } }
+    const d = await api('/api/admin/bookings?schedule_id=' + id);
+    if(!d.bookings.length){ box.innerHTML = '<span class="mut">Belum ada booking untuk jadwal ini.</span>'; return; }
+    const aktif = d.bookings.filter(b => b.status !== 'canceled');
+    const kursi = aktif.reduce((t, b) => t + b.seats, 0);
+    box.innerHTML = `<div class="mut" style="margin-bottom:6px"><b>${aktif.length}</b> booking aktif · <b>${kursi}</b> kursi</div>` +
+      d.bookings.map(b => {
+        const [label, color] = ST[b.status] || [b.status, '#6B7A66'];
+        const wa = b.wa.replace(/[^0-9]/g,'').replace(/^0/, '62');
+        return `<div class="sdet-row${b.status === 'canceled' ? ' off' : ''}">
+          <b>${esc(b.code)}</b> ${esc(b.name)} · ${b.seats}k · ${b.method === 'reward' ? '🎁 reward' : (METHOD_LABEL[b.method] || b.method)}
+          ${b.level && LVL[b.level] ? `<span class="pill xs" style="background:${LVL[b.level][1]}" title="${LVL[b.level][0]}">${b.level}</span>` : ''}
+          <span class="pill xs" style="background:${color}">${label}</span>
+          ${b.proof ? `<img src="${b.proof}" class="mini-proof s" onclick="viewImg(this.src)" title="Lihat bukti bayar">` : ''}
+          <a href="https://wa.me/${wa}?text=${encodeURIComponent(waTemplate(b))}" target="_blank" title="WA ${esc(b.wa)}" style="text-decoration:none">💬</a>
+        </div>`;
+      }).join('') +
+      `<div style="margin-top:8px"><a href="#" onclick="gotoBookings(${id});return false"
+        style="font-weight:800;color:var(--green)">Kelola semua di tab Booking →</a></div>`;
+  }catch(e){ box.innerHTML = '<span class="mut">Gagal memuat: ' + esc(e.message) + '</span>'; }
+}
+function gotoBookings(id){
+  $('bk-filter').value = String(id);   // set filter dulu — showTab yang memanggil loadBookings
+  BK_STATUS = 'all';
+  showTab('booking');
 }
 function editSchedule(id){
   const s = SCHEDULES.find(x => x.id === id); if(!s) return;
