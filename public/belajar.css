@@ -139,6 +139,8 @@ table.faan tr:last-child td{border-bottom:none}
 table.faan .fn{font-weight:800;white-space:nowrap}
 table.faan .fn small{display:block;font-weight:400;color:var(--mut);font-size:12px}
 table.faan .fv2{font-family:'DM Serif Display',serif;font-size:19px;color:var(--green);text-align:center;white-space:nowrap}
+table.faan tr.sec td{background:var(--ink);color:var(--gold-lt);font-weight:800;font-size:11.5px;
+  letter-spacing:.16em;padding:8px 10px;border-radius:6px}
 .table-scroll{overflow-x:auto}
 
 /* hitungan contoh */
