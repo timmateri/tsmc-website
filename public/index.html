@@ -162,6 +162,10 @@ section{padding:64px 0}
 .scard .top small{color:var(--mut);font-weight:700;font-size:13px}
 .badge{margin-left:auto;align-self:flex-start}
 .scard .meta{font-size:13.5px;color:var(--mut)}
+.venue-link{color:inherit;font-weight:700;text-decoration:underline;text-underline-offset:2.5px;
+  text-decoration-color:rgba(8,112,72,.55)}
+.venue-link:hover{color:var(--green)}
+#next-meta .venue-link:hover{color:var(--gold-lt)}
 .bar{height:8px;background:rgba(5,42,27,.1);border-radius:99px;overflow:hidden}
 .bar i{display:block;height:100%;border-radius:99px}
 .scard .foot{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
@@ -624,6 +628,12 @@ function renderAnnouncement(s){
   document.getElementById('member-more').textContent = '+' + (parseInt(s.stat_members||'0') || '···');
 }
 
+// venue jadi link Google Maps kalau admin mengisi link-nya
+function venueHTML(s){
+  return s.map_url
+    ? `<a class="venue-link" href="${esc(s.map_url)}" target="_blank" rel="noopener" title="Buka lokasi di Google Maps">${esc(s.venue)} ↗</a>`
+    : esc(s.venue);
+}
 function schedState(s){
   if(s.status === 'closed') return {label:'DITUTUP', color:'#6B7A66', btn:'Ditutup', full:true};
   if(s.left <= 0) return {label:'PENUH', color:'#6B7A66', btn:'Join Waiting List', full:true};
@@ -642,7 +652,7 @@ function renderSchedules(list){
   const n = list[0], nst = schedState(n);
   document.getElementById('next-title').textContent = fmtTanggal(n.date);
   document.getElementById('next-left').textContent = n.left > 0 ? `${n.left} slot tersisa` : 'penuh · waiting list';
-  document.getElementById('next-meta').textContent = `${n.time_start} WIB · ${n.venue}`;
+  document.getElementById('next-meta').innerHTML = `${esc(n.time_start)} WIB · ${venueHTML(n)}`;
   document.getElementById('stat-tables').textContent = n.tables;
 
   grid.innerHTML = list.map(s => {
@@ -657,7 +667,7 @@ function renderSchedules(list){
           <small>${esc(s.time_start)} – ${esc(s.time_end)} WIB</small></div>
         <span class="tag badge" style="background:${st.color};color:#fff">${st.label}</span>
       </div>
-      <div class="meta">📍 ${esc(s.venue)}${s.note ? ' · ' + esc(s.note) : ''}</div>
+      <div class="meta">📍 ${venueHTML(s)}${s.note ? ' · ' + esc(s.note) : ''}</div>
       <div class="bar"><i style="width:${pct}%;background:${st.color}"></i></div>
       <div class="meta">${s.booked}/${s.capacity} kursi terisi · <b style="color:${st.color}">${s.left > 0 ? s.left + ' slot tersisa' : 'waiting list'}</b></div>
       ${renderPlayers(s)}
@@ -782,7 +792,7 @@ function openBooking(id){
   toggleReward(false);
   rrow.classList.toggle('show', !!(LOYAL && LOYAL.rewards_ready > 0));
   document.getElementById('bk-sched-info').innerHTML =
-    `${fmtTanggal(currentSched.date)} · ${esc(currentSched.time_start)} WIB · ${esc(currentSched.venue)}<br>` +
+    `${fmtTanggal(currentSched.date)} · ${esc(currentSched.time_start)} WIB · ${venueHTML(currentSched)}<br>` +
     `Fee <b>${rupiah(currentSched.fee)}</b>/orang · sisa <b>${currentSched.left}</b> kursi`;
   openModal('book-modal');
 }

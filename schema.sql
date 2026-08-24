@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS schedules (
   time_end    TEXT NOT NULL,            -- contoh: 22.30
   venue       TEXT NOT NULL,
   note        TEXT DEFAULT '',
+  map_url     TEXT DEFAULT '',          -- link Google Maps venue (opsional)
   tables      INTEGER NOT NULL DEFAULT 4,   -- jumlah meja (1 meja = 4 kursi)
   capacity    INTEGER NOT NULL DEFAULT 16,  -- total kursi
   fee         INTEGER NOT NULL DEFAULT 75000,

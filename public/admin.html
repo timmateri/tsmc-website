@@ -127,6 +127,7 @@ main{padding:22px 0 60px}
           <div class="field"><label>Jam selesai</label><input id="sch-end" placeholder="22.30" value="22.30"></div>
         </div>
         <div class="field"><label>Tempat / venue</label><input id="sch-venue" placeholder="Clubhouse TSMC, Jakarta Barat"></div>
+        <div class="field"><label>Link Google Maps (opsional — venue di website jadi bisa diklik)</label><input id="sch-map" placeholder="https://maps.app.goo.gl/…"></div>
         <div class="field"><label>Catatan (opsional)</label><input id="sch-note" placeholder="Sesi reguler mingguan"></div>
         <div class="row3">
           <div class="field"><label>Jumlah meja</label><input type="number" id="sch-tables" value="4" min="1" onchange="document.getElementById('sch-cap').value=this.value*4"></div>
@@ -353,7 +354,7 @@ async function loadMembers(){
 function filterMembers(){
   const q = ($('mb-search').value || '').toLowerCase();
   const list = MEMBERS.filter(m =>
-    !q || m.name.toLowerCase().includes(q) || m.wa.includes(q.replace(/[^0-9+]/g,'') || ' '));
+    !q || m.name.toLowerCase().includes(q) || m.wa.includes(q.replace(/[^0-9+]/g,'') || '###'));
   $('mb-count').textContent = list.length + ' anggota';
   $('mb-list').innerHTML = list.length ? list.map(m => {
     const waLink = m.wa.replace(/[^0-9]/g,'').replace(/^0/, '62');
@@ -396,7 +397,7 @@ async function loadSchedules(){
       <b>${fmtTgl(s.date)}</b> ${esc(s.time_start)}–${esc(s.time_end)}
       <span class="pill" style="background:${s.status==='open' ? '#087048' : '#6B7A66'}">${s.status.toUpperCase()}</span>
     </div>
-    <div class="mut">${esc(s.venue)}${s.note ? ' · ' + esc(s.note) : ''} · ${s.tables} meja ·
+    <div class="mut">${esc(s.venue)}${s.map_url ? ` <a href="${esc(s.map_url)}" target="_blank" rel="noopener" title="Buka di Google Maps">🗺️</a>` : ''}${s.note ? ' · ' + esc(s.note) : ''} · ${s.tables} meja ·
       ${s.booked}/${s.capacity} kursi terisi · fee ${rupiah(s.fee)}</div>
     <div style="display:flex;gap:8px;margin-top:10px">
       <button class="btn ghost sm" onclick="editSchedule(${s.id})">✎ Edit</button>
@@ -411,6 +412,7 @@ function editSchedule(id){
   $('sch-cancel').classList.remove('hidden');
   $('sch-date').value = s.date; $('sch-start').value = s.time_start; $('sch-end').value = s.time_end;
   $('sch-venue').value = s.venue; $('sch-note').value = s.note || '';
+  $('sch-map').value = s.map_url || '';
   $('sch-tables').value = s.tables; $('sch-cap').value = s.capacity;
   $('sch-fee').value = s.fee; $('sch-status').value = s.status;
   window.scrollTo({top:0, behavior:'smooth'});
@@ -420,12 +422,13 @@ function resetSchedForm(){
   $('sch-form-title').textContent = 'Tambah Jadwal Baru';
   $('sch-save').textContent = 'Simpan Jadwal';
   $('sch-cancel').classList.add('hidden');
-  ['sch-date','sch-venue','sch-note'].forEach(i => $(i).value = '');
+  ['sch-date','sch-venue','sch-note','sch-map'].forEach(i => $(i).value = '');
 }
 async function saveSchedule(){
   const body = JSON.stringify({
     date: $('sch-date').value, time_start: $('sch-start').value, time_end: $('sch-end').value,
-    venue: $('sch-venue').value, note: $('sch-note').value, tables: $('sch-tables').value,
+    venue: $('sch-venue').value, note: $('sch-note').value, map_url: $('sch-map').value.trim(),
+    tables: $('sch-tables').value,
     capacity: $('sch-cap').value, fee: $('sch-fee').value, status: $('sch-status').value });
   try{
     if(editSchedId) await api('/api/admin/schedules/' + editSchedId, {method:'PUT', body});

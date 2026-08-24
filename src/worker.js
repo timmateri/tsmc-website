@@ -76,6 +76,16 @@ async function ensureLevelColumn(db) {
 
 // tabel koreksi manual stempel (dibuat otomatis kalau belum ada —
 // aman untuk database yang sudah terlanjur di-setup tanpa tabel ini)
+// kolom link Google Maps pada jadwal (migrasi otomatis untuk database lama)
+async function ensureMapCol(db) {
+  try { await db.prepare(`ALTER TABLE schedules ADD COLUMN map_url TEXT DEFAULT ''`).run(); }
+  catch (e) { /* kolom sudah ada */ }
+}
+// validasi link maps: opsional, wajib https bila diisi
+function mapUrlOk(u) {
+  return !u || (/^https:\/\/\S+$/.test(u) && u.length <= 300);
+}
+
 async function ensureAdjTable(db) {
   await db.prepare(`CREATE TABLE IF NOT EXISTS loyalty_adj (
     wa TEXT PRIMARY KEY, delta INTEGER NOT NULL DEFAULT 0,
@@ -466,12 +476,15 @@ export default {
         if (path === '/api/admin/schedules' && method === 'POST') {
           const b = await req.json();
           if (!/^\d{4}-\d{2}-\d{2}$/.test(b.date || '')) return err('Tanggal wajib format YYYY-MM-DD.');
+          const mapUrl = String(b.map_url || '').trim();
+          if (!mapUrlOk(mapUrl)) return err('Link Google Maps tidak valid — harus diawali https://');
           const tables = Math.max(1, parseInt(b.tables) || 4);
+          await ensureMapCol(db);
           await db.prepare(`
-            INSERT INTO schedules (date, time_start, time_end, venue, note, tables, capacity, fee, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO schedules (date, time_start, time_end, venue, note, map_url, tables, capacity, fee, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           `).bind(b.date, b.time_start || '18.30', b.time_end || '22.30', b.venue || '',
-            b.note || '', tables, parseInt(b.capacity) || tables * 4,
+            b.note || '', mapUrl, tables, parseInt(b.capacity) || tables * 4,
             parseInt(b.fee) || 75000, b.status || 'open').run();
           return json({ ok: true });
         }
@@ -479,10 +492,13 @@ export default {
           const m = path.match(/^\/api\/admin\/schedules\/(\d+)$/);
           if (m && method === 'PUT') {
             const b = await req.json();
+            const mapUrl = String(b.map_url || '').trim();
+            if (!mapUrlOk(mapUrl)) return err('Link Google Maps tidak valid — harus diawali https://');
+            await ensureMapCol(db);
             await db.prepare(`
-              UPDATE schedules SET date=?, time_start=?, time_end=?, venue=?, note=?,
+              UPDATE schedules SET date=?, time_start=?, time_end=?, venue=?, note=?, map_url=?,
                 tables=?, capacity=?, fee=?, status=? WHERE id=?
-            `).bind(b.date, b.time_start, b.time_end, b.venue || '', b.note || '',
+            `).bind(b.date, b.time_start, b.time_end, b.venue || '', b.note || '', mapUrl,
               parseInt(b.tables) || 4, parseInt(b.capacity) || 16,
               parseInt(b.fee) || 75000, b.status || 'open', m[1]).run();
             return json({ ok: true });
