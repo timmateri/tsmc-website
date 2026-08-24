@@ -246,10 +246,12 @@ export default {
               v: p.status === 'verifying' ? 1 : 0,
               l: p.level || '',              // level bermain (N/B/I)
               // status bayar untuk badge di daftar peserta:
-              // 'l' = lunas (terkonfirmasi) · 'v' = bayar di tempat
+              // 'v' = bayar di tempat (SELALU, walau sudah dikonfirmasi admin —
+              //       uangnya memang baru diterima di venue pada hari sesi)
+              // 'l' = lunas (QRIS/transfer terkonfirmasi)
               // 'p' = menunggu pembayaran (QRIS/transfer) · '' = lainnya
-              pay: p.status === 'confirmed' ? 'l'
-                : (p.status === 'pending' && p.method === 'venue') ? 'v'
+              pay: p.method === 'venue' ? 'v'
+                : p.status === 'confirmed' ? 'l'
                 : p.status === 'pending' ? 'p' : '',
             });
           }
