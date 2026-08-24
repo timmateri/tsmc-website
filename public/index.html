@@ -306,6 +306,11 @@ footer small{opacity:.7;display:block;margin-top:4px}
 .lk-row{background:#fff;border:1.5px solid rgba(5,42,27,.15);border-radius:12px;padding:14px;margin-bottom:10px;font-size:14px}
 .lk-row .chg-method{margin-left:8px;padding:5px 9px;border-radius:9px;font-family:inherit;font-size:12.5px;
   border:1.5px solid rgba(5,42,27,.3);background:#fff;color:var(--ink);vertical-align:1px}
+.lk-row .cancel-bk{margin-left:8px;padding:5px 11px;border-radius:9px;font-family:inherit;font-size:12.5px;
+  font-weight:800;cursor:pointer;background:transparent;color:var(--red);
+  border:1.5px solid var(--red);vertical-align:1px}
+.lk-row .cancel-bk:hover{background:var(--red);color:#fff}
+.lk-row .cancel-bk[disabled]{opacity:.5;cursor:not-allowed}
 .hidden{display:none!important}
 .center{text-align:center}
 .drop{border:2px dashed rgba(5,42,27,.35);border-radius:12px;padding:18px;text-align:center;font-size:14px;
@@ -944,8 +949,11 @@ let LOOKUP_WA = '';   // nomor WA yang terverifikasi lewat pencarian / tersimpan
 function bookingRow(b){
   const [label, color] = ST_LABEL[b.status] || [b.status, '#6B7A66'];
   const waCtx = stored('tsmc_wa') || LOOKUP_WA;
+  const notPast = parseDate(b.date) >= new Date(new Date().setHours(0,0,0,0));
   // metode bisa diubah sendiri selama belum dibayar (bukan klaim reward)
   const canChg = waCtx && b.method !== 'reward' && ['pending','waitlist'].includes(b.status);
+  // batalkan sendiri: booking aktif untuk sesi yang belum lewat
+  const canCancel = waCtx && notPast && ['pending','waitlist','verifying','confirmed'].includes(b.status);
   const methodTxt = b.method === 'reward' ? '' : ` · ${METHOD_LABEL[b.method] || esc(b.method)}`;
   return `<div class="lk-row"><b>${esc(b.code)}</b> · ${esc(b.name)} · ${b.seats} kursi${b.method === 'reward' ? ' · <b style="color:var(--red)">🎁 GRATIS</b>' : methodTxt}<br>
     ${fmtTanggal(b.date)} · ${esc(b.time_start)} WIB · ${esc(b.venue)}<br>
@@ -953,7 +961,27 @@ function bookingRow(b){
     ${canChg ? `<select class="chg-method" onchange="if(this.value)userChangeMethod('${esc(b.code)}', this.value, this)">
       <option value="">↔ ubah metode bayar…</option>
       ${['qris','transfer','venue'].filter(x => x !== b.method).map(x => `<option value="${x}">jadi: ${METHOD_LABEL[x]}</option>`).join('')}
-    </select>` : ''}</div>`;
+    </select>` : ''}
+    ${canCancel ? `<button class="cancel-bk" onclick="userCancelBooking('${esc(b.code)}','${esc(b.method)}','${esc(b.status)}',this)">✕ Batalkan</button>` : ''}</div>`;
+}
+async function userCancelBooking(code, bMethod, bStatus, el){
+  const wa = stored('tsmc_wa') || LOOKUP_WA;
+  if(!wa){ alert('Cari dulu booking kamu dengan nomor WhatsApp ya.'); return; }
+  // kalimat kedua hanya untuk yang SUDAH membayar (qris/transfer yang
+  // buktinya terkirim / sudah dikonfirmasi) — bayar di tempat & reward tidak
+  const sudahBayar = ['qris','transfer'].includes(bMethod) && ['verifying','confirmed'].includes(bStatus);
+  let msg = `Apakah kamu yakin ingin membatalkan booking ${code}?`;
+  if(sudahBayar) msg += '\n\nBooking yang dibatalkan kurang dari 24 jam sebelum sesi diadakan, uang yang sudah dibayarkan dianggap hangus.';
+  if(!confirm(msg)) return;
+  el.disabled = true;
+  try{
+    const d = await (await fetch('/api/bookings/cancel', {method:'POST',
+      headers:{'content-type':'application/json'}, body: JSON.stringify({code, wa})})).json();
+    if(!d.ok) throw new Error(d.error);
+    alert(`Booking ${code} sudah dibatalkan.`);
+  }catch(e){ alert(e.message); el.disabled = false; return; }
+  loadSite(); // slot kembali tersedia → refresh jadwal + "Booking Kamu"
+  if(document.getElementById('lookup-modal').classList.contains('show')) doLookup();
 }
 async function userChangeMethod(code, m, el){
   const wa = stored('tsmc_wa') || LOOKUP_WA;

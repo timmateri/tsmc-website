@@ -371,6 +371,30 @@ export default {
         } });
       }
 
+      // Batalkan booking oleh user sendiri — kode + nomor WA harus cocok,
+      // dan hanya untuk sesi yang belum lewat. Kursi otomatis terlepas
+      // (status canceled tidak dihitung HOLD_EXPR) dan stempel tidak cair.
+      if (path === '/api/bookings/cancel' && method === 'POST') {
+        const b = await req.json();
+        const code = (b.code || '').toUpperCase().trim();
+        const wa = (b.wa || '').replace(/[^0-9+]/g, '');
+        if (!code || wa.length < 9) return err('Kode booking / nomor WA tidak valid.');
+        const row = await env.DB.prepare(`
+          SELECT bk.id, bk.status, bk.wa, s.date FROM bookings bk
+          JOIN schedules s ON s.id = bk.schedule_id WHERE bk.code = ?
+        `).bind(code).first();
+        if (!row || row.wa !== wa) return err('Booking tidak ditemukan.', 404);
+        if (row.status === 'canceled') return err('Booking ini sudah dibatalkan.');
+        if (row.date < new Date().toISOString().slice(0, 10)) {
+          return err('Sesi ini sudah lewat — booking tidak bisa dibatalkan lagi.');
+        }
+        await env.DB.prepare(
+          `UPDATE bookings SET status = 'canceled',
+             admin_note = TRIM(admin_note || ' [dibatalkan sendiri oleh user]') WHERE id = ?`
+        ).bind(row.id).run();
+        return json({ ok: true });
+      }
+
       // Kartu loyalty berdasarkan nomor WA
       if (path === '/api/loyalty' && method === 'GET') {
         const wa = (url.searchParams.get('wa') || '').replace(/[^0-9+]/g, '');
