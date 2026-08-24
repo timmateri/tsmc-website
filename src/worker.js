@@ -214,15 +214,17 @@ export default {
             .then((r) => r.results),
           getSettings(db),
         ]);
-        // daftar peserta per jadwal: yang sudah bayar/terkonfirmasi + yang
-        // memilih bayar di tempat (langsung tampil dengan keterangan).
-        // Nama sudah disingkat di server demi privasi.
+        // daftar peserta per jadwal: semua yang masih menahan kursi
+        // (sinkron dengan HOLD_EXPR) — terkonfirmasi, sedang diverifikasi,
+        // bayar di tempat, dan pending QRIS/transfer (<24 jam) dengan
+        // keterangan masing-masing. Nama sudah disingkat demi privasi.
         if (schedules.length) {
           const ids = schedules.map((s) => s.id);
           const { results: parts } = await db.prepare(`
             SELECT schedule_id, name, seats, status, method, level FROM bookings
             WHERE (status IN ('confirmed','verifying')
-                   OR (status = 'pending' AND method = 'venue'))
+                   OR (status = 'pending' AND method = 'venue')
+                   OR (status = 'pending' AND created_at > datetime('now','-1 day')))
               AND schedule_id IN (${ids.map(() => '?').join(',')})
             ORDER BY id ASC
           `).bind(...ids).all();
@@ -234,9 +236,11 @@ export default {
               v: p.status === 'verifying' ? 1 : 0,
               l: p.level || '',              // level bermain (N/B/I)
               // status bayar untuk badge di daftar peserta:
-              // 'l' = lunas (terkonfirmasi) · 'v' = bayar di tempat · '' = lainnya
+              // 'l' = lunas (terkonfirmasi) · 'v' = bayar di tempat
+              // 'p' = menunggu pembayaran (QRIS/transfer) · '' = lainnya
               pay: p.status === 'confirmed' ? 'l'
-                : (p.status === 'pending' && p.method === 'venue') ? 'v' : '',
+                : (p.status === 'pending' && p.method === 'venue') ? 'v'
+                : p.status === 'pending' ? 'p' : '',
             });
           }
           for (const s of schedules) s.players = byId[s.id] || [];
