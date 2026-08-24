@@ -172,6 +172,9 @@ section{padding:64px 0}
 .players{font-size:12.5px;color:var(--mut);background:var(--cream);border-radius:9px;padding:7px 11px;line-height:1.7}
 .players b{color:var(--ink)}
 .players .verif{opacity:.65}
+.players ol{margin:5px 0 0;padding-left:22px}
+.players ol li{padding:1.5px 0}
+.players .pend{margin-top:5px;font-size:12px;opacity:.8}
 .lvl{display:inline-block;font-style:normal;font-weight:800;font-size:10px;line-height:1;
   padding:2.5px 5px;border-radius:5px;color:#fff;margin-left:3px;vertical-align:1px}
 .lvl-legend{font-size:12.5px;color:var(--mut);margin:-10px 0 22px;line-height:1.7}
@@ -649,10 +652,7 @@ function renderSchedules(list){
       <div class="meta">📍 ${esc(s.venue)}${s.note ? ' · ' + esc(s.note) : ''}</div>
       <div class="bar"><i style="width:${pct}%;background:${st.color}"></i></div>
       <div class="meta">${s.booked}/${s.capacity} kursi terisi · <b style="color:${st.color}">${s.left > 0 ? s.left + ' slot tersisa' : 'waiting list'}</b></div>
-      ${(s.players && s.players.length)
-        ? `<div class="players">👥 <b>Sudah daftar:</b> ${s.players.map(p =>
-            `<span class="${p.v ? 'verif' : ''}">${esc(p.n)}${p.x > 0 ? ' +' + p.x : ''}${p.l ? `<i class="lvl" style="background:${LVL_COLOR[p.l] || '#6B7A66'}" title="${LVL_NAME[p.l] || ''}">${p.l}</i>` : ''}</span>`).join(' · ')}</div>`
-        : `<div class="players">👥 Belum ada peserta terkonfirmasi — jadi yang pertama!</div>`}
+      ${renderPlayers(s)}
       <div class="foot">
         <div class="fee"><small>FEE / ORANG</small><b>${rupiah(s.fee)}</b></div>
         <button class="btn ${st.full ? 'ghost' : ''}" ${s.status==='closed' ? 'disabled' : ''}
@@ -660,6 +660,24 @@ function renderSchedules(list){
       </div>
     </div>`;
   }).join('');
+}
+
+// Daftar peserta terkonfirmasi sebagai list bernomor ke bawah.
+// Kursi ekstra (+1) ditampilkan sebagai baris sendiri dengan nama yang sama.
+// Kursi yang masih menunggu pembayaran (pending) disebut jujur, tanpa nama.
+function renderPlayers(s){
+  const players = s.players || [];
+  const seats = players.flatMap(p =>
+    Array.from({length: 1 + (p.x || 0)}, () =>
+      `<li class="${p.v ? 'verif' : ''}">${esc(p.n)}${p.l ? `<i class="lvl" style="background:${LVL_COLOR[p.l] || '#6B7A66'}" title="${LVL_NAME[p.l] || ''}">${p.l}</i>` : ''}</li>`));
+  const pending = Math.max(0, s.booked - players.reduce((t, p) => t + 1 + (p.x || 0), 0));
+  if(!seats.length){
+    return `<div class="players">👥 ${pending > 0
+      ? `${pending} kursi menunggu pembayaran — belum ada peserta terkonfirmasi.`
+      : 'Belum ada peserta terkonfirmasi — jadi yang pertama!'}</div>`;
+  }
+  return `<div class="players">👥 <b>Sudah daftar:</b><ol>${seats.join('')}</ol>${
+    pending > 0 ? `<div class="pend">⏳ +${pending} kursi menunggu pembayaran</div>` : ''}</div>`;
 }
 
 function tagClass(t){
