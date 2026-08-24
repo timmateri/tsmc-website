@@ -170,10 +170,24 @@ export default {
 
     if (!path.startsWith('/api/')) {
       const res = await env.ASSETS.fetch(req); // file statis (index.html, dll)
-      // Halaman ramah untuk route yang tidak ada (mis. salah ketik URL)
+      // Halaman ramah untuk route yang tidak ada (mis. salah ketik URL).
+      // Catatan: asset server menyajikan 404.html di path "/404" (html_handling
+      // auto) dan me-redirect "/404.html" → "/404", jadi coba keduanya dan
+      // ikuti satu kali redirect bila perlu.
       if (res.status === 404 && method === 'GET') {
-        const nf = await env.ASSETS.fetch(new Request(new URL('/404.html', url), req));
-        return new Response(nf.body, { status: 404, headers: nf.headers });
+        for (const p of ['/404', '/404.html']) {
+          let nf = await env.ASSETS.fetch(new Request(new URL(p, url)));
+          if (nf.status >= 300 && nf.status < 400) {
+            const loc = nf.headers.get('location');
+            if (loc) nf = await env.ASSETS.fetch(new Request(new URL(loc, url)));
+          }
+          if (nf.ok) {
+            return new Response(nf.body, {
+              status: 404,
+              headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' },
+            });
+          }
+        }
       }
       return res;
     }
