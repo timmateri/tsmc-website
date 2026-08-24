@@ -142,20 +142,21 @@ table.faan .fv2{font-family:'DM Serif Display',serif;font-size:19px;color:var(--
 table.faan tr.sec td{background:var(--ink);color:var(--gold-lt);font-weight:800;font-size:11.5px;
   letter-spacing:.16em;padding:8px 10px;border-radius:6px}
 .table-scroll{overflow-x:auto}
-/* layar sempit: tabel jadi kartu bertumpuk, angka faan jadi badge kanan-atas
-   yang selalu terlihat — tanpa geser horizontal sama sekali */
+/* layar sempit: tabel faan LEBAR (modul 02) jadi kartu bertumpuk, angka faan
+   jadi badge kanan-atas yang selalu terlihat — tanpa geser horizontal.
+   Tabel .faan biasa (mis. tabel klaim modul 03) tetap berbentuk tabel. */
 @media(max-width:640px){
-  table.faan, table.faan tbody, table.faan tr, table.faan td{display:block;width:100%}
-  table.faan tr:first-child{display:none}         /* baris header tidak perlu di mode kartu */
-  table.faan tr{position:relative;border-bottom:1px dashed rgba(4,51,31,.15);padding:11px 0}
-  table.faan tr:last-child{border-bottom:none}
-  table.faan td{border-bottom:none;padding:0}
-  table.faan td.fn{padding-right:62px;margin-bottom:3px}  /* beri ruang untuk badge faan */
-  table.faan .fv2{position:absolute;top:11px;right:0;width:auto;
+  table.faan.wide, table.faan.wide tbody, table.faan.wide tr, table.faan.wide td{display:block;width:100%}
+  table.faan.wide tr:first-child{display:none}    /* baris header tidak perlu di mode kartu */
+  table.faan.wide tr{position:relative;border-bottom:1px dashed rgba(4,51,31,.15);padding:11px 0}
+  table.faan.wide tr:last-child{border-bottom:none}
+  table.faan.wide td{border-bottom:none;padding:0}
+  table.faan.wide td.fn{padding-right:62px;margin-bottom:3px}  /* ruang untuk badge faan */
+  table.faan.wide .fv2{position:absolute;top:11px;right:0;width:auto;
     background:var(--cream);border:1.5px solid var(--green);border-radius:10px;
     padding:1px 11px;font-size:17px;line-height:1.5}
-  table.faan tr.sec{border-bottom:none;padding:6px 0}
-  table.faan tr.sec td{padding:8px 10px}
+  table.faan.wide tr.sec{border-bottom:none;padding:6px 0}
+  table.faan.wide tr.sec td{padding:8px 10px}
 }
 
 /* hitungan contoh */
