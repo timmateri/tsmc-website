@@ -16,6 +16,14 @@
 
   const rupiah = n => 'Rp ' + Number(n).toLocaleString('id-ID');
   const pd = iso => { const [y,m,d] = iso.split('-').map(Number); return new Date(y, m-1, d); };
+  // penyingkatan nama yang SAMA dengan server ("Budi Tanoto" -> "Budi T.") —
+  // dijalankan lagi di sini agar hasil share dari admin & user dijamin identik,
+  // apa pun sumber datanya. Aman untuk nama yang sudah singkat ("Budi T." tetap).
+  const shortName = full => {
+    const parts = String(full || '').trim().split(/\s+/);
+    if (parts.length <= 1) return parts[0] || '';
+    return parts[0] + ' ' + parts[1][0].toUpperCase() + '.';
+  };
   const sesiNama = s => {
     const j = parseInt(s.time_start);
     return HARI[pd(s.date).getDay()] + ' ' + (j < 11 ? 'Pagi' : j < 17 ? 'Siang' : 'Malam');
@@ -141,7 +149,7 @@
       rows.forEach((p, i) => {
         let x = P + 36;
         ctx.fillStyle = C.ink; ctx.font = '600 30px "Schibsted Grotesk", sans-serif';
-        const nm = `${i + 1}. ${p.n}`;
+        const nm = `${i + 1}. ${shortName(p.n)}`;
         ctx.fillText(nm, x, yy); x += ctx.measureText(nm).width + 16;
         if (p.l && LVLC[p.l]) { // badge level
           ctx.fillStyle = LVLC[p.l]; rr(ctx, x, yy - 28, 38, 38, 10); ctx.fill();
