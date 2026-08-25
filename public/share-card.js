@@ -198,7 +198,7 @@
       + `📍 ${s.venue}${s.note ? ' · ' + s.note : ''}\n`;
     if (s.map_url) t += `🗺️ ${s.map_url}\n`;
     t += `💺 ${s.left > 0 ? `Sisa ${s.left} dari ${s.capacity} kursi` : 'PENUH — bisa masuk waiting list'} · Fee ${rupiah(s.fee)}/orang\n\n`
-      + `Book slot kamu di:\n${SITE_URL}/#jadwal`;
+      + `Book slot kamu di:\n${SITE_URL}/#jadwal-${s.id}`;   // link langsung ke kartu jadwal ini
     return t;
   }
 
@@ -206,17 +206,21 @@
     const text = shareText(s);
     let blob = null;
     try { blob = await renderCard(s); } catch (e) { /* gagal gambar → share teks saja */ }
-    if (blob) {
+    // Share sheet native hanya dipakai di HP/tablet — di laptop (macOS/Windows)
+    // sheet-nya tidak memuat WhatsApp dan teks/link ikut hilang, jadi desktop
+    // langsung ke fallback: unduh PNG + buka WhatsApp Web berisi teks & link.
+    const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    if (blob && isMobile) {
       const file = new File([blob], `jadwal-tsmc-${s.date}.png`, { type: 'image/png' });
-      // share sheet HP (WhatsApp, IG, dll) — dengan gambar
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         try { await navigator.share({ files: [file], text }); return; }
         catch (e) { if (e && e.name === 'AbortError') return; }
       }
-      // fallback desktop: unduh gambar + buka WA berisi teks
+    }
+    if (blob) {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = file.name;
+      a.download = `jadwal-tsmc-${s.date}.png`;
       document.body.appendChild(a); a.click(); a.remove();
     }
     window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener');
