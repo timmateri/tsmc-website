@@ -7,7 +7,7 @@
 // Pakai: <span data-tile="wan:3"></span>  atau
 //        <div class="tile-row" data-tiles="tung:1,tung:2,sok:5"></div>
 // Jenis: wan:1-9 · tung:1-9 · sok:1-9 · wind:e/s/w/n ·
-//        dragon:c/f/b · flower · back
+//        dragon:c/f/b · flower:1-4 · season:1-4 · joker · back
 // ============================================================
 'use strict';
 (function () {
@@ -155,6 +155,17 @@
       sun;
   }
 
+  // ---- joker (dipakai di J2 house rules) — burung di atas perisai ----
+  function jokerFace() {
+    return (
+      // perisai
+      `<path d="M15 24 H45 V54 Q45 67 30 74 Q15 67 15 54 Z" fill="#fff" stroke="${RED}" stroke-width="2.8"/>` +
+      `<path d="M19 28 H41 V53 Q41 63 30 69 Q19 63 19 53 Z" fill="none" stroke="${RED}" stroke-width="1" opacity=".45"/>` +
+      // burung (memakai gambar burung 1 sok, diperkecil di dalam perisai)
+      `<g transform="translate(30 47) scale(0.6) translate(-29 -46)">${sokBird()}</g>`
+    );
+  }
+
   function tileSVG(spec) {
     const [kind, val] = spec.split(':');
     const v = parseInt(val) || 0;
@@ -180,6 +191,9 @@
     } else if (kind === 'season') {
       inner = seasonFace(v || 1);
       label = 'musim ' + (SEASONS[v] || '');
+    } else if (kind === 'joker') {
+      inner = jokerFace();
+      label = 'joker';
     } else if (kind === 'back') {
       inner = `<rect x="7" y="7" width="46" height="70" rx="6" fill="${GREEN}"/>` +
         `<rect x="12" y="12" width="36" height="60" rx="4" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.5"/>`;
