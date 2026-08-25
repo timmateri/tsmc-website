@@ -264,6 +264,7 @@ main{padding:22px 0 60px}
 <div class="flash" id="flash"></div>
 <div class="imgview" id="imgview" onclick="this.classList.remove('show')"><img id="imgview-img"></div>
 
+<script src="/share-card.js"></script>
 <script>
 'use strict';
 let TOKEN = localStorage.getItem('tsmc_admin_token') || '';
@@ -491,11 +492,23 @@ async function loadSchedules(){
       ${s.booked}/${s.capacity} kursi terisi · fee ${rupiah(s.fee)}</div>
     <div style="display:flex;gap:8px;margin-top:10px">
       <button class="btn ghost sm" onclick="toggleSchedDetail(${s.id})">👥 Peserta ▾</button>
+      <button class="btn ghost sm" onclick="adminShareSchedule(${s.id})" title="Bagikan kartu jadwal ke grup WA / sosial media">📤 Bagikan</button>
       <button class="btn ghost sm" onclick="editSchedule(${s.id})">✎ Edit</button>
       <button class="btn red sm" onclick="if(confirm('Hapus jadwal ini beserta semua bookingnya?'))delSchedule(${s.id})">Hapus</button>
     </div>
     <div class="sch-det hidden" id="sch-det-${s.id}"></div></div>`).join('') || '<p class="mut">Belum ada jadwal.</p>';
 }
+/* bagikan kartu jadwal — pakai data publik (/api/site) agar nama peserta
+   sudah tersamarkan seperti di website, aman untuk grup */
+async function adminShareSchedule(id){
+  try{
+    const d = await (await fetch('/api/site')).json();
+    const s = d.schedules.find(x => x.id === id);
+    if(!s){ alert('Jadwal ini tidak tampil di website publik (sudah lewat / dibatalkan) — tidak bisa dibagikan.'); return; }
+    TSMCShare.share(s);
+  }catch(e){ alert('Gagal menyiapkan kartu: ' + e.message); }
+}
+
 /* detail peserta per jadwal — expand/collapse di dalam kartu */
 async function toggleSchedDetail(id){
   const box = $('sch-det-' + id);

@@ -169,6 +169,7 @@ section{padding:64px 0}
 .bar{height:8px;background:rgba(5,42,27,.1);border-radius:99px;overflow:hidden}
 .bar i{display:block;height:100%;border-radius:99px}
 .scard .foot{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.btn.share-btn{padding:13px 15px}
 .scard .fee small{display:block;font-size:10.5px;font-weight:800;letter-spacing:.12em;color:var(--mut-lt)}
 .scard .fee b{font-family:'DM Serif Display',serif;font-size:20px}
 .paynote{margin-top:22px;font-size:13px;color:var(--mut);background:var(--cream);
@@ -573,6 +574,7 @@ footer small{opacity:.7;display:block;margin-top:4px}
   </div>
 </div>
 
+<script src="/share-card.js"></script>
 <script>
 'use strict';
 const HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
@@ -635,6 +637,11 @@ function renderAnnouncement(s){
   document.getElementById('member-more').textContent = '+' + (parseInt(s.stat_members||'0') || '···');
 }
 
+// bagikan kartu jadwal (gambar + teks) ke WA / sosial media
+function shareSchedule(id){
+  const s = SITE && SITE.schedules.find(x => x.id === id);
+  if(s) TSMCShare.share(s);
+}
 // venue jadi link Google Maps kalau admin mengisi link-nya
 function venueHTML(s){
   return s.map_url
@@ -680,8 +687,11 @@ function renderSchedules(list){
       ${renderPlayers(s)}
       <div class="foot">
         <div class="fee"><small>FEE / ORANG</small><b>${rupiah(s.fee)}</b></div>
-        <button class="btn ${st.full ? 'ghost' : ''}" ${s.status==='closed' ? 'disabled' : ''}
-          onclick="openBooking(${s.id})">${st.btn}</button>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn ghost share-btn" onclick="shareSchedule(${s.id})" title="Bagikan jadwal ini ke WhatsApp / sosial media">📤</button>
+          <button class="btn ${st.full ? 'ghost' : ''}" ${s.status==='closed' ? 'disabled' : ''}
+            onclick="openBooking(${s.id})">${st.btn}</button>
+        </div>
       </div>
     </div>`;
   }).join('');
