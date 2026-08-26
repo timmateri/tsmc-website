@@ -512,7 +512,7 @@ async function setSchedStatus(id, status){
     : `Aktifkan lagi jadwal ${s ? fmtTgl(s.date) : ''}?\n\nJadwal akan kembali muncul sebagai jadwal aktif yang bisa di-book.`;
   if(!confirm(tanya)) return;
   try{
-    await api('/api/admin/schedules/' + id + '/status', {method:'POST', body:{status}});
+    await api('/api/admin/schedules/' + id + '/status', {method:'POST', body: JSON.stringify({status})});
     flash(status === 'done' ? 'Jadwal ditandai selesai ✓' : 'Jadwal diaktifkan lagi ✓');
     loadSchedules();
   }catch(e){ alert('Gagal: ' + e.message); }
