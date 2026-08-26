@@ -30,7 +30,7 @@
     });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
     // Kembali ke tampilan desktop → pastikan menu tidak tertinggal terbuka.
-    window.addEventListener('resize', () => { if (window.innerWidth > 820) setOpen(false); });
+    window.addEventListener('resize', () => { if (window.innerWidth > 1080) setOpen(false); });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
