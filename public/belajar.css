@@ -186,23 +186,28 @@ table.faan .fv2 .alt{display:block;font-family:'Schibsted Grotesk',sans-serif;fo
   font-weight:700;letter-spacing:.03em;color:var(--mut-lt);line-height:1.3;white-space:normal;margin-top:3px}
 table.faan .fv2.minus{color:var(--red)}
 .table-scroll{overflow-x:auto}
-/* layar sempit: tabel faan LEBAR (modul 02) jadi kartu bertumpuk, angka faan
-   jadi badge kanan-atas yang selalu terlihat — tanpa geser horizontal.
+/* layar sempit: tabel faan LEBAR (modul 02 & 04) jadi kartu bertumpuk.
+   Tiap baris memakai grid dua kolom: nama tangan + badge nilai sebaris di atas,
+   lalu deskripsi & tile-nya selebar penuh di bawahnya. Badge tidak lagi
+   melayang absolut, jadi tidak mungkin menutupi teks sepanjang apa pun.
    Tabel .faan biasa (mis. tabel klaim modul 03) tetap berbentuk tabel. */
 @media(max-width:640px){
-  table.faan.wide, table.faan.wide tbody, table.faan.wide tr, table.faan.wide td{display:block;width:100%}
+  table.faan.wide, table.faan.wide tbody{display:block;width:100%}
+  table.faan.wide tr{display:grid;grid-template-columns:minmax(0,1fr) auto;
+    column-gap:10px;align-items:start;
+    border-bottom:1px dashed rgba(4,51,31,.15);padding:11px 0}
   table.faan.wide tr:first-child{display:none}    /* baris header tidak perlu di mode kartu */
-  table.faan.wide tr{position:relative;border-bottom:1px dashed rgba(4,51,31,.15);padding:11px 0}
   table.faan.wide tr:last-child{border-bottom:none}
-  table.faan.wide td{border-bottom:none;padding:0}
-  table.faan.wide td.fn{padding-right:62px;margin-bottom:3px}  /* ruang untuk badge faan */
-  table.faan.wide .fv2{position:absolute;top:11px;right:0;width:auto;
+  table.faan.wide td{display:block;width:auto;border-bottom:none;padding:0}
+  table.faan.wide td.fn{grid-column:1;grid-row:1;margin-bottom:3px;min-width:0}
+  table.faan.wide td.fv2{grid-column:2;grid-row:1;width:auto;align-self:start;
     background:var(--cream);border:1.5px solid var(--green);border-radius:10px;
-    padding:1px 11px;font-size:17px;line-height:1.5}
-  table.faan.wide tr.sec{border-bottom:none;padding:6px 0}
+    padding:2px 11px;font-size:17px;line-height:1.5}
+  /* sel deskripsi (tanpa kelas) selalu selebar penuh di baris kedua */
+  table.faan.wide td:not(.fn):not(.fv2){grid-column:1 / -1;grid-row:2}
+  table.faan.wide tr.sec{display:block;border-bottom:none;padding:6px 0}
   table.faan.wide tr.sec td{padding:8px 10px}
-  table.faan.wide.j2 td.fn{padding-right:88px}
-  table.faan.wide.j2 .fv2{width:auto;max-width:84px;text-align:center}
+  table.faan.wide.j2 td.fv2{max-width:92px;text-align:center}
 }
 
 /* hitungan contoh */
