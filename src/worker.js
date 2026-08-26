@@ -54,8 +54,13 @@ async function getSettings(db) {
 
 // ---------- Loyalty card (tanpa login — identitas = nomor WA) ----------
 // 1 sesi hadir (booking confirmed, tanggal sudah lewat) = 1 stempel.
-// 5 stempel = 1 permainan gratis. Klaim gratis dicatat sebagai booking
-// dengan method 'reward' dan perlu dikonfirmasi admin.
+// STEMPEL_PER_HADIAH stempel = 1 permainan gratis. Klaim gratis dicatat
+// sebagai booking dengan method 'reward' dan perlu dikonfirmasi admin.
+//
+// Kalau ambang hadiahnya berubah, cukup ubah angka di bawah ini —
+// tapi ingat mengubahnya juga menggeser progres anggota yang sudah
+// berjalan, dan jumlah stempel yang digambar di beranda & admin.
+const STEMPEL_PER_HADIAH = 8;
 const TIERS = [
   { min: 30, name: 'Limit Hand', icon: '👑' },
   { min: 15, name: 'Sik Wu', icon: '🏆' },
@@ -108,14 +113,15 @@ async function getLoyalty(db, wa) {
     delta = a ? a.delta : 0;
   } catch (e) { /* tabel belum dibuat */ }
   const playsTotal = Math.max(0, (row.plays_total || 0) + delta);
-  const net = Math.max(0, (row.plays_stamp || 0) + delta - (row.rewards_used || 0) * 5);
+  const net = Math.max(0, (row.plays_stamp || 0) + delta - (row.rewards_used || 0) * STEMPEL_PER_HADIAH);
   const tier = TIERS.find((t) => playsTotal >= t.min);
   const nextIdx = TIERS.indexOf(tier) - 1;
   const next = nextIdx >= 0 ? TIERS[nextIdx] : null;
   return {
     plays_total: playsTotal,
-    card: net % 5,                      // stempel di kartu yang sedang berjalan (0–4)
-    rewards_ready: Math.floor(net / 5), // permainan gratis yang siap dipakai
+    card: net % STEMPEL_PER_HADIAH,                      // stempel di kartu berjalan
+    rewards_ready: Math.floor(net / STEMPEL_PER_HADIAH),  // permainan gratis siap pakai
+    per_reward: STEMPEL_PER_HADIAH,     // dikirim ke halaman depan supaya angkanya satu sumber
     tier: { name: tier.name, icon: tier.icon },
     next_tier: next ? { name: next.name, icon: next.icon, need: next.min - playsTotal } : null,
   };
@@ -511,16 +517,16 @@ export default {
           const members = results.map((m) => {
             const delta = deltaMap[m.wa] || 0;
             const total = Math.max(0, m.plays + delta);
-            const net = Math.max(0, m.plays + delta - m.rewards_used * 5);
+            const net = Math.max(0, m.plays + delta - m.rewards_used * STEMPEL_PER_HADIAH);
             const tier = TIERS.find((t) => total >= t.min);
             return {
               wa: m.wa, name: m.name, plays: m.plays, delta,
-              total, card: net % 5, rewards_ready: Math.floor(net / 5),
+              total, card: net % STEMPEL_PER_HADIAH, rewards_ready: Math.floor(net / STEMPEL_PER_HADIAH),
               rewards_used: m.rewards_used, total_bookings: m.total_bookings,
               tier: { name: tier.name, icon: tier.icon },
             };
           });
-          return json({ ok: true, members });
+          return json({ ok: true, members, per_reward: STEMPEL_PER_HADIAH });
         }
         if (path === '/api/admin/members/adjust' && method === 'POST') {
           const b = await req.json();

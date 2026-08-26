@@ -246,6 +246,8 @@ section{padding:64px 0}
 .loyal .lnext{font-size:12px;color:var(--mut);font-weight:700}
 .loyal .stamps{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .loyal .stamp{width:44px;height:auto;filter:drop-shadow(0 2px 0 rgba(4,51,31,.25))}
+@media(max-width:560px){.loyal .stamps{gap:5px}.loyal .stamp{width:32px}}
+@media(max-width:380px){.loyal .stamp{width:28px}}
 .loyal .gift{background:var(--red);color:#fff;font-weight:800;font-size:12.5px;
   padding:7px 13px;border-radius:99px;margin-left:6px}
 .loyal .lfoot{font-size:12.5px;color:var(--mut);margin-top:9px}
@@ -1185,13 +1187,16 @@ function forgetMe(){
   updateNavMe();
 }
 let LOYAL = null; // hasil /api/loyalty terakhir, dipakai modal booking
+// Berapa stempel untuk 1 permainan gratis. Angkanya ikut yang dikirim server
+// (loyalty.per_reward); 8 hanya dipakai kalau server versi lama belum mengirim.
+const perReward = () => (LOYAL && LOYAL.per_reward) || 8;
 /* tombol nav: "Cek Booking" saat belum dikenal; badge tier + nama saat dikenal */
 function updateNavMe(){
   const btn = document.getElementById('nav-me');
   const wa = stored('tsmc_wa');
   if(wa && LOYAL){
     const nama = (stored('tsmc_name') || '').trim().split(/\s+/)[0] || T('Kamu','You');
-    btn.innerHTML = `${LOYAL.tier.icon} ${esc(nama)} · ${LOYAL.rewards_ready > 0 ? '🎁' : LOYAL.card + '/5 ✿'}`;
+    btn.innerHTML = `${LOYAL.tier.icon} ${esc(nama)} · ${LOYAL.rewards_ready > 0 ? '🎁' : LOYAL.card + '/' + perReward() + ' ✿'}`;
     btn.classList.add('known');
     btn.title = T(`${LOYAL.tier.name} · ${LOYAL.plays_total}x main — klik untuk lihat booking & kartu stempelmu`,
       `${LOYAL.tier.name} · played ${LOYAL.plays_total}x — tap to see your bookings & stamp card`);
@@ -1221,7 +1226,8 @@ function stampSVG(filled, idx){
 function renderLoyalty(l){
   const box = document.getElementById('loyal');
   if(!l){ box.innerHTML = ''; return; }
-  const stamps = Array.from({length:5}, (_, i) => stampSVG(i < l.card, i + 1)).join('');
+  const n = l.per_reward || 8;
+  const stamps = Array.from({length:n}, (_, i) => stampSVG(i < l.card, i + 1)).join('');
   const gift = l.rewards_ready > 0
     ? `<span class="gift">🎁 ${l.rewards_ready} ${T('permainan GRATIS siap dipakai!', 'FREE ' + jml(l.rewards_ready,'game') + ' ready to use!')}</span>` : '';
   const next = l.next_tier
@@ -1234,7 +1240,8 @@ function renderLoyalty(l){
         ${next}
       </div>
       <div class="stamps">${stamps}${gift}</div>
-      <div class="lfoot">${T('Setiap sesi yang kamu hadiri = 1 stempel · 5 stempel = 1 permainan gratis 🀄','Every session you attend = 1 stamp · 5 stamps = 1 free game 🀄')}</div>
+      <div class="lfoot">${T(`Setiap sesi yang kamu hadiri = 1 stempel · ${n} stempel = 1 permainan gratis 🀄`,
+        `Every session you attend = 1 stamp · ${n} stamps = 1 free game 🀄`)}</div>
     </div>`;
 }
 async function renderMyBookings(){

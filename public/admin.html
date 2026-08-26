@@ -125,7 +125,7 @@ main{padding:22px 0 60px}
     <div id="tab-booking">
       <details class="sec-note" style="cursor:pointer">
         <summary style="font-weight:800">ℹ️ Cara kerja verifikasi &amp; reward</summary>
-        <div style="margin-top:8px">Anggota yang sudah upload bukti bayar berstatus <b>SEDANG DIVERIFIKASI</b> — cek buktinya lalu tekan <b>Konfirmasi</b>. Slot QRIS/transfer yang belum dibayar &gt;24 jam otomatis dilepas; <b>bayar di tempat</b> ditahan sampai hari sesi. Booking berlabel <b style="color:var(--red)">🎁 KLAIM REWARD</b> adalah anggota yang menukar 5 stempel loyalty dengan permainan gratis — cek dulu (mis. via WA) lalu Konfirmasi; stempelnya otomatis terpotong.</div>
+        <div style="margin-top:8px">Anggota yang sudah upload bukti bayar berstatus <b>SEDANG DIVERIFIKASI</b> — cek buktinya lalu tekan <b>Konfirmasi</b>. Slot QRIS/transfer yang belum dibayar &gt;24 jam otomatis dilepas; <b>bayar di tempat</b> ditahan sampai hari sesi. Booking berlabel <b style="color:var(--red)">🎁 KLAIM REWARD</b> adalah anggota yang menukar 8 stempel loyalty dengan permainan gratis — cek dulu (mis. via WA) lalu Konfirmasi; stempelnya otomatis terpotong.</div>
       </details>
       <div class="bk-head">
         <select id="bk-filter" onchange="loadBookings()"></select>
@@ -435,10 +435,14 @@ function waTemplate(b){
 }
 
 /* ===== anggota & stempel ===== */
+// Ambang hadiah datang dari server (/api/admin/members), jadi cukup diubah
+// di worker.js kalau suatu saat aturannya berganti lagi.
+let PER_REWARD = 8;
 let MEMBERS = [];
 async function loadMembers(){
   const d = await api('/api/admin/members');
   MEMBERS = d.members;
+  if(d.per_reward) PER_REWARD = d.per_reward;
   filterMembers();
 }
 function filterMembers(){
@@ -448,7 +452,7 @@ function filterMembers(){
   $('mb-count').textContent = list.length + ' anggota';
   $('mb-list').innerHTML = list.length ? list.map(m => {
     const waLink = m.wa.replace(/[^0-9]/g,'').replace(/^0/, '62');
-    const stamps = '✿'.repeat(m.card) + '·'.repeat(5 - m.card);
+    const stamps = '✿'.repeat(m.card) + '·'.repeat(Math.max(0, PER_REWARD - m.card));
     return `<div class="card">
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
         <b>${m.tier.icon} ${esc(m.name)}</b>
@@ -457,7 +461,7 @@ function filterMembers(){
       </div>
       <div class="mut" style="margin-top:4px">
         ${m.total}x main (otomatis ${m.plays}${m.delta ? ', koreksi ' + (m.delta > 0 ? '+' : '') + m.delta : ''})
-        · kartu: <b style="letter-spacing:3px">${stamps}</b> ${m.card}/5
+        · kartu: <b style="letter-spacing:3px">${stamps}</b> ${m.card}/${PER_REWARD}
         ${m.rewards_ready > 0 ? ' · <b style="color:var(--red)">🎁 ' + m.rewards_ready + ' gratis siap</b>' : ''}
         ${m.rewards_used > 0 ? ' · ' + m.rewards_used + 'x reward terpakai' : ''}
       </div>
