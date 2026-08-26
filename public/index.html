@@ -638,6 +638,11 @@ footer small{opacity:.7;display:block;margin-top:4px}
    Teks yang digambar JavaScript tidak bisa memakai atribut data-en,
    jadi pasangan Indonesia/Inggrisnya ditulis langsung lewat T(). */
 const T = (id, en) => (window.I18N && window.I18N.get() === 'en' ? en : id);
+/* Teks yang diketik admin (catatan jadwal, berita, event, caption,
+   pengumuman): versi Inggrisnya datang dari kolom *_en di database.
+   Kalau kolom itu masih kosong — misalnya isinya dibuat sebelum fitur ini
+   ada, atau terjemahannya gagal — tampilkan saja teks aslinya. */
+const D = (id, en) => (window.I18N && window.I18N.get() === 'en' && en ? en : (id || ''));
 const HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 const HARI_EN = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const BULAN = ['JAN','FEB','MAR','APR','MEI','JUN','JUL','AGU','SEP','OKT','NOV','DES'];
@@ -703,7 +708,7 @@ async function loadSite(){
 
 function renderAnnouncement(s){
   const el = document.getElementById('annc');
-  if(s.announcement){ el.textContent = s.announcement; el.style.display='block'; }
+  if(s.announcement){ el.textContent = D(s.announcement, s.announcement_en); el.style.display='block'; }
   else el.style.display='none';
   document.getElementById('stat-members').textContent = s.stat_members || '—';
   document.getElementById('stat-sessions').textContent = s.stat_sessions || '—';
@@ -776,7 +781,7 @@ function schedCard(s, past){
           <small>${esc(s.time_start)} – ${esc(s.time_end)} WIB</small></div>
         <span class="tag badge" style="background:${warna};color:#fff">${past ? T('SELESAI','DONE') : st.label}</span>
       </div>
-      <div class="meta">📍 ${venueHTML(s)}${s.note ? ' · ' + esc(s.note) : ''}</div>
+      <div class="meta">📍 ${venueHTML(s)}${s.note ? ' · ' + esc(D(s.note, s.note_en)) : ''}</div>
       <div class="bar"><i style="width:${pct}%;background:${warna}"></i></div>
       <div class="meta">${past
         ? `${hadir} ${T('pemain hadir', jml(hadir,'player') + ' attended')} · ${s.booked}/${s.capacity} ${T('kursi terisi','seats taken')}`
@@ -842,40 +847,50 @@ function renderNews(list){
       <div class="img">${n.image ? `<img src="${n.image}" alt="" loading="lazy">` : '<span class="tile">中</span>'}</div>
       <div class="body">
         <div class="meta"><span class="tag ${tagClass(n.tag)}">${esc(n.tag)}</span> ${fmtShort(n.date)}</div>
-        <h3>${esc(n.title)}</h3>
-        <p>${esc(n.blurb)}</p>
+        <h3>${esc(D(n.title, n.title_en))}</h3>
+        <p>${esc(D(n.blurb, n.blurb_en))}</p>
         <a onclick="openNews(${n.id})">${T('Baca selengkapnya →','Read more →')}</a>
       </div>
     </div>`).join('');
 }
 function fmtShort(iso){ if(!iso) return ''; const d = parseDate(iso); const b = bulan(d.getMonth()); return `${d.getDate()} ${b.charAt(0) + b.slice(1).toLowerCase()} ${d.getFullYear()}`; }
 
+let LAST_NEWS = null;   // berita yang sedang dibuka, digambar ulang saat ganti bahasa
 async function openNews(id){
   openModal('news-modal');
   const box = document.getElementById('news-detail');
   box.innerHTML = `<p class="sub">${T('Memuat…','Loading…')}</p>`;
   const d = await (await fetch('/api/news/' + id)).json();
-  if(!d.ok){ box.innerHTML = `<p class="sub">${T('Berita tidak ditemukan.','Article not found.')}</p>`; return; }
-  const n = d.news;
+  if(!d.ok){ LAST_NEWS = null; box.innerHTML = `<p class="sub">${T('Berita tidak ditemukan.','Article not found.')}</p>`; return; }
+  LAST_NEWS = d.news;
+  paintNewsDetail();
+}
+function paintNewsDetail(){
+  const n = LAST_NEWS;
+  if(!n) return;
+  const box = document.getElementById('news-detail');
+  if(!box) return;
   box.innerHTML = `
     <div class="meta" style="display:flex;gap:10px;align-items:center;font-size:12px;font-weight:700;color:var(--mut)">
       <span class="tag ${tagClass(n.tag)}">${esc(n.tag)}</span> ${fmtShort(n.date)}</div>
-    <h3 style="font-size:28px;margin:10px 0">${esc(n.title)}</h3>
+    <h3 style="font-size:28px;margin:10px 0">${esc(D(n.title, n.title_en))}</h3>
     ${n.image ? `<img src="${n.image}" style="border-radius:12px;margin:8px 0" alt="">` : ''}
-    <div style="font-size:15.5px;white-space:pre-wrap;color:var(--ink)">${esc(n.body || n.blurb)}</div>`;
+    <div style="font-size:15.5px;white-space:pre-wrap;color:var(--ink)">${
+      esc(D(n.body || n.blurb, n.body_en || n.blurb_en))}</div>`;
 }
 
 function renderEvents(list){
   document.getElementById('event-list').innerHTML = list.length
-    ? list.map(e => `<li><b>${esc(e.date_label)}</b> ${esc(e.title)}</li>`).join('')
+    ? list.map(e => `<li><b>${esc(D(e.date_label, e.date_label_en))}</b> ${esc(D(e.title, e.title_en))}</li>`).join('')
     : `<li>${T('Belum ada event terjadwal.','No events scheduled yet.')}</li>`;
 }
 
 function renderGallery(list){
   const grid = document.getElementById('gal-grid');
   grid.innerHTML = list.length
-    ? list.map(g => `<figure class="gitem"><img src="${g.image}" alt="${esc(g.caption)}" loading="lazy">
-        ${g.caption ? `<figcaption>${esc(g.caption)}</figcaption>` : ''}</figure>`).join('')
+    ? list.map(g => { const cap = D(g.caption, g.caption_en);
+        return `<figure class="gitem"><img src="${g.image}" alt="${esc(cap)}" loading="lazy">
+        ${cap ? `<figcaption>${esc(cap)}</figcaption>` : ''}</figure>`; }).join('')
     : `<div class="gal-empty">${T('Foto-foto sesi akan tampil di sini — admin bisa upload lewat dashboard.','Session photos will appear here — the admin can upload them from the dashboard.')}</div>`;
 }
 
@@ -1280,6 +1295,8 @@ if(window.I18N) window.I18N.onChange(() => {
     renderNews(SITE.news);
     renderEvents(SITE.events);
     renderGallery(SITE.gallery);
+    renderAnnouncement(SITE.settings);
+    paintNewsDetail();          // kalau modal berita sedang terbuka
   }
   renderMyBookings();
   updateNavMe();

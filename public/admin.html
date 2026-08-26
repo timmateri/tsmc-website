@@ -26,6 +26,15 @@ h1,h2,h3{font-family:'DM Serif Display',serif;font-weight:400}
 .field input,.field select,.field textarea{width:100%;padding:10px 12px;font-family:inherit;font-size:16px;
   border:1.5px solid rgba(5,42,27,.3);border-radius:9px;background:#fff;color:var(--ink)}
 .field textarea{min-height:110px;resize:vertical}
+/* kotak versi bahasa Inggris — diisi otomatis saat menyimpan, boleh dikoreksi */
+.field.en{margin:-4px 0 14px;padding-left:12px;border-left:3px solid rgba(5,42,27,.14)}
+.field.en label{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:#4E5C4B}
+.field.en label small{font-weight:600;letter-spacing:0;text-transform:none;opacity:.75}
+.field.en input,.field.en textarea{font-size:15px;background:#FBFCF8}
+.field.en textarea{min-height:80px}
+.tr-btn{margin-left:auto;border:1.5px solid rgba(5,42,27,.25);background:#fff;border-radius:99px;
+  padding:3px 11px;font-family:inherit;font-size:11.5px;font-weight:800;cursor:pointer;color:var(--green)}
+.tr-btn:disabled{opacity:.5;cursor:progress}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 @media(max-width:640px){.row3{grid-template-columns:1fr 1fr}}
@@ -161,6 +170,9 @@ main{padding:22px 0 60px}
         <div class="field"><label>Tempat / venue</label><input id="sch-venue" placeholder="Clubhouse TSMC, Jakarta Barat"></div>
         <div class="field"><label>Link Google Maps (opsional — venue di website jadi bisa diklik)</label><input id="sch-map" placeholder="https://maps.app.goo.gl/…"></div>
         <div class="field"><label>Catatan (opsional)</label><input id="sch-note" placeholder="Sesi reguler mingguan"></div>
+        <div class="field en"><label>English <small>diisi otomatis saat disimpan</small>
+          <button type="button" class="tr-btn" onclick="terjemah('sch-note','sch-note-en',this)">🌐 Terjemahkan</button></label>
+          <input id="sch-note-en" placeholder="Biarkan kosong = diterjemahkan otomatis"></div>
         <div class="row3">
           <div class="field"><label>Jumlah meja</label><input type="number" id="sch-tables" value="4" min="1" onchange="document.getElementById('sch-cap').value=this.value*4"></div>
           <div class="field"><label>Total kursi</label><input type="number" id="sch-cap" value="16" min="1"></div>
@@ -186,8 +198,17 @@ main{padding:22px 0 60px}
             <select id="nw-pub"><option value="1">Ya, publikasikan</option><option value="0">Draft (sembunyikan)</option></select></div>
         </div>
         <div class="field"><label>Judul</label><input id="nw-title" maxlength="150"></div>
+        <div class="field en"><label>English <small>diisi otomatis saat disimpan</small>
+          <button type="button" class="tr-btn" onclick="terjemah('nw-title','nw-title-en',this)">🌐 Terjemahkan</button></label>
+          <input id="nw-title-en" maxlength="200" placeholder="Biarkan kosong = diterjemahkan otomatis"></div>
         <div class="field"><label>Ringkasan singkat (tampil di kartu berita)</label><input id="nw-blurb" maxlength="200"></div>
+        <div class="field en"><label>English <small>diisi otomatis saat disimpan</small>
+          <button type="button" class="tr-btn" onclick="terjemah('nw-blurb','nw-blurb-en',this)">🌐 Terjemahkan</button></label>
+          <input id="nw-blurb-en" maxlength="260" placeholder="Biarkan kosong = diterjemahkan otomatis"></div>
         <div class="field"><label>Isi lengkap berita</label><textarea id="nw-body"></textarea></div>
+        <div class="field en"><label>English <small>diisi otomatis saat disimpan</small>
+          <button type="button" class="tr-btn" onclick="terjemah('nw-body','nw-body-en',this)">🌐 Terjemahkan</button></label>
+          <textarea id="nw-body-en" placeholder="Biarkan kosong = diterjemahkan otomatis"></textarea></div>
         <div class="field"><label>Foto berita (opsional)</label><input type="file" id="nw-img" accept="image/*">
           <img id="nw-img-prev" class="proof-thumb hidden"></div>
         <button class="btn" onclick="saveNews()" id="nw-save">Publikasikan</button>
@@ -207,6 +228,12 @@ main{padding:22px 0 60px}
           <div class="field"><label>&nbsp;</label><button class="btn" style="width:100%" onclick="saveEvent()">Tambah</button></div>
         </div>
         <div class="field"><label>Nama event</label><input id="ev-title" placeholder="TSMC Open 2026 · babak kualifikasi"></div>
+        <div class="field en"><label>English <small>label tanggal &amp; nama event, diisi otomatis saat disimpan</small>
+          <button type="button" class="tr-btn" onclick="terjemah('ev-title','ev-title-en',this)">🌐 Terjemahkan</button></label>
+          <div class="row3" style="gap:10px">
+            <input id="ev-label-en" placeholder="12 Sep">
+            <input id="ev-title-en" style="grid-column:span 2" placeholder="Biarkan kosong = diterjemahkan otomatis">
+          </div></div>
       </div>
       <div id="ev-list"></div>
     </div>
@@ -219,6 +246,9 @@ main{padding:22px 0 60px}
           <input type="file" id="gal-files" accept="image/*" multiple></div>
         <div class="field"><label>Keterangan (opsional, berlaku untuk semua foto yang dipilih)</label>
           <input id="gal-caption" placeholder="Sesi Sabtu malam, 29 Agustus"></div>
+        <div class="field en"><label>English <small>diisi otomatis saat disimpan</small>
+          <button type="button" class="tr-btn" onclick="terjemah('gal-caption','gal-caption-en',this)">🌐 Terjemahkan</button></label>
+          <input id="gal-caption-en" placeholder="Biarkan kosong = diterjemahkan otomatis"></div>
         <button class="btn" onclick="uploadGallery()" id="gal-btn">Upload</button>
       </div>
       <div class="gal-grid" id="gal-list"></div>
@@ -230,6 +260,9 @@ main{padding:22px 0 60px}
         <h3 style="margin-bottom:12px">Pengumuman &amp; Statistik</h3>
         <div class="field"><label>Teks pengumuman (bar hitam paling atas — kosongkan untuk sembunyikan)</label>
           <input id="st-announcement"></div>
+        <div class="field en"><label>English <small>diisi otomatis saat disimpan</small>
+          <button type="button" class="tr-btn" onclick="terjemah('st-announcement','st-announcement_en',this)">🌐 Terjemahkan</button></label>
+          <input id="st-announcement_en" placeholder="Biarkan kosong = diterjemahkan otomatis"></div>
         <div class="row2">
           <div class="field"><label>Jumlah anggota aktif</label><input id="st-stat_members"></div>
           <div class="field"><label>Jumlah sesi sejak 2023</label><input id="st-stat_sessions"></div>
@@ -607,6 +640,26 @@ function gotoBookings(id){
   BK_STATUS = 'all';
   showTab('booking');
 }
+/* ===== terjemahan konten =====
+   Kotak "English" boleh dibiarkan kosong: worker menerjemahkannya sendiri
+   saat menyimpan. Tombol 🌐 hanya untuk melihat hasilnya lebih dulu supaya
+   bisa dikoreksi sebelum tayang. */
+async function terjemah(idSumber, idTujuan, btn){
+  const src = $(idSumber), dst = $(idTujuan);
+  if(!src || !dst) return;
+  const teks = src.value.trim();
+  if(!teks) return alert('Isi dulu teks bahasa Indonesianya.');
+  if(dst.value.trim() && !confirm('Kotak English sudah ada isinya. Timpa dengan hasil terjemahan baru?')) return;
+  const label = btn ? btn.textContent : '';
+  if(btn){ btn.disabled = true; btn.textContent = 'Menerjemahkan…'; }
+  try{
+    const d = await api('/api/admin/translate', {method:'POST', body: JSON.stringify({text: teks})});
+    dst.value = d.en || '';
+    flash('Diterjemahkan ✓ — silakan koreksi kalau perlu');
+  }catch(e){ alert('Gagal menerjemahkan: ' + e.message); }
+  if(btn){ btn.disabled = false; btn.textContent = label; }
+}
+
 function editSchedule(id){
   const s = SCHEDULES.find(x => x.id === id); if(!s) return;
   editSchedId = id;
@@ -615,6 +668,7 @@ function editSchedule(id){
   $('sch-cancel').classList.remove('hidden');
   $('sch-date').value = s.date; $('sch-start').value = s.time_start; $('sch-end').value = s.time_end;
   $('sch-venue').value = s.venue; $('sch-note').value = s.note || '';
+  $('sch-note-en').value = s.note_en || '';
   $('sch-map').value = s.map_url || '';
   $('sch-tables').value = s.tables; $('sch-cap').value = s.capacity;
   $('sch-fee').value = s.fee; $('sch-status').value = s.status;
@@ -625,12 +679,13 @@ function resetSchedForm(){
   $('sch-form-title').textContent = 'Tambah Jadwal Baru';
   $('sch-save').textContent = 'Simpan Jadwal';
   $('sch-cancel').classList.add('hidden');
-  ['sch-date','sch-venue','sch-note','sch-map'].forEach(i => $(i).value = '');
+  ['sch-date','sch-venue','sch-note','sch-note-en','sch-map'].forEach(i => $(i).value = '');
 }
 async function saveSchedule(){
   const body = JSON.stringify({
     date: $('sch-date').value, time_start: $('sch-start').value, time_end: $('sch-end').value,
-    venue: $('sch-venue').value, note: $('sch-note').value, map_url: $('sch-map').value.trim(),
+    venue: $('sch-venue').value, note: $('sch-note').value, note_en: $('sch-note-en').value,
+    map_url: $('sch-map').value.trim(),
     tables: $('sch-tables').value,
     capacity: $('sch-cap').value, fee: $('sch-fee').value, status: $('sch-status').value });
   try{
@@ -673,6 +728,8 @@ function editNews(id){
   $('nw-cancel').classList.remove('hidden');
   $('nw-tag').value = n.tag; $('nw-date').value = n.date; $('nw-pub').value = String(n.published);
   $('nw-title').value = n.title; $('nw-blurb').value = n.blurb || ''; $('nw-body').value = n.body || '';
+  $('nw-title-en').value = n.title_en || ''; $('nw-blurb-en').value = n.blurb_en || '';
+  $('nw-body-en').value = n.body_en || '';
   if(n.image){ $('nw-img-prev').src = n.image; $('nw-img-prev').classList.remove('hidden'); }
   else $('nw-img-prev').classList.add('hidden');
   window.scrollTo({top:0, behavior:'smooth'});
@@ -682,14 +739,16 @@ function resetNewsForm(){
   $('news-form-title').textContent = 'Tulis Berita Baru';
   $('nw-save').textContent = 'Publikasikan';
   $('nw-cancel').classList.add('hidden');
-  ['nw-title','nw-blurb','nw-body'].forEach(i => $(i).value = '');
+  ['nw-title','nw-blurb','nw-body','nw-title-en','nw-blurb-en','nw-body-en'].forEach(i => $(i).value = '');
   $('nw-img').value = ''; $('nw-img-prev').classList.add('hidden');
 }
 async function saveNews(){
   const body = JSON.stringify({
     tag: $('nw-tag').value, date: $('nw-date').value || undefined,
     published: $('nw-pub').value === '1', title: $('nw-title').value,
-    blurb: $('nw-blurb').value, body: $('nw-body').value, image: newsImgData });
+    blurb: $('nw-blurb').value, body: $('nw-body').value, image: newsImgData,
+    title_en: $('nw-title-en').value, blurb_en: $('nw-blurb-en').value,
+    body_en: $('nw-body-en').value });
   try{
     if(editNewsId) await api('/api/admin/news/' + editNewsId, {method:'PUT', body});
     else await api('/api/admin/news', {method:'POST', body});
@@ -709,9 +768,10 @@ async function loadEvents(){
 async function saveEvent(){
   try{
     await api('/api/admin/events', {method:'POST', body: JSON.stringify({
-      date_label: $('ev-label').value, title: $('ev-title').value, sort_date: $('ev-date').value })});
+      date_label: $('ev-label').value, title: $('ev-title').value, sort_date: $('ev-date').value,
+      date_label_en: $('ev-label-en').value, title_en: $('ev-title-en').value })});
     flash('Event ditambahkan ✓');
-    $('ev-label').value = ''; $('ev-title').value = '';
+    ['ev-label','ev-title','ev-label-en','ev-title-en'].forEach(i => $(i).value = '');
     loadEvents();
   }catch(e){ alert(e.message); }
 }
@@ -735,10 +795,11 @@ async function uploadGallery(){
       btn.textContent = `Mengupload ${i+1}/${files.length}…`;
       const image = await compressImage(files[i]);
       await api('/api/admin/gallery', {method:'POST',
-        body: JSON.stringify({image, caption: $('gal-caption').value})});
+        body: JSON.stringify({image, caption: $('gal-caption').value,
+          caption_en: $('gal-caption-en').value})});
     }
     flash('Foto terupload ✓');
-    $('gal-files').value = ''; $('gal-caption').value = '';
+    ['gal-files','gal-caption','gal-caption-en'].forEach(i => $(i).value = '');
     loadGallery();
   }catch(e){ alert(e.message); }
   btn.disabled = false; btn.textContent = 'Upload';
@@ -752,7 +813,7 @@ $('st-qris-file').addEventListener('change', async e => {
   qrisData = await compressImage(e.target.files[0], 900, 0.85);
   $('st-qris-prev').src = qrisData; $('st-qris-prev').classList.remove('hidden');
 });
-const ST_KEYS = ['announcement','stat_members','stat_sessions','bank_name','bank_account',
+const ST_KEYS = ['announcement','announcement_en','stat_members','stat_sessions','bank_name','bank_account',
   'bank_holder','wa_admin','wa_group','instagram','email'];
 async function loadSettings(){
   const d = await api('/api/admin/settings');
@@ -764,7 +825,9 @@ async function saveSettings(){
   ST_KEYS.forEach(k => body[k] = $('st-' + k).value);
   if(qrisData !== undefined) body.qris_image = qrisData;
   try{
-    await api('/api/admin/settings', {method:'POST', body: JSON.stringify(body)});
+    const d = await api('/api/admin/settings', {method:'POST', body: JSON.stringify(body)});
+    // kalau versi Inggrisnya baru saja diterjemahkan otomatis, tampilkan hasilnya
+    if(d.announcement_en !== undefined) $('st-announcement_en').value = d.announcement_en;
     flash('Pengaturan tersimpan ✓');
   }catch(e){ alert(e.message); }
 }

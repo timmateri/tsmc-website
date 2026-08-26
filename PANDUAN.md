@@ -164,6 +164,20 @@ Daftar semua anggota yang pernah booking, lengkap dengan tier, jumlah main, dan 
 - **+1 stempel** untuk bonus manual (hadiah event, kompensasi, dsb).
 - Koreksi berlaku sekaligus ke kartu stempel dan hitungan tier, dan tercatat terpisah dari hitungan otomatis (tampil sebagai "koreksi +1/−1").
 
+### 🌐 Kotak "English" — versi Inggris konten yang kamu ketik
+
+Website punya toggle bahasa ID/EN. Kerangka website (menu, tombol, modul belajar, kuis) sudah diterjemahkan permanen, tapi teks yang **kamu** ketik — catatan jadwal, berita, event, keterangan foto, pengumuman — tidak bisa ikut otomatis kecuali versi Inggrisnya disimpan juga.
+
+Karena itu tiap kolom teks punya pasangan kotak **English** di bawahnya:
+
+- **Biarkan kosong** → saat kamu menekan Simpan, sistem menerjemahkannya sendiri. Tidak ada langkah tambahan, tidak ada biaya, tidak perlu API key.
+- **Tekan 🌐 Terjemahkan** kalau ingin melihat hasilnya lebih dulu, lalu perbaiki sesukamu sebelum menyimpan.
+- **Ketik sendiri** kalau kamu ingin kalimat Inggrisnya persis seperti maumu — apa pun yang ada di kotak itu dipakai apa adanya, mesin tidak ikut campur.
+
+Yang perlu diingat: terjemahan mesin tidak sempurna, terutama untuk nama tempat, istilah mahjong, dan candaan. Untuk berita panjang atau pengumuman penting, sempatkan membaca ulang kotak Englishnya sebelum publikasi.
+
+> Kalau kotak English dibiarkan kosong dan terjemahannya gagal, website tidak akan menampilkan bagian kosong — pengunjung yang memilih English tetap melihat teks Indonesianya. Begitu juga untuk konten lama yang dibuat sebelum fitur ini ada; untuk menerjemahkannya, buka lagi lewat **✎ Edit** lalu simpan sekali.
+
 ### 📰 Tab "Berita" — Mengubah konten berita
 
 1. Pilih kategori (KOMUNITAS / EVENT / RECAP / PENGUMUMAN), isi judul, ringkasan, dan isi lengkap.

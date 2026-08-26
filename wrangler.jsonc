@@ -9,6 +9,14 @@
 		"directory": "./public",
 		"binding": "ASSETS"
 	},
+	// Workers AI — dipakai untuk menerjemahkan teks yang diketik admin
+	// (catatan jadwal, berita, event, caption, pengumuman) ke bahasa Inggris
+	// saat disimpan. Tidak perlu API key: bindingnya bawaan Cloudflare.
+	// Kalau baris ini dihapus, website tetap jalan — versi Inggris konten
+	// admin saja yang kosong, dan halaman depan menampilkan teks aslinya.
+	"ai": {
+		"binding": "AI"
+	},
 	// Database D1 — setelah menjalankan `npx wrangler d1 create tsmc-db`,
 	// salin "database_id" dari hasilnya dan tempel menggantikan teks di bawah.
 	"d1_databases": [

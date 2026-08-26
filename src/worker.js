@@ -131,6 +131,79 @@ async function ensureAttendedColumn(db) {
 // jalan lain: status pembayaran sama sekali tidak ikut menentukan.
 const HADIR_EXPR = `(b.attended = 1)`;
 
+// ---------- Terjemahan konten buatan admin ----------
+// Teks yang diketik admin (catatan jadwal, berita, event, caption, pengumuman)
+// tidak bisa dijangkau data-en di HTML, jadi versi Inggrisnya disimpan di
+// kolom sendiri. Diisi otomatis saat menyimpan, dan boleh ditimpa manual
+// lewat kotak "English" di dashboard.
+const KOLOM_EN = {
+  schedules: ['note_en'],
+  news: ['title_en', 'blurb_en', 'body_en'],
+  events: ['date_label_en', 'title_en'],
+  gallery: ['caption_en'],
+};
+let kolomEnSiap = false;
+async function ensureEnColumns(db) {
+  if (kolomEnSiap) return;
+  for (const tabel of Object.keys(KOLOM_EN)) {
+    for (const kol of KOLOM_EN[tabel]) {
+      try { await db.prepare(`ALTER TABLE ${tabel} ADD COLUMN ${kol} TEXT DEFAULT ''`).run(); }
+      catch (e) { /* kolom sudah ada */ }
+    }
+  }
+  kolomEnSiap = true;
+}
+
+// Batas aman: teks yang sangat panjang dipenggal per paragraf supaya tidak
+// melewati batas model, dan jumlah penggalannya dibatasi.
+const TERJEMAH_MAKS_POTONG = 24;
+const TERJEMAH_MAKS_CHAR = 1200;
+
+// Terjemahkan satu teks Indonesia → Inggris memakai Workers AI.
+// Model m2m100 memang khusus penerjemah: dia tidak bisa "menjawab" atau
+// menuruti perintah yang kebetulan tertulis di dalam teksnya, jadi lebih
+// aman dipakai untuk konten yang diketik orang lain daripada model chat.
+// Kalau binding AI tidak ada atau modelnya gagal, kembalikan string kosong —
+// halaman depan otomatis jatuh kembali ke teks Indonesianya.
+async function terjemahkan(env, teks) {
+  const asli = String(teks == null ? '' : teks).trim();
+  if (!asli || !env.AI) return '';
+  // Potong per paragraf, lalu gabung paragraf pendek supaya panggilannya sedikit.
+  const potongan = [];
+  let buf = '';
+  for (const par of asli.split(/\n{2,}/)) {
+    if ((buf + '\n\n' + par).length > TERJEMAH_MAKS_CHAR && buf) { potongan.push(buf); buf = par; }
+    else buf = buf ? buf + '\n\n' + par : par;
+  }
+  if (buf) potongan.push(buf);
+  if (potongan.length > TERJEMAH_MAKS_POTONG) potongan.length = TERJEMAH_MAKS_POTONG;
+
+  const hasil = [];
+  for (const p of potongan) {
+    try {
+      const r = await env.AI.run('@cf/meta/m2m100-1.2b', {
+        text: p.slice(0, TERJEMAH_MAKS_CHAR),
+        source_lang: 'indonesian',
+        target_lang: 'english',
+      });
+      const t = (r && (r.translated_text || r.response || '')).toString().trim();
+      if (!t) return '';
+      hasil.push(t);
+    } catch (e) {
+      return '';   // gagal → biarkan kosong, nanti tampil versi Indonesianya
+    }
+  }
+  return hasil.join('\n\n');
+}
+
+// Ambil versi Inggris sebuah kolom: pakai yang diketik admin kalau ada,
+// kalau tidak coba terjemahkan otomatis.
+async function isiEn(env, manual, asli) {
+  const m = String(manual == null ? '' : manual).trim();
+  if (m) return m;
+  return terjemahkan(env, asli);
+}
+
 async function ensureAdjTable(db) {
   await db.prepare(`CREATE TABLE IF NOT EXISTS loyalty_adj (
     wa TEXT PRIMARY KEY, delta INTEGER NOT NULL DEFAULT 0,
@@ -299,30 +372,35 @@ export default {
       if (path === '/api/site' && method === 'GET') {
         const db = env.DB;
         await ensureLevelColumn(db);
+        await ensureEnColumns(db);
+        // Kolom *_en ikut dikirim supaya toggle bahasa di halaman depan tidak
+        // perlu memanggil server lagi — dua versinya sudah ada di browser.
         const [schedules, past, news, events, gallery, settings] = await Promise.all([
           schedulesWithAvailability(db, 'active'),
           schedulesWithAvailability(db, 'past'),
-          db.prepare(`SELECT id, tag, title, blurb, date, image FROM news
+          db.prepare(`SELECT id, tag, title, title_en, blurb, blurb_en, date, image FROM news
                       WHERE published = 1 ORDER BY date DESC, id DESC LIMIT 30`).all()
             .then((r) => r.results),
-          db.prepare(`SELECT id, date_label, title FROM events
+          db.prepare(`SELECT id, date_label, date_label_en, title, title_en FROM events
                       WHERE sort_date >= date('now','-1 day')
                       ORDER BY sort_date ASC LIMIT 12`).all().then((r) => r.results),
-          db.prepare(`SELECT id, caption, image FROM gallery ORDER BY id DESC LIMIT 24`).all()
+          db.prepare(`SELECT id, caption, caption_en, image FROM gallery ORDER BY id DESC LIMIT 24`).all()
             .then((r) => r.results),
           getSettings(db),
         ]);
         await Promise.all([attachPlayers(db, schedules), attachPlayers(db, past)]);
         // hanya kirim pengaturan yang memang untuk publik
-        const pub = (({ announcement, wa_admin, instagram, wa_group, email,
+        const pub = (({ announcement, announcement_en, wa_admin, instagram, wa_group, email,
           stat_members, stat_sessions }) =>
-          ({ announcement, wa_admin, instagram, wa_group, email, stat_members, stat_sessions }))(settings);
+          ({ announcement, announcement_en, wa_admin, instagram, wa_group, email,
+            stat_members, stat_sessions }))(settings);
         return json({ ok: true, schedules, past, news, events, gallery, settings: pub });
       }
 
       // Isi lengkap satu berita
       if (path.match(/^\/api\/news\/\d+$/) && method === 'GET') {
         const id = path.split('/').pop();
+        await ensureEnColumns(env.DB);
         const row = await env.DB.prepare(
           'SELECT * FROM news WHERE id = ? AND published = 1'
         ).bind(id).first();
@@ -622,13 +700,15 @@ export default {
           if (!mapUrlOk(mapUrl)) return err('Link Google Maps tidak valid — harus diawali https://');
           const tables = Math.max(1, parseInt(b.tables) || 4);
           await ensureMapCol(db);
+          await ensureEnColumns(db);
+          const noteEn = await isiEn(env, b.note_en, b.note);
           await db.prepare(`
-            INSERT INTO schedules (date, time_start, time_end, venue, note, map_url, tables, capacity, fee, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO schedules (date, time_start, time_end, venue, note, note_en, map_url, tables, capacity, fee, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           `).bind(b.date, b.time_start || '18.30', b.time_end || '22.30', b.venue || '',
-            b.note || '', mapUrl, tables, parseInt(b.capacity) || tables * 4,
+            b.note || '', noteEn, mapUrl, tables, parseInt(b.capacity) || tables * 4,
             parseInt(b.fee) || 75000, b.status || 'open').run();
-          return json({ ok: true });
+          return json({ ok: true, note_en: noteEn });
         }
         {
           const m = path.match(/^\/api\/admin\/schedules\/(\d+)$/);
@@ -637,13 +717,15 @@ export default {
             const mapUrl = String(b.map_url || '').trim();
             if (!mapUrlOk(mapUrl)) return err('Link Google Maps tidak valid — harus diawali https://');
             await ensureMapCol(db);
+            await ensureEnColumns(db);
+            const noteEn = await isiEn(env, b.note_en, b.note);
             await db.prepare(`
-              UPDATE schedules SET date=?, time_start=?, time_end=?, venue=?, note=?, map_url=?,
+              UPDATE schedules SET date=?, time_start=?, time_end=?, venue=?, note=?, note_en=?, map_url=?,
                 tables=?, capacity=?, fee=?, status=? WHERE id=?
-            `).bind(b.date, b.time_start, b.time_end, b.venue || '', b.note || '', mapUrl,
+            `).bind(b.date, b.time_start, b.time_end, b.venue || '', b.note || '', noteEn, mapUrl,
               parseInt(b.tables) || 4, parseInt(b.capacity) || 16,
               parseInt(b.fee) || 75000, b.status || 'open', m[1]).run();
-            return json({ ok: true });
+            return json({ ok: true, note_en: noteEn });
           }
           if (m && method === 'DELETE') {
             await db.prepare('DELETE FROM bookings WHERE schedule_id = ?').bind(m[1]).run();
@@ -690,23 +772,37 @@ export default {
           const b = await req.json();
           if (!b.title) return err('Judul wajib diisi.');
           if (b.image && !imageOk(b.image)) return err('Gambar terlalu besar.');
+          await ensureEnColumns(db);
+          const en = {
+            title: await isiEn(env, b.title_en, b.title),
+            blurb: await isiEn(env, b.blurb_en, b.blurb),
+            body: await isiEn(env, b.body_en, b.body),
+          };
           await db.prepare(`
-            INSERT INTO news (tag, title, blurb, body, image, published, date)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-          `).bind((b.tag || 'KOMUNITAS').toUpperCase(), b.title, b.blurb || '', b.body || '',
-            b.image || null, b.published ? 1 : 0, b.date || new Date().toISOString().slice(0, 10)).run();
-          return json({ ok: true });
+            INSERT INTO news (tag, title, title_en, blurb, blurb_en, body, body_en, image, published, date)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `).bind((b.tag || 'KOMUNITAS').toUpperCase(), b.title, en.title, b.blurb || '', en.blurb,
+            b.body || '', en.body, b.image || null, b.published ? 1 : 0,
+            b.date || new Date().toISOString().slice(0, 10)).run();
+          return json({ ok: true, en: en });
         }
         {
           const m = path.match(/^\/api\/admin\/news\/(\d+)$/);
           if (m && method === 'PUT') {
             const b = await req.json();
             if (b.image && !imageOk(b.image)) return err('Gambar terlalu besar.');
+            await ensureEnColumns(db);
+            const en = {
+              title: await isiEn(env, b.title_en, b.title),
+              blurb: await isiEn(env, b.blurb_en, b.blurb),
+              body: await isiEn(env, b.body_en, b.body),
+            };
             await db.prepare(`
-              UPDATE news SET tag=?, title=?, blurb=?, body=?, image=?, published=?, date=? WHERE id=?
-            `).bind((b.tag || 'KOMUNITAS').toUpperCase(), b.title, b.blurb || '', b.body || '',
-              b.image || null, b.published ? 1 : 0, b.date, m[1]).run();
-            return json({ ok: true });
+              UPDATE news SET tag=?, title=?, title_en=?, blurb=?, blurb_en=?, body=?, body_en=?,
+                image=?, published=?, date=? WHERE id=?
+            `).bind((b.tag || 'KOMUNITAS').toUpperCase(), b.title, en.title, b.blurb || '', en.blurb,
+              b.body || '', en.body, b.image || null, b.published ? 1 : 0, b.date, m[1]).run();
+            return json({ ok: true, en: en });
           }
           if (m && method === 'DELETE') {
             await db.prepare('DELETE FROM news WHERE id = ?').bind(m[1]).run();
@@ -722,9 +818,16 @@ export default {
         if (path === '/api/admin/events' && method === 'POST') {
           const b = await req.json();
           if (!b.title || !b.date_label) return err('Tanggal dan nama event wajib diisi.');
-          await db.prepare('INSERT INTO events (date_label, title, sort_date) VALUES (?, ?, ?)')
-            .bind(b.date_label, b.title, b.sort_date || new Date().toISOString().slice(0, 10)).run();
-          return json({ ok: true });
+          await ensureEnColumns(db);
+          const en = {
+            title: await isiEn(env, b.title_en, b.title),
+            date_label: await isiEn(env, b.date_label_en, b.date_label),
+          };
+          await db.prepare(`INSERT INTO events (date_label, date_label_en, title, title_en, sort_date)
+            VALUES (?, ?, ?, ?, ?)`)
+            .bind(b.date_label, en.date_label, b.title, en.title,
+              b.sort_date || new Date().toISOString().slice(0, 10)).run();
+          return json({ ok: true, en: en });
         }
         {
           const m = path.match(/^\/api\/admin\/events\/(\d+)$/);
@@ -738,9 +841,11 @@ export default {
         if (path === '/api/admin/gallery' && method === 'POST') {
           const b = await req.json();
           if (!imageOk(b.image)) return err('Foto tidak valid atau terlalu besar.');
-          await db.prepare('INSERT INTO gallery (caption, image) VALUES (?, ?)')
-            .bind(b.caption || '', b.image).run();
-          return json({ ok: true });
+          await ensureEnColumns(db);
+          const capEn = await isiEn(env, b.caption_en, b.caption);
+          await db.prepare('INSERT INTO gallery (caption, caption_en, image) VALUES (?, ?, ?)')
+            .bind(b.caption || '', capEn, b.image).run();
+          return json({ ok: true, caption_en: capEn });
         }
         {
           const m = path.match(/^\/api\/admin\/gallery\/(\d+)$/);
@@ -750,15 +855,35 @@ export default {
           }
         }
 
+        // ---- Terjemahan sesuai permintaan (tombol 🌐 di dashboard) ----
+        // Dipakai supaya admin bisa melihat & mengoreksi hasilnya sebelum
+        // menyimpan, bukan cuma pasrah menerima hasil mesin.
+        if (path === '/api/admin/translate' && method === 'POST') {
+          const b = await req.json();
+          if (!env.AI) {
+            return err('Layanan terjemahan belum aktif. Tambahkan binding "AI" di wrangler.jsonc lalu deploy ulang.');
+          }
+          const teks = String(b.text || '').slice(0, TERJEMAH_MAKS_CHAR * TERJEMAH_MAKS_POTONG);
+          if (!teks.trim()) return json({ ok: true, en: '' });
+          const en = await terjemahkan(env, teks);
+          if (!en) return err('Terjemahan gagal — coba lagi sebentar, atau ketik manual.');
+          return json({ ok: true, en: en });
+        }
+
         // ---- Pengaturan ----
         if (path === '/api/admin/settings' && method === 'GET') {
           return json({ ok: true, settings: await getSettings(db) });
         }
         if (path === '/api/admin/settings' && method === 'POST') {
           const b = await req.json();
-          const allowed = ['announcement', 'bank_name', 'bank_account', 'bank_holder',
+          const allowed = ['announcement', 'announcement_en', 'bank_name', 'bank_account', 'bank_holder',
             'qris_image', 'wa_admin', 'instagram', 'wa_group', 'email',
             'stat_members', 'stat_sessions'];
+          // Pengumuman ikut punya versi Inggris; kalau kotaknya dibiarkan
+          // kosong, diterjemahkan otomatis dari teks Indonesianya.
+          if ('announcement' in b) {
+            b.announcement_en = await isiEn(env, b.announcement_en, b.announcement);
+          }
           for (const k of allowed) {
             if (k in b) {
               if (k === 'qris_image' && b[k] && !imageOk(b[k])) return err('Gambar QRIS terlalu besar.');
@@ -767,7 +892,7 @@ export default {
               ).bind(k, String(b[k])).run();
             }
           }
-          return json({ ok: true });
+          return json({ ok: true, announcement_en: b.announcement_en || '' });
         }
       }
 
