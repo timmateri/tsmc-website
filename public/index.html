@@ -296,6 +296,65 @@ section{padding:64px 0}
 .gitem figcaption{position:absolute;inset-inline:0;bottom:0;background:linear-gradient(transparent,rgba(5,42,27,.85));
   color:var(--cream);font-size:12.5px;font-weight:700;padding:18px 12px 8px}
 .gal-empty{color:var(--mut);font-size:14.5px;background:#fff;border:1.5px dashed rgba(5,42,27,.3);border-radius:12px;padding:28px;text-align:center}
+/* album galeri: satu kartu = satu sesi, sampulnya kolase foto.
+   Tiap album dapat salah satu dari 5 gaya art mahjong (v1–v5) supaya
+   deretan album tidak terlihat seragam — warna aksen, stempel sudut,
+   watermark, dan susunan kolasenya berbeda-beda. */
+.albums{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.album{border:1.5px solid rgba(5,42,27,.2);border-radius:14px;overflow:hidden;background:#fff;
+  cursor:pointer;text-align:left;font:inherit;padding:0;box-shadow:0 4px 0 rgba(5,42,27,.08);
+  transition:transform .12s ease,box-shadow .12s ease;width:100%;display:block;position:relative;
+  --acc:#087048;--acc-soft:rgba(8,112,72,.12)}
+.album:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--acc-soft)}
+.album:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+/* bingkai kolase */
+.album .wrapk{position:relative}
+.album .kolase{display:grid;gap:3px;aspect-ratio:4/3;background:var(--acc-soft);padding:3px}
+.album .kolase img{width:100%;height:100%;object-fit:cover;display:block;border-radius:3px}
+/* susunan dasar menurut jumlah foto sampul */
+.kolase.n1{grid-template-columns:1fr}
+.kolase.n2{grid-template-columns:1fr 1fr}
+.kolase.n3{grid-template-columns:1.5fr 1fr;grid-template-rows:1fr 1fr}
+.kolase.n3 img:first-child{grid-row:span 2}
+.kolase.n4{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+/* variasi susunan khusus saat sampulnya 4 foto */
+.album.v2 .kolase.n4{grid-template-columns:1.6fr 1fr}
+.album.v2 .kolase.n4 img:first-child{grid-row:span 2}
+.album.v2 .kolase.n4 img:nth-child(4){display:none}
+.album.v3 .kolase.n4{grid-template-columns:repeat(3,1fr);grid-template-rows:1.4fr 1fr}
+.album.v3 .kolase.n4 img:first-child{grid-column:span 3}
+.album.v4 .kolase.n4{grid-template-columns:1fr 1.6fr}
+.album.v4 .kolase.n4 img:nth-child(3){grid-row:span 2;grid-column:2;grid-row-start:1}
+.album.v4 .kolase.n4 img:nth-child(4){display:none}
+.album.v5 .kolase.n4{grid-template-columns:1.35fr 1fr;grid-template-rows:1fr 1.35fr}
+/* stempel sudut ala cap mahjong */
+.album .seal{position:absolute;top:9px;right:9px;width:46px;height:46px;transform:rotate(-7deg);
+  filter:drop-shadow(0 3px 6px rgba(5,42,27,.35));pointer-events:none}
+.album:hover .seal{transform:rotate(-7deg) scale(1.06)}
+.album .seal svg{width:100%;height:100%;display:block}
+/* keterangan + watermark besar di belakangnya */
+.album .info{padding:12px 14px 14px;position:relative;overflow:hidden;
+  border-top:3px solid var(--acc)}
+.album .info .wm{position:absolute;right:-14px;bottom:-26px;width:104px;height:104px;opacity:.09;
+  pointer-events:none;color:var(--acc)}
+.album .info .wm svg{width:100%;height:100%;display:block}
+.album .info b{display:block;font-size:15px;line-height:1.3;position:relative}
+.album .info .sub{font-size:12.5px;color:var(--mut);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap;
+  align-items:center;position:relative}
+.album .exp{background:rgba(192,32,40,.1);color:var(--red);border-radius:99px;padding:2px 9px;font-weight:800;font-size:11.5px}
+@media (prefers-reduced-motion: reduce){
+  .album,.album .seal{transition:none}
+  .album:hover{transform:none}
+  .album:hover .seal{transform:rotate(-7deg)}
+}
+/* isi album di dalam modal */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:14px}
+.pitem{position:relative;border-radius:10px;overflow:hidden;border:1.5px solid rgba(5,42,27,.18);aspect-ratio:1}
+.pitem img{width:100%;height:100%;object-fit:cover;display:block}
+.pitem a{position:absolute;right:6px;bottom:6px;background:rgba(5,42,27,.86);color:var(--cream);
+  border-radius:8px;padding:4px 8px;font-size:12px;font-weight:800;text-decoration:none}
+.pitem a:hover{background:var(--green)}
+.albhead{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
 /* anggota + aturan */
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:26px}
 @media(max-width:820px){.two-col{grid-template-columns:1fr}}
@@ -498,7 +557,7 @@ footer small{opacity:.7;display:block;margin-top:4px}
       <h2 data-en="Session Gallery">Galeri Sesi</h2>
       <div class="sub" data-en="Photos from our weekly sessions &amp; events">Dokumentasi sesi mingguan &amp; event</div>
     </div>
-    <div class="gal-grid" id="gal-grid"></div>
+    <div class="albums" id="gal-grid"></div>
   </div>
 </section>
 
@@ -630,6 +689,14 @@ footer small{opacity:.7;display:block;margin-top:4px}
   </div>
 </div>
 
+<!-- isi satu album galeri: foto-foto satu sesi + tombol unduh -->
+<div class="modal-bg" id="album-modal">
+  <div class="modal" style="max-width:820px">
+    <button class="x" onclick="closeModal('album-modal')">×</button>
+    <div id="album-detail"></div>
+  </div>
+</div>
+
 <script src="/i18n.js"></script>
 <script src="/share-card.js"></script>
 <script>
@@ -691,6 +758,7 @@ async function loadSite(){
     const d = await r.json();
     if(!d.ok) throw new Error(d.error);
     SITE = d;
+    if(d.gallery_days) GAL_HARI = d.gallery_days;   // masa simpan foto, satu sumber di worker
     renderAnnouncement(d.settings);
     renderSchedules(d.schedules);
     renderPast(d.past);
@@ -885,13 +953,134 @@ function renderEvents(list){
     : `<li>${T('Belum ada event terjadwal.','No events scheduled yet.')}</li>`;
 }
 
+/* ---------- galeri per album ----------
+   Foto dikelompokkan per sesi. Kartunya menampilkan kolase sampul; isinya
+   baru diambil dari server saat album dibuka, supaya halaman depan ringan.
+   Semua foto terhapus otomatis setelah GAL_HARI hari. */
+let GAL_HARI = 7;
+function sisaHari(created){
+  if(!created) return GAL_HARI;
+  const t = new Date(String(created).replace(' ', 'T') + 'Z').getTime();
+  if(isNaN(t)) return GAL_HARI;
+  return Math.max(0, GAL_HARI - Math.floor((Date.now() - t) / 86400000));
+}
+function labelSisa(n){
+  if(n <= 0) return T('hilang hari ini','gone today');
+  if(n === 1) return T('tinggal 1 hari','1 day left');
+  return T(`tinggal ${n} hari`, `${n} days left`);
+}
+function ukuran(b){
+  if(!b) return '';
+  const mb = b / 1048576;
+  return mb >= 1 ? mb.toFixed(mb < 10 ? 1 : 0) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB';
+}
+/* Lima gaya art untuk kartu album. Album ke-1 dapat gaya 1, ke-2 gaya 2,
+   dan seterusnya memutar — jadi tiga album berjejer pasti berbeda motif.
+   Gayanya dikunci ke posisi album, bukan acak, supaya tidak berubah-ubah
+   setiap halaman dimuat ulang.
+   Motifnya digambar sebagai SVG kecil di sini (bukan memuat belajar.js),
+   supaya halaman depan tetap ringan. */
+const GAL_ART = [
+  { acc:'#C02028', soft:'rgba(192,32,40,.14)', nama:'naga merah',
+    motif:'<text x="30" y="42" text-anchor="middle" font-size="30" font-weight="900" font-family="\'Noto Serif TC\',serif" fill="currentColor">中</text>' },
+  { acc:'#087048', soft:'rgba(8,112,72,.14)', nama:'naga hijau',
+    motif:'<text x="30" y="42" text-anchor="middle" font-size="30" font-weight="900" font-family="\'Noto Serif TC\',serif" fill="currentColor">發</text>' },
+  { acc:'#C9A54A', soft:'rgba(201,165,74,.18)', nama:'tiga tung',
+    motif:'<g fill="none" stroke="currentColor" stroke-width="3">'
+      + '<circle cx="30" cy="15" r="7"/><circle cx="19" cy="34" r="7"/><circle cx="41" cy="34" r="7"/></g>'
+      + '<g fill="currentColor"><circle cx="30" cy="15" r="2.4"/><circle cx="19" cy="34" r="2.4"/><circle cx="41" cy="34" r="2.4"/></g>' },
+  { acc:'#2A5B7A', soft:'rgba(42,91,122,.14)', nama:'angin timur',
+    motif:'<g stroke="currentColor" stroke-width="2.6" stroke-linecap="round">'
+      + '<path d="M30 5v6M30 39v6M6 25h6M48 25h6"/></g>'
+      + '<text x="30" y="35" text-anchor="middle" font-size="24" font-weight="900" font-family="\'Noto Serif TC\',serif" fill="currentColor">東</text>' },
+  { acc:'#A0416B', soft:'rgba(160,65,107,.14)', nama:'bunga plum',
+    motif:'<g fill="currentColor">'
+      + '<circle cx="30" cy="12" r="7"/><circle cx="47" cy="24" r="7"/><circle cx="40" cy="43" r="7"/>'
+      + '<circle cx="20" cy="43" r="7"/><circle cx="13" cy="24" r="7"/></g>'
+      + '<circle cx="30" cy="28" r="5" fill="#FAFCF5"/>' },
+];
+// stempel sudut: motifnya di dalam "keping" bergaya tile mahjong
+function sealSVG(a){
+  return `<svg viewBox="0 0 60 60" aria-hidden="true">
+    <rect x="2" y="2" width="56" height="56" rx="13" fill="#FAFCF5" stroke="${a.acc}" stroke-width="3"/>
+    <rect x="7" y="7" width="46" height="46" rx="9" fill="none" stroke="${a.acc}" stroke-width="1" opacity=".45"/>
+    <g transform="translate(0 7)" color="${a.acc}">${a.motif}</g></svg>`;
+}
+// watermark besar di area keterangan — motif yang sama, tanpa keping
+function wmSVG(a){
+  return `<svg viewBox="0 0 60 50" aria-hidden="true">${a.motif}</svg>`;
+}
+
 function renderGallery(list){
   const grid = document.getElementById('gal-grid');
-  grid.innerHTML = list.length
-    ? list.map(g => { const cap = D(g.caption, g.caption_en);
-        return `<figure class="gitem"><img src="${g.image}" alt="${esc(cap)}" loading="lazy">
-        ${cap ? `<figcaption>${esc(cap)}</figcaption>` : ''}</figure>`; }).join('')
-    : `<div class="gal-empty">${T('Foto-foto sesi akan tampil di sini — admin bisa upload lewat dashboard.','Session photos will appear here — the admin can upload them from the dashboard.')}</div>`;
+  if(!list || !list.length){
+    grid.innerHTML = `<div class="gal-empty">${T('Foto-foto sesi akan tampil di sini — admin bisa upload lewat dashboard.','Session photos will appear here — the admin can upload them from the dashboard.')}</div>`;
+    return;
+  }
+  grid.innerHTML = list.map((a, i) => {
+    const c = (a.cover || []).slice(0, 4);
+    const sisa = sisaHari(a.created_at);
+    const art = GAL_ART[i % GAL_ART.length];
+    return `<button class="album v${(i % GAL_ART.length) + 1}"
+        style="--acc:${art.acc};--acc-soft:${art.soft}"
+        onclick="openAlbum('${esc(a.key)}')"
+        aria-label="${esc(a.title)} — ${a.n} ${T('foto','photos')}">
+      <div class="wrapk">
+        <div class="kolase n${c.length}">${c.map(src => `<img src="${src}" alt="" loading="lazy">`).join('')}</div>
+        <span class="seal">${sealSVG(art)}</span>
+      </div>
+      <div class="info">
+        <span class="wm">${wmSVG(art)}</span>
+        <b>${esc(a.title)}</b>
+        <div class="sub"><span>📷 ${a.n} ${T('foto', jml(a.n,'photo'))}</span>
+          ${a.bytes ? `<span>· ${ukuran(a.bytes)}</span>` : ''}
+          <span class="exp">⏳ ${labelSisa(sisa)}</span></div>
+      </div></button>`;
+  }).join('');
+}
+
+let LAST_ALBUM = null;   // album yang sedang dibuka, digambar ulang saat ganti bahasa
+async function openAlbum(key){
+  openModal('album-modal');
+  const box = document.getElementById('album-detail');
+  box.innerHTML = `<p class="sub">${T('Memuat foto…','Loading photos…')}</p>`;
+  try{
+    const d = await (await fetch('/api/gallery/album/' + encodeURIComponent(key))).json();
+    if(!d.ok) throw new Error(d.error || 'gagal');
+    LAST_ALBUM = d;
+    paintAlbum();
+  }catch(e){
+    LAST_ALBUM = null;
+    box.innerHTML = `<p class="sub">${T('Album ini sudah tidak tersedia — mungkin masa simpannya sudah lewat.','This album is no longer available — its storage window has probably passed.')}</p>`;
+  }
+}
+function paintAlbum(){
+  const d = LAST_ALBUM;
+  if(!d) return;
+  const box = document.getElementById('album-detail');
+  if(!box) return;
+  const sisa = sisaHari(d.photos[0] && d.photos[0].created_at);
+  const adaAsli = d.photos.some(p => p.has_full);
+  box.innerHTML = `
+    <h3 style="font-size:26px;margin-bottom:2px">${esc(d.title)}</h3>
+    <div class="albhead">
+      <span class="sub" style="font-size:13px">📷 ${d.photos.length} ${T('foto', jml(d.photos.length,'photo'))}</span>
+      <span class="exp">⏳ ${labelSisa(sisa)}</span>
+      <a class="btn" style="margin-left:auto;text-decoration:none"
+         href="/api/gallery/zip/${esc(d.key)}">⬇ ${T(`Unduh semua (${d.photos.length} foto)`,
+           `Download all (${d.photos.length} ${jml(d.photos.length,'photo')})`)}</a>
+    </div>
+    <p class="sub" style="font-size:12.5px;margin-top:8px">${adaAsli
+      ? T('Yang terunduh adalah foto versi asli, bukan versi kecil yang tampil di sini.',
+          'What you download is the original photo, not the small version shown here.')
+      : T('Foto album ini hanya tersedia dalam versi tampilan.',
+          'This album is only available in display resolution.')}</p>
+    <div class="pgrid">${d.photos.map((p, i) => `
+      <figure class="pitem">
+        <img src="${p.image}" alt="${esc(D(p.caption, p.caption_en))}" loading="lazy">
+        <a href="/api/gallery/photo/${p.id}" title="${T('Unduh foto ini','Download this photo')}"
+           aria-label="${T('Unduh foto','Download photo')} ${i+1}">⬇</a>
+      </figure>`).join('')}</div>`;
 }
 
 function renderContacts(s){
@@ -1297,6 +1486,7 @@ if(window.I18N) window.I18N.onChange(() => {
     renderGallery(SITE.gallery);
     renderAnnouncement(SITE.settings);
     paintNewsDetail();          // kalau modal berita sedang terbuka
+    paintAlbum();               // kalau modal album sedang terbuka
   }
   renderMyBookings();
   updateNavMe();

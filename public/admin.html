@@ -240,18 +240,28 @@ main{padding:22px 0 60px}
 
     <!-- GALERI -->
     <div id="tab-galeri" class="hidden">
+      <div class="sec-note" id="gal-note">Foto diunggah <b>per sesi</b>. Di website, satu sesi tampil sebagai satu kartu album
+        berisi kolase foto; pengunjung bisa membukanya dan mengunduh versi aslinya.
+        <b>Semua foto terhapus otomatis setelah 7 hari.</b></div>
       <div class="card">
-        <h3 style="margin-bottom:12px">Upload Foto</h3>
-        <div class="field"><label>Pilih foto (bisa lebih dari satu — otomatis dikompres)</label>
+        <h3 style="margin-bottom:12px">Upload Foto Sesi</h3>
+        <div class="field"><label>Album ini untuk sesi yang mana?</label>
+          <select id="gal-sched" onchange="isiJudulAlbum()">
+            <option value="">— pilih jadwal —</option>
+          </select></div>
+        <div class="field"><label>Judul album (boleh diubah)</label>
+          <input id="gal-album" placeholder="Sesi Rabu Siang 26 Agustus 2026 — Roze's Garden"></div>
+        <div class="field"><label>Pilih foto (bisa banyak sekaligus)</label>
           <input type="file" id="gal-files" accept="image/*" multiple></div>
-        <div class="field"><label>Keterangan (opsional, berlaku untuk semua foto yang dipilih)</label>
-          <input id="gal-caption" placeholder="Sesi Sabtu malam, 29 Agustus"></div>
+        <div class="field"><label>Keterangan foto (opsional, berlaku untuk semua foto yang dipilih)</label>
+          <input id="gal-caption" placeholder="Meja 2 lagi seru-serunya"></div>
         <div class="field en"><label>English <small>diisi otomatis saat disimpan</small>
           <button type="button" class="tr-btn" onclick="terjemah('gal-caption','gal-caption-en',this)">🌐 Terjemahkan</button></label>
           <input id="gal-caption-en" placeholder="Biarkan kosong = diterjemahkan otomatis"></div>
         <button class="btn" onclick="uploadGallery()" id="gal-btn">Upload</button>
+        <div class="mut" id="gal-progress" style="margin-top:10px;font-size:13px"></div>
       </div>
-      <div class="gal-grid" id="gal-list"></div>
+      <div id="gal-list"></div>
     </div>
 
     <!-- PENGATURAN -->
@@ -777,32 +787,84 @@ async function saveEvent(){
 }
 async function delEvent(id){ await api('/api/admin/events/' + id, {method:'DELETE'}); flash('Event dihapus'); loadEvents(); }
 
-/* ===== galeri ===== */
+/* ===== galeri per album =====
+   Tiap foto diunggah dua kali: versi kecil (untuk ditampilkan, masuk D1)
+   dan berkas aslinya (untuk diunduh pengunjung, masuk R2). */
+let GAL_HARI = 7, GAL_R2 = true;
+function isiJudulAlbum(){
+  const id = parseInt($('gal-sched').value);
+  const s = SCHEDULES.find(x => x.id === id);
+  if(s) $('gal-album').value = `Sesi ${fmtTgl(s.date)} — ${s.venue}`;
+}
 async function loadGallery(){
-  const d = await (await fetch('/api/site')).json();
-  $('gal-list').innerHTML = d.gallery.map(g => `<div class="card">
-    <img src="${g.image}" onclick="viewImg(this.src)">
-    ${g.caption ? `<div class="mut" style="margin-top:6px">${esc(g.caption)}</div>` : ''}
-    <button class="btn red sm" style="margin-top:8px" onclick="if(confirm('Hapus foto ini?'))delGallery(${g.id})">Hapus</button>
-    </div>`).join('') || '<p class="mut">Belum ada foto.</p>';
+  // daftar jadwal untuk dropdown album
+  if(!SCHEDULES.length){ try{ await loadSchedules(); }catch(e){} }
+  $('gal-sched').innerHTML = '<option value="">— pilih jadwal —</option>' +
+    SCHEDULES.map(s => `<option value="${s.id}">${fmtTgl(s.date)} · ${esc(s.venue)}</option>`).join('');
+
+  const d = await api('/api/admin/gallery');
+  GAL_HARI = d.days || 7; GAL_R2 = !!d.r2;
+  if(!GAL_R2){
+    $('gal-note').innerHTML += '<br><b style="color:var(--red)">Penyimpanan foto asli (R2) belum aktif</b> — '
+      + 'foto tetap tampil, tapi yang bisa diunduh hanya versi kecil. Lihat PANDUAN.md bagian Galeri.';
+  }
+  $('gal-list').innerHTML = d.albums.length ? d.albums.map(a => {
+    const sisa = Math.max(0, GAL_HARI - Math.floor((Date.now() -
+      new Date(String(a.created_at).replace(' ','T') + 'Z').getTime()) / 86400000));
+    const mb = a.bytes ? (a.bytes/1048576).toFixed(1) + ' MB' : '—';
+    return `<div class="card">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <b>${esc(a.album || 'Tanpa judul')}</b>
+        <span class="pill" style="background:var(--ink)">${a.n} foto</span>
+        <span class="pill" style="background:${sisa <= 2 ? '#C02028' : '#6B7A66'}">${
+          sisa <= 0 ? 'hilang hari ini' : 'tinggal ' + sisa + ' hari'}</span>
+      </div>
+      <div class="mut" style="margin-top:4px">${a.n_asli}/${a.n} punya versi asli · ${mb} · diunggah ${esc(a.created_at || '')}</div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <a class="btn ghost sm" href="/api/gallery/zip/${esc(a.album_key)}" style="text-decoration:none">⬇ Unduh ZIP</a>
+        <button class="btn red sm" onclick="delAlbum('${esc(a.album_key)}', ${a.n})">Hapus album</button>
+      </div></div>`;
+  }).join('') : '<p class="mut">Belum ada album foto.</p>';
 }
 async function uploadGallery(){
   const files = $('gal-files').files;
   if(!files.length) return alert('Pilih foto dulu.');
-  const btn = $('gal-btn'); btn.disabled = true;
+  const judul = $('gal-album').value.trim();
+  if(!judul) return alert('Isi judul albumnya dulu — ini yang tampil sebagai nama sesi di website.');
+  const btn = $('gal-btn'), prog = $('gal-progress');
+  btn.disabled = true;
+  let gagalAsli = 0;
   try{
+    const a = await api('/api/admin/gallery/album', {method:'POST', body: JSON.stringify({album: judul})});
     for(let i = 0; i < files.length; i++){
       btn.textContent = `Mengupload ${i+1}/${files.length}…`;
+      prog.textContent = `${files[i].name} — mengecilkan…`;
       const image = await compressImage(files[i]);
-      await api('/api/admin/gallery', {method:'POST',
+      const r = await api('/api/admin/gallery', {method:'POST',
         body: JSON.stringify({image, caption: $('gal-caption').value,
-          caption_en: $('gal-caption-en').value})});
+          caption_en: $('gal-caption-en').value, album_key: a.key, album: judul,
+          schedule_id: $('gal-sched').value || null, orig_name: files[i].name})});
+      // lalu berkas aslinya, apa adanya, supaya bisa diunduh utuh
+      if(GAL_R2 && r.id){
+        prog.textContent = `${files[i].name} — mengirim versi asli (${(files[i].size/1048576).toFixed(1)} MB)…`;
+        try{
+          await api('/api/admin/gallery/' + r.id + '/full',
+            {method:'PUT', headers:{'content-type': files[i].type || 'image/jpeg'}, body: files[i]});
+        }catch(e){ gagalAsli++; }
+      }
     }
-    flash('Foto terupload ✓');
+    flash(gagalAsli ? `Album tersimpan, tapi ${gagalAsli} foto asli gagal dikirim`
+                    : `Album "${judul}" terupload ✓`);
     ['gal-files','gal-caption','gal-caption-en'].forEach(i => $(i).value = '');
+    prog.textContent = '';
     loadGallery();
-  }catch(e){ alert(e.message); }
+  }catch(e){ alert(e.message); prog.textContent = ''; }
   btn.disabled = false; btn.textContent = 'Upload';
+}
+async function delAlbum(key, n){
+  if(!confirm(`Hapus album ini beserta ${n} fotonya? Tidak bisa dibatalkan.`)) return;
+  await api('/api/admin/gallery/album/' + key, {method:'DELETE'});
+  flash('Album dihapus'); loadGallery();
 }
 async function delGallery(id){ await api('/api/admin/gallery/' + id, {method:'DELETE'}); flash('Foto dihapus'); loadGallery(); }
 
