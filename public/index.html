@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Social Mahjong Club — Main Bareng Tiap Minggu</title>
-<meta name="description" content="Komunitas mahjong Hong Kong style di Jakarta. Pilih jadwal sesi, bayar fee, dan slot meja kamu langsung terkunci.">
+<title data-en="The Social Mahjong Club — Playing Together Every Week">The Social Mahjong Club — Main Bareng Tiap Minggu</title>
+<meta name="description" content="Komunitas mahjong Hong Kong style di Jakarta. Pilih jadwal sesi, bayar fee, dan slot meja kamu langsung terkunci." data-en-content="A Hong Kong style mahjong community in Jakarta. Pick a session, pay the fee, and your seat at the table is locked in.">
 <link rel="icon" type="image/png" href="/favicon.png">
 <meta name="theme-color" content="#087048">
 
@@ -65,11 +65,12 @@ a{color:inherit}
 /* ---------- nav ---------- */
 nav{position:sticky;top:0;z-index:50;background:rgba(251,246,232,.94);backdrop-filter:blur(8px);
   border-bottom:1.5px solid rgba(5,42,27,.12)}
-nav .wrap{display:flex;align-items:center;gap:22px;height:64px;position:relative}
+nav .wrap{display:flex;align-items:center;gap:16px;height:64px;position:relative}
 .logo{display:flex;align-items:center;text-decoration:none}
 .logo img{height:36px;display:block}
 @media(max-width:480px){.logo img{height:28px}}
-nav .links{display:flex;gap:20px;margin-left:auto;font-size:14px;font-weight:700;align-items:center}
+nav .links{display:flex;gap:16px;margin-left:auto;font-size:13.5px;font-weight:700;align-items:center}
+nav .links>a,nav .drop-wrap>a{white-space:nowrap}
 nav .links a{text-decoration:none;opacity:.8}
 nav .links a:hover{opacity:1;color:var(--green)}
 /* dropdown "Belajar" */
@@ -98,6 +99,15 @@ nav .links a.nav-quiz{opacity:1;color:#fff;background:var(--red);border-radius:9
 nav .links a.nav-quiz:hover{color:#fff;transform:translateY(-1px);box-shadow:0 4px 0 #8E1A20}
 nav .links a.nav-quiz:active{transform:translateY(2px);box-shadow:0 1px 0 #8E1A20}
 nav .links a.nav-quiz::after{content:"↗";font-size:10px;margin-left:5px;opacity:.85}
+/* peralih bahasa ID / EN — selalu di ujung kanan bar */
+.lang-switch{display:inline-flex;gap:2px;background:var(--cream);border:1.5px solid rgba(5,42,27,.2);
+  border-radius:99px;padding:2px;flex:0 0 auto;margin-left:2px}
+.lang-switch button{border:none;background:transparent;cursor:pointer;font-family:inherit;
+  font-size:11.5px;font-weight:800;letter-spacing:.06em;color:var(--mut);padding:5px 11px;
+  border-radius:99px;line-height:1;transition:background .12s,color .12s;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.lang-switch button:hover{color:var(--ink)}
+.lang-switch button.on{background:var(--green);color:#fff}
 nav .btn{padding:9px 18px;font-size:13.5px;margin-left:6px;white-space:nowrap}
 #nav-me.known{box-shadow:inset 0 0 0 1.5px var(--green);color:var(--green);font-weight:800}
 /* tombol hamburger — hanya tampil di mobile */
@@ -106,7 +116,8 @@ nav .btn{padding:9px 18px;font-size:13.5px;margin-left:6px;white-space:nowrap}
   cursor:pointer;color:var(--ink);font-size:20px;line-height:1}
 .burger:active{background:var(--cream)}
 #nav-cek-mobile{display:none}
-@media(max-width:820px){
+/* Ambang 1080px: label Inggris lebih panjang, baris nav butuh ruang lebih dulu. */
+@media(max-width:1080px){
   .burger{display:inline-flex}
   nav #nav-me{display:none}                 /* badge loyalty pindah ke dalam menu */
   #nav-book{margin-left:auto}               /* dorong Book Slot + hamburger ke kanan */
@@ -129,7 +140,10 @@ nav .btn{padding:9px 18px;font-size:13.5px;margin-left:6px;white-space:nowrap}
   nav .links .dd-panel a b{font-size:15px}
   #nav-cek-mobile{border-bottom:none;color:var(--green);font-weight:800}
 }
-@media(max-width:480px){nav .btn{padding:8px 12px;font-size:12.5px}}
+@media(max-width:480px){
+  nav .btn{padding:8px 12px;font-size:12.5px}
+  .lang-switch button{padding:5px 8px;font-size:10.5px}
+}
 /* ---------- hero ---------- */
 header{background:var(--cream);border-bottom:1.5px solid rgba(5,42,27,.12);overflow:hidden}
 .hero{display:grid;grid-template-columns:1.25fr .9fr;gap:40px;padding:64px 0 56px;align-items:center}
@@ -350,47 +364,48 @@ footer small{opacity:.7;display:block;margin-top:4px}
   <div class="wrap">
     <a class="logo" href="#"><img src="/tsmc-logo.png" alt="The Social Mahjong Club"></a>
     <div class="links" id="nav-links">
-      <a href="#jadwal">Jadwal</a>
-      <a href="#berita">Berita &amp; Event</a>
+      <a href="#jadwal" data-en="Schedule">Jadwal</a>
+      <a href="#berita" data-en="News &amp; Events">Berita &amp; Event</a>
       <div class="drop-wrap">
-        <a href="#belajar">Belajar <span class="caret">▾</span></a>
+        <a href="#belajar"><span data-en="Learn">Belajar</span> <span class="caret">▾</span></a>
         <div class="dropdown"><div class="dd-panel">
-          <a href="/modul-01"><small>MODUL 01</small><b>Kenali Tile &amp; Susunan Meja</b></a>
-          <a href="/modul-02"><small>MODUL 02</small><b>Menghitung Faan</b></a>
-          <a href="/modul-03"><small>MODUL 03</small><b>Etika &amp; Ritme Permainan</b></a>
-          <a href="/modul-04"><small>MODUL 04</small><b>J2 House Rules</b></a>
+          <a href="/modul-01"><small data-en="MODULE 01">MODUL 01</small><b data-en="Know the Tiles &amp; the Table">Kenali Tile &amp; Susunan Meja</b></a>
+          <a href="/modul-02"><small data-en="MODULE 02">MODUL 02</small><b data-en="Counting Faan">Menghitung Faan</b></a>
+          <a href="/modul-03"><small data-en="MODULE 03">MODUL 03</small><b data-en="Etiquette &amp; Rhythm of Play">Etika &amp; Ritme Permainan</b></a>
+          <a href="/modul-04"><small data-en="MODULE 04">MODUL 04</small><b>J2 House Rules</b></a>
         </div></div>
       </div>
-      <a href="#galeri">Galeri</a>
-      <a href="#anggota">Anggota</a>
+      <a href="#galeri" data-en="Gallery">Galeri</a>
+      <a href="#anggota" data-en="Members">Anggota</a>
       <a class="nav-quiz" href="/kuis" target="_blank" rel="noopener">Quiz</a>
-      <a href="#" id="nav-cek-mobile" onclick="navMeClick();closeNav();return false;">🀄 Cek Booking &amp; Kartu Stempel</a>
+      <a href="#" id="nav-cek-mobile" onclick="navMeClick();closeNav();return false;" data-en="🀄 Check Booking &amp; Stamp Card">🀄 Cek Booking &amp; Kartu Stempel</a>
     </div>
-    <button class="btn ghost" id="nav-me" onclick="navMeClick()">Cek Booking</button>
+    <button class="btn ghost" id="nav-me" onclick="navMeClick()" data-en="Check Booking">Cek Booking</button>
     <button class="btn" id="nav-book" onclick="scrollToId('jadwal')">Book Slot</button>
-    <button class="burger" id="nav-burger" aria-label="Buka menu" aria-expanded="false" aria-controls="nav-links" onclick="toggleNav()">☰</button>
+    <div data-lang-switch></div>
+    <button class="burger" id="nav-burger" aria-label="Buka menu" aria-expanded="false" aria-controls="nav-links" onclick="toggleNav()" data-en-label="Open menu">☰</button>
   </div>
 </nav>
 
 <header>
   <div class="wrap hero">
     <div>
-      <div class="kicker">HONG KONG STYLE · MAIN BARENG TIAP MINGGU</div>
-      <h1>Datang, duduk,<br>bilang <span class="pong">"Pong!"</span></h1>
-      <p>Komunitas mahjong untuk main bersama — bukan judi, murni hobi. Pilih jadwal sesi, bayar fee, dan slot meja kamu langsung terkunci.</p>
+      <div class="kicker" data-en="HONG KONG STYLE · PLAYING TOGETHER EVERY WEEK">HONG KONG STYLE · MAIN BARENG TIAP MINGGU</div>
+      <h1 data-en="Come, sit down,<br>and call <span class=&quot;pong&quot;>&quot;Pong!&quot;</span>">Datang, duduk,<br>bilang <span class="pong">"Pong!"</span></h1>
+      <p data-en="A mahjong community for playing together — not gambling, purely a hobby. Pick a session, pay the fee, and your seat at the table is locked in.">Komunitas mahjong untuk main bersama — bukan judi, murni hobi. Pilih jadwal sesi, bayar fee, dan slot meja kamu langsung terkunci.</p>
       <div class="cta">
-        <button class="btn" onclick="scrollToId('jadwal')">Lihat Jadwal &amp; Book</button>
-        <button class="btn ghost" onclick="scrollToId('belajar')">Baru mulai? Belajar dulu</button>
+        <button class="btn" onclick="scrollToId('jadwal')" data-en="See the Schedule &amp; Book">Lihat Jadwal &amp; Book</button>
+        <button class="btn ghost" onclick="scrollToId('belajar')" data-en="New to this? Start learning">Baru mulai? Belajar dulu</button>
       </div>
       <div class="stats">
-        <div><b id="stat-members">—</b><span>anggota aktif</span></div>
-        <div><b id="stat-sessions">—</b><span>sesi digelar</span></div>
-        <div><b id="stat-tables">4</b><span>meja per sesi</span></div>
+        <div><b id="stat-members">—</b><span data-en="active members">anggota aktif</span></div>
+        <div><b id="stat-sessions">—</b><span data-en="sessions held">sesi digelar</span></div>
+        <div><b id="stat-tables">4</b><span data-en="tables per session">meja per sesi</span></div>
       </div>
     </div>
     <div class="next-card" id="next-card">
       <span class="tile">發</span>
-      <span class="tag">SESI BERIKUTNYA</span>
+      <span class="tag" data-en="NEXT SESSION">SESI BERIKUTNYA</span>
       <h3 id="next-title">Memuat…</h3>
       <div class="left" id="next-left"></div>
       <p id="next-meta"></p>
@@ -401,37 +416,37 @@ footer small{opacity:.7;display:block;margin-top:4px}
 <section id="jadwal">
   <div class="wrap">
     <div class="sec-head">
-      <h2>Jadwal Bermain</h2>
-      <div class="sub">1 slot = 1 kursi · <span class="lookup-link" onclick="openLookup()">Cek status booking kamu →</span></div>
+      <h2 data-en="Playing Schedule">Jadwal Bermain</h2>
+      <div class="sub" data-en="1 slot = 1 seat · <span class=&quot;lookup-link&quot; onclick=&quot;openLookup()&quot;>Check your booking status →</span>">1 slot = 1 kursi · <span class="lookup-link" onclick="openLookup()">Cek status booking kamu →</span></div>
     </div>
     <div class="steps">
-      <div><b>1.</b> Pilih jadwal</div>
-      <div><b>2.</b> Bayar fee — QRIS · Transfer · di tempat</div>
-      <div><b>3.</b> Slot terkunci, tinggal datang</div>
+      <div data-en="<b>1.</b> Pick a session"><b>1.</b> Pilih jadwal</div>
+      <div data-en="<b>2.</b> Pay the fee — QRIS · bank transfer · at the venue"><b>2.</b> Bayar fee — QRIS · Transfer · di tempat</div>
+      <div data-en="<b>3.</b> Seat locked in, just turn up"><b>3.</b> Slot terkunci, tinggal datang</div>
     </div>
-    <div class="lvl-legend">Level pemain: <i class="lvl" style="background:#C9A54A">N</i> Newbie (baru pertama kali) · <i class="lvl" style="background:#1E4D8C">B</i> Beginner (belajar hitung poin) · <i class="lvl" style="background:#087048">I</i> Intermediate (main pakai poin) — kami usahakan satu meja berisi pemain selevel.</div>
+    <div class="lvl-legend" data-en="Player levels: <i class=&quot;lvl&quot; style=&quot;background:#C9A54A&quot;>N</i> Newbie (never played before) · <i class=&quot;lvl&quot; style=&quot;background:#1E4D8C&quot;>B</i> Beginner (learning to count points) · <i class=&quot;lvl&quot; style=&quot;background:#087048&quot;>I</i> Intermediate (plays with points) — we try to seat players of the same level together.">Level pemain: <i class="lvl" style="background:#C9A54A">N</i> Newbie (baru pertama kali) · <i class="lvl" style="background:#1E4D8C">B</i> Beginner (belajar hitung poin) · <i class="lvl" style="background:#087048">I</i> Intermediate (main pakai poin) — kami usahakan satu meja berisi pemain selevel.</div>
     <div id="mybk" class="hidden">
       <div class="mybk-head">
-        <h3>🀄 Booking Kamu</h3>
-        <span class="forget" onclick="forgetMe()">bukan kamu? hapus dari perangkat ini</span>
+        <h3 data-en="🀄 Your Bookings">🀄 Booking Kamu</h3>
+        <span class="forget" onclick="forgetMe()" data-en="not you? remove from this device">bukan kamu? hapus dari perangkat ini</span>
       </div>
       <div id="loyal"></div>
       <div id="mybk-list"></div>
     </div>
     <div class="sched-grid" id="sched-grid"></div>
-    <div class="paynote">Pembayaran: QRIS, transfer bank, atau bayar di tempat. Slot dianggap hangus jika belum hadir 15 menit setelah sesi dimulai. Booking QRIS/transfer yang belum dibayar dalam 24 jam otomatis dilepas; yang memilih bayar di tempat kursinya ditahan sampai hari sesi.</div>
+    <div class="paynote" data-en="Payment: QRIS, bank transfer, or pay at the venue. A seat is forfeited if you have not arrived 15 minutes after the session starts. QRIS/transfer bookings left unpaid for 24 hours are released automatically; those paying at the venue keep their seat until the day of the session.">Pembayaran: QRIS, transfer bank, atau bayar di tempat. Slot dianggap hangus jika belum hadir 15 menit setelah sesi dimulai. Booking QRIS/transfer yang belum dibayar dalam 24 jam otomatis dilepas; yang memilih bayar di tempat kursinya ditahan sampai hari sesi.</div>
   </div>
 </section>
 
 <section id="berita">
   <div class="wrap">
     <div class="sec-head">
-      <h2>Berita &amp; Event</h2>
-      <div class="sub">Kabar komunitas &amp; event mahjong terdekat</div>
+      <h2 data-en="News &amp; Events">Berita &amp; Event</h2>
+      <div class="sub" data-en="Community news &amp; upcoming mahjong events">Kabar komunitas &amp; event mahjong terdekat</div>
     </div>
     <div class="news-grid" id="news-grid"></div>
     <div class="calendar">
-      <h3>KALENDER TURNAMEN &amp; EVENT</h3>
+      <h3 data-en="TOURNAMENT &amp; EVENT CALENDAR">KALENDER TURNAMEN &amp; EVENT</h3>
       <ul id="event-list"></ul>
     </div>
   </div>
@@ -440,15 +455,15 @@ footer small{opacity:.7;display:block;margin-top:4px}
 <section id="belajar">
   <div class="wrap">
     <div class="sec-head">
-      <h2>Belajar Mahjong</h2>
-      <div class="sub">Belajar dari nol lewat empat modul singkat — lalu uji hitunganmu di kuis</div>
+      <h2 data-en="Learn Mahjong">Belajar Mahjong</h2>
+      <div class="sub" data-en="Start from zero with four short modules — then test your counting in the quiz">Belajar dari nol lewat empat modul singkat — lalu uji hitunganmu di kuis</div>
     </div>
     <div class="learn-grid">
-      <a class="lcard" href="/modul-01"><small>MODUL 01</small><h3>Kenali tile &amp; susunan meja</h3><p>144 tile, angin duduk, dan cara set meja Hong Kong style dari nol.</p><span class="mlink">Buka modul →</span></a>
-      <a class="lcard" href="/modul-02"><small>MODUL 02</small><h3>Menghitung faan</h3><p>Dari chicken hand sampai limit hand — tabel faan standar yang dipakai komunitas.</p><span class="mlink">Buka modul →</span></a>
-      <a class="lcard" href="/modul-03"><small>MODUL 03</small><h3>Etika &amp; ritme permainan</h3><p>Cuci tile, urutan giliran, klaim pong/gong, dan kapan menyebut sik wu.</p><span class="mlink">Buka modul →</span></a>
-      <a class="lcard" href="/modul-04"><small>MODUL 04</small><h3>J2 house rules</h3><p>Aturan rumah komunitas temenmahjong: sistem poin, joker, bunga, dan instant win.</p><span class="mlink">Buka modul →</span></a>
-      <a class="lcard" href="/kuis"><small>LATIHAN</small><h3>Kuis tebak poin</h3><p>Tangan sudah menang — tinggal dihitung. Pilih tabel faan TSMC atau poin J2, lalu tebak nilainya. Salah sekali, ronde selesai.</p><span class="mlink">Main kuis →</span></a>
+      <a class="lcard" href="/modul-01"><small>MODUL 01</small><h3 data-en="Know the tiles &amp; the table">Kenali tile &amp; susunan meja</h3><p data-en="144 tiles, seat winds, and how to set up a Hong Kong style table from scratch.">144 tile, angin duduk, dan cara set meja Hong Kong style dari nol.</p><span class="mlink" data-en="Open module →">Buka modul →</span></a>
+      <a class="lcard" href="/modul-02"><small>MODUL 02</small><h3 data-en="Counting faan">Menghitung faan</h3><p data-en="From chicken hand to limit hand — the standard faan table the community uses.">Dari chicken hand sampai limit hand — tabel faan standar yang dipakai komunitas.</p><span class="mlink" data-en="Open module →">Buka modul →</span></a>
+      <a class="lcard" href="/modul-03"><small>MODUL 03</small><h3 data-en="Etiquette &amp; rhythm of play">Etika &amp; ritme permainan</h3><p data-en="Washing tiles, turn order, claiming pong/gong, and when to call sik wu.">Cuci tile, urutan giliran, klaim pong/gong, dan kapan menyebut sik wu.</p><span class="mlink" data-en="Open module →">Buka modul →</span></a>
+      <a class="lcard" href="/modul-04"><small>MODUL 04</small><h3 data-en="J2 house rules">J2 house rules</h3><p data-en="The temenmahjong house rules: the points system, jokers, flowers, and instant wins.">Aturan rumah komunitas temenmahjong: sistem poin, joker, bunga, dan instant win.</p><span class="mlink" data-en="Open module →">Buka modul →</span></a>
+      <a class="lcard" href="/kuis"><small data-en="PRACTICE">LATIHAN</small><h3 data-en="Score quiz">Kuis tebak poin</h3><p data-en="The hand has already won — it just needs counting. Pick the TSMC faan table or J2 points, then name the value. One wrong answer ends the run.">Tangan sudah menang — tinggal dihitung. Pilih tabel faan TSMC atau poin J2, lalu tebak nilainya. Salah sekali, ronde selesai.</p><span class="mlink" data-en="Play the quiz →">Main kuis →</span></a>
     </div>
   </div>
 </section>
@@ -456,8 +471,8 @@ footer small{opacity:.7;display:block;margin-top:4px}
 <section id="galeri">
   <div class="wrap">
     <div class="sec-head">
-      <h2>Galeri Sesi</h2>
-      <div class="sub">Dokumentasi sesi mingguan &amp; event</div>
+      <h2 data-en="Session Gallery">Galeri Sesi</h2>
+      <div class="sub" data-en="Photos from our weekly sessions &amp; events">Dokumentasi sesi mingguan &amp; event</div>
     </div>
     <div class="gal-grid" id="gal-grid"></div>
   </div>
@@ -466,21 +481,21 @@ footer small{opacity:.7;display:block;margin-top:4px}
 <section id="anggota">
   <div class="wrap two-col">
     <div class="panel">
-      <h3>Direktori Anggota</h3>
-      <p>Kenalan sebelum duduk semeja. Profil anggota, gaya main, dan rekan main favorit.</p>
+      <h3 data-en="Member Directory">Direktori Anggota</h3>
+      <p data-en="Get to know people before you sit down together. Member profiles, playing styles, and favourite partners.">Kenalan sebelum duduk semeja. Profil anggota, gaya main, dan rekan main favorit.</p>
       <div class="avatars">
         <i style="background:#C9A54A;color:#04331F">AR</i><i style="background:#087048;color:#EAF3DF">DL</i>
         <i style="background:#C02028;color:#EAF3DF">MJ</i><i style="background:#EAF3DF;color:#04331F">SK</i>
         <i style="background:#1E4D8C;color:#EAF3DF">VN</i><i style="background:#04331F;color:#BCD96A" id="member-more">+123</i>
       </div>
-      <p style="margin-top:10px">Gabung grup WhatsApp untuk kenalan dengan anggota lain → <a id="wa-group-link" href="#" target="_blank" rel="noopener" style="font-weight:800;color:var(--green)">WhatsApp Group</a></p>
+      <p style="margin-top:10px" data-en="Join the WhatsApp group to meet the other members → <a id=&quot;wa-group-link&quot; href=&quot;#&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; style=&quot;font-weight:800;color:var(--green)&quot;>WhatsApp Group</a>">Gabung grup WhatsApp untuk kenalan dengan anggota lain → <a id="wa-group-link" href="#" target="_blank" rel="noopener" style="font-weight:800;color:var(--green)">WhatsApp Group</a></p>
     </div>
     <div class="panel">
-      <h3>Aturan &amp; Etika Meja</h3>
+      <h3 data-en="Rules &amp; Table Etiquette">Aturan &amp; Etika Meja</h3>
       <ul class="rules">
-        <li>Fee dibayar sebelum sesi — slot hangus 15 menit setelah sesi dimulai tanpa kabar.</li>
-        <li>No real-money gambling. Fee hanya untuk sewa tempat dan konsumsi.</li>
-        <li>Hormati meja: tidak main HP saat giliran, dan selesaikan putaran sebelum pulang.</li>
+        <li data-en="Fees are paid before the session — a seat is forfeited 15 minutes after the start if we have not heard from you.">Fee dibayar sebelum sesi — slot hangus 15 menit setelah sesi dimulai tanpa kabar.</li>
+        <li data-en="No real-money gambling. Fees only cover the venue and refreshments.">No real-money gambling. Fee hanya untuk sewa tempat dan konsumsi.</li>
+        <li data-en="Respect the table: no phones on your turn, and finish the round before you leave.">Hormati meja: tidak main HP saat giliran, dan selesaikan putaran sebelum pulang.</li>
       </ul>
     </div>
   </div>
@@ -495,14 +510,14 @@ footer small{opacity:.7;display:block;margin-top:4px}
     </div>
     <div class="foot-links">
       <a id="ig-link" href="#" target="_blank" rel="noopener"><span class="ficon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.2" cy="6.8" r="1.3" fill="currentColor" stroke="none"/></svg></span><span>Instagram</span></a>
-      <a id="wa-group-flink" href="#" target="_blank" rel="noopener"><span class="ficon"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.7-1.2A9 9 0 1 0 12 3z"/><path d="M8.8 8.4c.3-.8 1.5-.9 1.8-.2l.7 1.4c.2.4 0 .8-.3 1.1l-.6.5c.5 1.1 1.4 2 2.5 2.5l.5-.6c.3-.4.7-.5 1.1-.3l1.4.7c.7.4.6 1.5-.2 1.8-1 .4-2.2.3-3.4-.3a10 10 0 0 1-3.8-3.8c-.6-1.2-.7-2.4-.3-3.4z" fill="currentColor" stroke="none"/></svg></span><span>Grup WA Komunitas</span></a>
+      <a id="wa-group-flink" href="#" target="_blank" rel="noopener"><span class="ficon"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.7-1.2A9 9 0 1 0 12 3z"/><path d="M8.8 8.4c.3-.8 1.5-.9 1.8-.2l.7 1.4c.2.4 0 .8-.3 1.1l-.6.5c.5 1.1 1.4 2 2.5 2.5l.5-.6c.3-.4.7-.5 1.1-.3l1.4.7c.7.4.6 1.5-.2 1.8-1 .4-2.2.3-3.4-.3a10 10 0 0 1-3.8-3.8c-.6-1.2-.7-2.4-.3-3.4z" fill="currentColor" stroke="none"/></svg></span><span data-en="Community WhatsApp Group">Grup WA Komunitas</span></a>
       <a id="email-link" href="#"><span class="ficon"><svg viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M4.5 7.5l7.5 5.5 7.5-5.5"/></svg></span><span>hello@tsmc.id</span></a>
     </div>
   </div>
 </footer>
 
 <!-- Tombol Book Slot yang selalu terlihat di mobile -->
-<div id="mobile-cta"><button class="btn" onclick="scrollToId('jadwal')">🀄 Book Slot Sekarang</button></div>
+<div id="mobile-cta"><button class="btn" onclick="scrollToId('jadwal')" data-en="🀄 Book a Slot Now">🀄 Book Slot Sekarang</button></div>
 
 <!-- ============ MODAL BOOKING ============ -->
 <div class="modal-bg" id="book-modal">
@@ -515,57 +530,57 @@ footer small{opacity:.7;display:block;margin-top:4px}
       <div class="sub" id="bk-sched-info"></div>
       <label class="reward-row" id="bk-reward-row">
         <input type="checkbox" id="bk-use-reward" onchange="toggleReward(this.checked)">
-        <span>🎁 <b>Pakai 1 permainan gratis!</b> Kartu stempelmu sudah penuh — sesi ini gratis untuk 1 kursi (dikonfirmasi admin).</span>
+        <span data-en="🎁 <b>Use one free game!</b> Your stamp card is full — this session is free for 1 seat (subject to admin confirmation).">🎁 <b>Pakai 1 permainan gratis!</b> Kartu stempelmu sudah penuh — sesi ini gratis untuk 1 kursi (dikonfirmasi admin).</span>
       </label>
-      <div class="field"><label>Nama</label><input id="bk-name" maxlength="60" placeholder="Nama kamu"></div>
-      <div class="field"><label>Nomor WhatsApp</label><input id="bk-wa" inputmode="tel" placeholder="08123456789"></div>
-      <div class="field"><label>Level bermain</label>
+      <div class="field"><label data-en="Name">Nama</label><input id="bk-name" maxlength="60" placeholder="Nama kamu" data-en-placeholder="Your name"></div>
+      <div class="field"><label data-en="WhatsApp number">Nomor WhatsApp</label><input id="bk-wa" inputmode="tel" placeholder="08123456789"></div>
+      <div class="field"><label data-en="Playing level">Level bermain</label>
         <select id="bk-level">
-          <option value="">— pilih level kamu —</option>
-          <option value="N">N · Newbie — belum pernah main mahjong sama sekali</option>
-          <option value="B">B · Beginner — sudah bisa main, mau belajar hitung poin</option>
-          <option value="I">I · Intermediate — sudah lancar &amp; mau main pakai poin</option>
+          <option value="" data-en="— choose your level —">— pilih level kamu —</option>
+          <option value="N" data-en="N · Newbie — never played mahjong at all">N · Newbie — belum pernah main mahjong sama sekali</option>
+          <option value="B" data-en="B · Beginner — can play, learning to count points">B · Beginner — sudah bisa main, mau belajar hitung poin</option>
+          <option value="I" data-en="I · Intermediate — fluent &amp; playing with points">I · Intermediate — sudah lancar &amp; mau main pakai poin</option>
         </select>
-        <small style="display:block;margin-top:5px;font-size:12px;color:var(--mut)">Dipakai untuk memasangkan kamu semeja dengan pemain yang selevel.</small>
+        <small style="display:block;margin-top:5px;font-size:12px;color:var(--mut)"><span data-en="Used to seat you with players of a similar level.">Dipakai untuk memasangkan kamu semeja dengan pemain yang selevel.</span></small>
       </div>
-      <div class="field"><label>Jumlah kursi</label>
-        <select id="bk-seats"><option value="1">1 kursi</option><option value="2">2 kursi</option><option value="3">3 kursi</option><option value="4">4 kursi (1 meja)</option></select>
+      <div class="field"><label data-en="Number of seats">Jumlah kursi</label>
+        <select id="bk-seats"><option value="1" data-en="1 seat">1 kursi</option><option value="2" data-en="2 seats">2 kursi</option><option value="3" data-en="3 seats">3 kursi</option><option value="4" data-en="4 seats (a full table)">4 kursi (1 meja)</option></select>
       </div>
-      <div class="field"><label>Metode pembayaran</label>
+      <div class="field"><label data-en="Payment method">Metode pembayaran</label>
         <select id="bk-method">
           <option value="qris">QRIS</option>
-          <option value="transfer">Transfer bank</option>
-          <option value="venue">Bayar di tempat</option>
+          <option value="transfer" data-en="Bank transfer">Transfer bank</option>
+          <option value="venue" data-en="Pay at the venue">Bayar di tempat</option>
         </select>
       </div>
-      <button class="btn" style="width:100%" onclick="submitBooking()" id="bk-submit">Lanjut ke Pembayaran</button>
+      <button class="btn" style="width:100%" onclick="submitBooking()" id="bk-submit" data-en="Continue to Payment">Lanjut ke Pembayaran</button>
       <div class="msg-err" id="bk-err"></div>
     </div>
 
     <!-- Langkah 2: bayar + upload bukti -->
     <div id="bk-step2" class="hidden">
-      <h3>Pembayaran</h3>
-      <div class="sub">Kode booking kamu: <span class="code-pill" id="bk-code"></span><br>
-        <b>Simpan / screenshot kode ini</b> untuk cek status.</div>
+      <h3 data-en="Payment">Pembayaran</h3>
+      <div class="sub"><span data-en="Your booking code:">Kode booking kamu:</span> <span class="code-pill" id="bk-code"></span><br>
+        <span data-en="<b>Save or screenshot this code</b> so you can check your status."><b>Simpan / screenshot kode ini</b> untuk cek status.</span></div>
       <div class="payment-box" id="bk-payinfo"></div>
       <div id="bk-proof-wrap">
-        <div class="field"><label>Upload bukti pembayaran</label>
-          <div class="drop" id="bk-drop" onclick="document.getElementById('bk-file').click()">Klik untuk pilih foto / screenshot bukti transfer</div>
+        <div class="field"><label data-en="Upload proof of payment">Upload bukti pembayaran</label>
+          <div class="drop" id="bk-drop" onclick="document.getElementById('bk-file').click()" data-en="Tap to choose a photo or screenshot of your transfer">Klik untuk pilih foto / screenshot bukti transfer</div>
           <input type="file" id="bk-file" accept="image/*" class="hidden">
         </div>
-        <button class="btn" style="width:100%" onclick="submitProof()" id="bk-proof-btn" disabled>Kirim Bukti Pembayaran</button>
+        <button class="btn" style="width:100%" onclick="submitProof()" id="bk-proof-btn" disabled data-en="Send Proof of Payment">Kirim Bukti Pembayaran</button>
       </div>
       <div class="msg-err" id="bk-err2"></div>
     </div>
 
     <!-- Langkah 3: selesai -->
     <div id="bk-step3" class="hidden center">
-      <h3 id="bk-done-title">Slot kamu tercatat! 🀄</h3>
+      <h3 id="bk-done-title"></h3>
       <p class="sub" id="bk-done-sub"></p>
       <p style="margin:14px 0"><span class="code-pill" id="bk-code2"></span></p>
-      <a class="btn" id="bk-wa-admin" target="_blank" rel="noopener" style="text-decoration:none">💬 Konfirmasi via WA Admin</a>
-      <a class="btn ghost hidden" id="bk-wa-group" target="_blank" rel="noopener" style="text-decoration:none;margin-top:10px">👥 Gabung Grup WA Komunitas</a>
-      <p style="margin-top:14px"><a class="lookup-link" onclick="closeModal('book-modal');openLookup()">Cek status booking →</a></p>
+      <a class="btn" id="bk-wa-admin" target="_blank" rel="noopener" style="text-decoration:none" data-en="💬 Confirm via Admin WhatsApp">💬 Konfirmasi via WA Admin</a>
+      <a class="btn ghost hidden" id="bk-wa-group" target="_blank" rel="noopener" style="text-decoration:none;margin-top:10px" data-en="👥 Join the Community WhatsApp Group">👥 Gabung Grup WA Komunitas</a>
+      <p style="margin-top:14px"><a class="lookup-link" onclick="closeModal('book-modal');openLookup()" data-en="Check booking status →">Cek status booking →</a></p>
     </div>
   </div>
 </div>
@@ -574,10 +589,10 @@ footer small{opacity:.7;display:block;margin-top:4px}
 <div class="modal-bg" id="lookup-modal">
   <div class="modal">
     <button class="x" onclick="closeModal('lookup-modal')">×</button>
-    <h3>Cek Status Booking</h3>
-    <div class="sub">Masukkan kode booking (TSMC-XXXX) atau nomor WhatsApp yang dipakai saat booking.</div>
-    <div class="field"><input id="lk-q" placeholder="TSMC-XXXX atau 08123456789"></div>
-    <button class="btn" style="width:100%" onclick="doLookup()">Cari</button>
+    <h3 data-en="Check Booking Status">Cek Status Booking</h3>
+    <div class="sub" data-en="Enter your booking code (TSMC-XXXX) or the WhatsApp number you booked with.">Masukkan kode booking (TSMC-XXXX) atau nomor WhatsApp yang dipakai saat booking.</div>
+    <div class="field"><input id="lk-q" placeholder="TSMC-XXXX atau 08123456789" data-en-placeholder="TSMC-XXXX or 08123456789"></div>
+    <button class="btn" style="width:100%" onclick="doLookup()" data-en="Search">Cari</button>
     <div class="msg-err" id="lk-err"></div>
     <div id="lk-results" style="margin-top:14px"></div>
   </div>
@@ -591,19 +606,34 @@ footer small{opacity:.7;display:block;margin-top:4px}
   </div>
 </div>
 
+<script src="/i18n.js"></script>
 <script src="/share-card.js"></script>
 <script>
 'use strict';
+/* ---------- bahasa ----------
+   Teks yang digambar JavaScript tidak bisa memakai atribut data-en,
+   jadi pasangan Indonesia/Inggrisnya ditulis langsung lewat T(). */
+const T = (id, en) => (window.I18N && window.I18N.get() === 'en' ? en : id);
 const HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const HARI_EN = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const BULAN = ['JAN','FEB','MAR','APR','MEI','JUN','JUL','AGU','SEP','OKT','NOV','DES'];
+const BULAN_EN = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 const BULAN_LONG = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const BULAN_LONG_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const hari = i => T(HARI[i], HARI_EN[i]);
+const bulan = i => T(BULAN[i], BULAN_EN[i]);
+const bulanLong = i => T(BULAN_LONG[i], BULAN_LONG_EN[i]);
 const rupiah = n => 'Rp ' + Number(n).toLocaleString('id-ID');
 const LVL_COLOR = {N:'#C9A54A', B:'#1E4D8C', I:'#087048'};
 const LVL_NAME = {N:'Newbie — baru pertama kali', B:'Beginner — belajar hitung poin', I:'Intermediate — main pakai poin'};
+const LVL_NAME_EN = {N:'Newbie — first time ever', B:'Beginner — learning to count points', I:'Intermediate — plays with points'};
+const lvlName = l => T(LVL_NAME[l] || '', LVL_NAME_EN[l] || '');
+/* Inggris butuh bentuk jamak; Indonesia tidak. jml(1,'seat') -> 'seat', jml(3,'seat') -> 'seats' */
+const jml = (n, kata) => kata + (Number(n) === 1 ? '' : 's');
 let SITE = null, currentSched = null, currentCode = null, proofData = null;
 
 function parseDate(iso){ const [y,m,d] = iso.split('-').map(Number); return new Date(y, m-1, d); }
-function fmtTanggal(iso){ const d = parseDate(iso); return `${HARI[d.getDay()]}, ${d.getDate()} ${BULAN_LONG[d.getMonth()]}`; }
+function fmtTanggal(iso){ const d = parseDate(iso); return `${hari(d.getDay())}, ${d.getDate()} ${bulanLong(d.getMonth())}`; }
 function scrollToId(id){ closeNav(); document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
 /* ---------- menu hamburger (mobile) ---------- */
 function toggleNav(){
@@ -642,7 +672,7 @@ async function loadSite(){
     focusHashSchedule();   // kalau dibuka lewat link share #jadwal-N
   }catch(e){
     document.getElementById('sched-grid').innerHTML =
-      '<p style="color:var(--mut)">Gagal memuat data. Coba refresh halaman.</p>';
+      `<p style="color:var(--mut)">${T('Gagal memuat data. Coba refresh halaman.','Could not load the data. Try refreshing the page.')}</p>`;
   }
 }
 
@@ -678,27 +708,27 @@ window.addEventListener('hashchange', () => focusHashSchedule(true));
 // venue jadi link Google Maps kalau admin mengisi link-nya
 function venueHTML(s){
   return s.map_url
-    ? `<a class="venue-link" href="${esc(s.map_url)}" target="_blank" rel="noopener" title="Buka lokasi di Google Maps">${esc(s.venue)} ↗</a>`
+    ? `<a class="venue-link" href="${esc(s.map_url)}" target="_blank" rel="noopener" title="${T('Buka lokasi di Google Maps','Open the location in Google Maps')}">${esc(s.venue)} ↗</a>`
     : esc(s.venue);
 }
 function schedState(s){
-  if(s.status === 'closed') return {label:'DITUTUP', color:'#6B7A66', btn:'Ditutup', full:true};
-  if(s.left <= 0) return {label:'PENUH', color:'#6B7A66', btn:'Join Waiting List', full:true};
-  if(s.left <= 3) return {label:'HAMPIR PENUH', color:'#C02028', btn:'Book Slot', full:false};
+  if(s.status === 'closed') return {label:T('DITUTUP','CLOSED'), color:'#6B7A66', btn:T('Ditutup','Closed'), full:true};
+  if(s.left <= 0) return {label:T('PENUH','FULL'), color:'#6B7A66', btn:'Join Waiting List', full:true};
+  if(s.left <= 3) return {label:T('HAMPIR PENUH','ALMOST FULL'), color:'#C02028', btn:'Book Slot', full:false};
   return {label:'OPEN', color:'#087048', btn:'Book Slot', full:false};
 }
 
 function renderSchedules(list){
   const grid = document.getElementById('sched-grid');
   if(!list.length){
-    grid.innerHTML = '<p style="color:var(--mut)">Belum ada jadwal baru — pantau terus ya!</p>';
-    document.getElementById('next-title').textContent = 'Segera diumumkan';
+    grid.innerHTML = `<p style="color:var(--mut)">${T('Belum ada jadwal baru — pantau terus ya!','No new sessions yet — keep an eye out!')}</p>`;
+    document.getElementById('next-title').textContent = T('Segera diumumkan','Announced soon');
     return;
   }
   // kartu "sesi berikutnya" di hero
   const n = list[0], nst = schedState(n);
   document.getElementById('next-title').textContent = fmtTanggal(n.date);
-  document.getElementById('next-left').textContent = n.left > 0 ? `${n.left} slot tersisa` : 'penuh · waiting list';
+  document.getElementById('next-left').textContent = n.left > 0 ? `${n.left} ${T('slot tersisa', jml(n.left,'slot') + ' left')}` : T('penuh · waiting list','full · waiting list');
   document.getElementById('next-meta').innerHTML = `${esc(n.time_start)} WIB · ${venueHTML(n)}`;
   document.getElementById('stat-tables').textContent = n.tables;
 
@@ -709,19 +739,19 @@ function renderSchedules(list){
     return `
     <div class="scard" id="jadwal-${s.id}">
       <div class="top">
-        <div class="datebox"><b>${d.getDate()}</b><span>${BULAN[d.getMonth()]}</span></div>
-        <div><h3>${HARI[d.getDay()]} ${parseInt(s.time_start) < 11 ? 'Pagi' : parseInt(s.time_start) < 17 ? 'Siang' : 'Malam'}</h3>
+        <div class="datebox"><b>${d.getDate()}</b><span>${bulan(d.getMonth())}</span></div>
+        <div><h3>${hari(d.getDay())} ${parseInt(s.time_start) < 11 ? T('Pagi','Morning') : parseInt(s.time_start) < 17 ? T('Siang','Afternoon') : T('Malam','Evening')}</h3>
           <small>${esc(s.time_start)} – ${esc(s.time_end)} WIB</small></div>
         <span class="tag badge" style="background:${st.color};color:#fff">${st.label}</span>
       </div>
       <div class="meta">📍 ${venueHTML(s)}${s.note ? ' · ' + esc(s.note) : ''}</div>
       <div class="bar"><i style="width:${pct}%;background:${st.color}"></i></div>
-      <div class="meta">${s.booked}/${s.capacity} kursi terisi · <b style="color:${st.color}">${s.left > 0 ? s.left + ' slot tersisa' : 'waiting list'}</b></div>
+      <div class="meta">${s.booked}/${s.capacity} ${T('kursi terisi','seats taken')} · <b style="color:${st.color}">${s.left > 0 ? s.left + T(' slot tersisa', ' ' + jml(s.left,'slot') + ' left') : 'waiting list'}</b></div>
       ${renderPlayers(s)}
       <div class="foot">
-        <div class="fee"><small>FEE / ORANG</small><b>${rupiah(s.fee)}</b></div>
+        <div class="fee"><small>${T('FEE / ORANG','FEE / PERSON')}</small><b>${rupiah(s.fee)}</b></div>
         <div style="display:flex;gap:8px;align-items:center">
-          <button class="btn ghost share-btn" onclick="shareSchedule(${s.id})" title="Bagikan jadwal ini ke WhatsApp / sosial media">📤</button>
+          <button class="btn ghost share-btn" onclick="shareSchedule(${s.id})" title="${T('Bagikan jadwal ini ke WhatsApp / sosial media','Share this session to WhatsApp / social media')}">📤</button>
           <button class="btn ${st.full ? 'ghost' : ''}" ${s.status==='closed' ? 'disabled' : ''}
             onclick="openBooking(${s.id})">${st.btn}</button>
         </div>
@@ -735,24 +765,24 @@ function renderSchedules(list){
 // Keterangan bayar di kanan level: stempel LUNAS (terkonfirmasi),
 // "bayar di tempat", atau "menunggu pembayaran" (QRIS/transfer <24 jam).
 function payMark(p){
-  if(p.pay === 'l') return '<img src="/lunas.png" class="paidmark" alt="LUNAS" title="Sudah bayar — terkonfirmasi">';
-  if(p.pay === 'v') return '<span class="venuemark" title="Membayar langsung di venue">bayar di tempat</span>';
-  if(p.pay === 'p') return '<span class="waitmark" title="Slot ditahan 24 jam sampai pembayaran masuk">menunggu pembayaran</span>';
+  if(p.pay === 'l') return `<img src="/lunas.png" class="paidmark" alt="LUNAS" title="${T('Sudah bayar — terkonfirmasi','Paid — confirmed')}">`;
+  if(p.pay === 'v') return `<span class="venuemark" title="${T('Membayar langsung di venue','Paying at the venue')}">${T('bayar di tempat','pays at venue')}</span>`;
+  if(p.pay === 'p') return `<span class="waitmark" title="${T('Slot ditahan 24 jam sampai pembayaran masuk','Seat held for 24 hours until payment arrives')}">${T('menunggu pembayaran','awaiting payment')}</span>`;
   return '';
 }
 function renderPlayers(s){
   const players = s.players || [];
   const seats = players.flatMap(p =>
     Array.from({length: 1 + (p.x || 0)}, () =>
-      `<li class="${p.v ? 'verif' : ''}">${esc(p.n)}${p.l ? `<i class="lvl" style="background:${LVL_COLOR[p.l] || '#6B7A66'}" title="${LVL_NAME[p.l] || ''}">${p.l}</i>` : ''}${payMark(p)}</li>`));
+      `<li class="${p.v ? 'verif' : ''}">${esc(p.n)}${p.l ? `<i class="lvl" style="background:${LVL_COLOR[p.l] || '#6B7A66'}" title="${lvlName(p.l)}">${p.l}</i>` : ''}${payMark(p)}</li>`));
   const pending = Math.max(0, s.booked - players.reduce((t, p) => t + 1 + (p.x || 0), 0));
   if(!seats.length){
     return `<div class="players">👥 ${pending > 0
-      ? `${pending} kursi menunggu pembayaran — belum ada peserta terkonfirmasi.`
-      : 'Belum ada peserta terkonfirmasi — jadi yang pertama!'}</div>`;
+      ? `${pending} ${T('kursi menunggu pembayaran — belum ada peserta terkonfirmasi.', jml(pending,'seat') + ' awaiting payment — no confirmed players yet.')}`
+      : T('Belum ada peserta terkonfirmasi — jadi yang pertama!','No confirmed players yet — be the first!')}</div>`;
   }
-  return `<div class="players">👥 <b>Sudah daftar:</b><ol>${seats.join('')}</ol>${
-    pending > 0 ? `<div class="pend">⏳ +${pending} kursi menunggu pembayaran</div>` : ''}</div>`;
+  return `<div class="players">👥 <b>${T('Sudah daftar:','Signed up:')}</b><ol>${seats.join('')}</ol>${
+    pending > 0 ? `<div class="pend">⏳ +${pending} ${T('kursi menunggu pembayaran', jml(pending,'seat') + ' awaiting payment')}</div>` : ''}</div>`;
 }
 
 function tagClass(t){
@@ -762,7 +792,7 @@ function tagClass(t){
 
 function renderNews(list){
   const grid = document.getElementById('news-grid');
-  if(!list.length){ grid.innerHTML = '<p style="color:var(--mut)">Belum ada berita.</p>'; return; }
+  if(!list.length){ grid.innerHTML = `<p style="color:var(--mut)">${T('Belum ada berita.','No news yet.')}</p>`; return; }
   grid.innerHTML = list.slice(0, 6).map(n => `
     <div class="ncard">
       <div class="img">${n.image ? `<img src="${n.image}" alt="" loading="lazy">` : '<span class="tile">中</span>'}</div>
@@ -770,18 +800,18 @@ function renderNews(list){
         <div class="meta"><span class="tag ${tagClass(n.tag)}">${esc(n.tag)}</span> ${fmtShort(n.date)}</div>
         <h3>${esc(n.title)}</h3>
         <p>${esc(n.blurb)}</p>
-        <a onclick="openNews(${n.id})">Baca selengkapnya →</a>
+        <a onclick="openNews(${n.id})">${T('Baca selengkapnya →','Read more →')}</a>
       </div>
     </div>`).join('');
 }
-function fmtShort(iso){ if(!iso) return ''; const d = parseDate(iso); return `${d.getDate()} ${BULAN[d.getMonth()].charAt(0) + BULAN[d.getMonth()].slice(1).toLowerCase()} ${d.getFullYear()}`; }
+function fmtShort(iso){ if(!iso) return ''; const d = parseDate(iso); const b = bulan(d.getMonth()); return `${d.getDate()} ${b.charAt(0) + b.slice(1).toLowerCase()} ${d.getFullYear()}`; }
 
 async function openNews(id){
   openModal('news-modal');
   const box = document.getElementById('news-detail');
-  box.innerHTML = '<p class="sub">Memuat…</p>';
+  box.innerHTML = `<p class="sub">${T('Memuat…','Loading…')}</p>`;
   const d = await (await fetch('/api/news/' + id)).json();
-  if(!d.ok){ box.innerHTML = '<p class="sub">Berita tidak ditemukan.</p>'; return; }
+  if(!d.ok){ box.innerHTML = `<p class="sub">${T('Berita tidak ditemukan.','Article not found.')}</p>`; return; }
   const n = d.news;
   box.innerHTML = `
     <div class="meta" style="display:flex;gap:10px;align-items:center;font-size:12px;font-weight:700;color:var(--mut)">
@@ -794,7 +824,7 @@ async function openNews(id){
 function renderEvents(list){
   document.getElementById('event-list').innerHTML = list.length
     ? list.map(e => `<li><b>${esc(e.date_label)}</b> ${esc(e.title)}</li>`).join('')
-    : '<li>Belum ada event terjadwal.</li>';
+    : `<li>${T('Belum ada event terjadwal.','No events scheduled yet.')}</li>`;
 }
 
 function renderGallery(list){
@@ -802,7 +832,7 @@ function renderGallery(list){
   grid.innerHTML = list.length
     ? list.map(g => `<figure class="gitem"><img src="${g.image}" alt="${esc(g.caption)}" loading="lazy">
         ${g.caption ? `<figcaption>${esc(g.caption)}</figcaption>` : ''}</figure>`).join('')
-    : '<div class="gal-empty">Foto-foto sesi akan tampil di sini — admin bisa upload lewat dashboard.</div>';
+    : `<div class="gal-empty">${T('Foto-foto sesi akan tampil di sini — admin bisa upload lewat dashboard.','Session photos will appear here — the admin can upload them from the dashboard.')}</div>`;
 }
 
 function renderContacts(s){
@@ -842,24 +872,28 @@ function openBooking(id){
   document.getElementById('bk-use-reward').checked = false;
   toggleReward(false);
   rrow.classList.toggle('show', !!(LOYAL && LOYAL.rewards_ready > 0));
-  document.getElementById('bk-sched-info').innerHTML =
-    `${fmtTanggal(currentSched.date)} · ${esc(currentSched.time_start)} WIB · ${venueHTML(currentSched)}<br>` +
-    `Fee <b>${rupiah(currentSched.fee)}</b>/orang · sisa <b>${currentSched.left}</b> kursi`;
+  paintSchedInfo();
   openModal('book-modal');
 }
 
+function paintSchedInfo(){
+  if(!currentSched) return;
+  document.getElementById('bk-sched-info').innerHTML =
+    `${fmtTanggal(currentSched.date)} · ${esc(currentSched.time_start)} WIB · ${venueHTML(currentSched)}<br>` +
+    `Fee <b>${rupiah(currentSched.fee)}</b>${T('/orang','/person')} · ${T('sisa','left')} <b>${currentSched.left}</b> ${T('kursi', jml(currentSched.left,'seat'))}`;
+}
 function toggleReward(on){
   // klaim gratis = 1 kursi, tanpa metode pembayaran
   document.getElementById('bk-seats').disabled = on;
   document.getElementById('bk-method').disabled = on;
   if(on) document.getElementById('bk-seats').value = '1';
-  document.getElementById('bk-submit').textContent = on ? 'Klaim Permainan Gratis 🎁' : 'Lanjut ke Pembayaran';
+  document.getElementById('bk-submit').textContent = on ? T('Klaim Permainan Gratis 🎁','Claim Your Free Game 🎁') : T('Lanjut ke Pembayaran','Continue to Payment');
 }
 async function submitBooking(allowWaitlist){
   const btn = document.getElementById('bk-submit');
   const errEl = document.getElementById('bk-err');
   const useReward = document.getElementById('bk-use-reward').checked;
-  errEl.textContent = ''; btn.disabled = true; btn.textContent = 'Memproses…';
+  errEl.textContent = ''; btn.disabled = true; btn.textContent = T('Memproses…','Processing…');
   try{
     const payload = {
       schedule_id: currentSched.id,
@@ -871,12 +905,12 @@ async function submitBooking(allowWaitlist){
       allow_waitlist: !!allowWaitlist,
       use_reward: useReward,
     };
-    if(!payload.level) throw new Error('Pilih level bermain kamu dulu ya.');
+    if(!payload.level) throw new Error(T('Pilih level bermain kamu dulu ya.','Please choose your playing level first.'));
     const d = await (await fetch('/api/bookings', {method:'POST',
       headers:{'content-type':'application/json'}, body: JSON.stringify(payload)})).json();
     if(!d.ok){
-      if(d.waitlist && confirm(d.error + '\nKamu akan dihubungi admin jika ada kursi kosong.')){
-        btn.disabled = false; btn.textContent = 'Lanjut ke Pembayaran';
+      if(d.waitlist && confirm(d.error + T('\nKamu akan dihubungi admin jika ada kursi kosong.','\nThe admin will contact you if a seat frees up.'))){
+        btn.disabled = false; btn.textContent = T('Lanjut ke Pembayaran','Continue to Payment');
         return submitBooking(true);
       }
       throw new Error(d.error);
@@ -889,30 +923,25 @@ async function submitBooking(allowWaitlist){
     const method = payload.method;
     const p = d.payment;
     if(d.reward){
-      showDone('Klaim permainan gratis terkirim! 🎁', 'Kursi kamu sudah ditahan tanpa perlu bayar. Admin akan mengonfirmasi klaim stempelmu sebentar lagi.');
+      showDone(['Klaim permainan gratis terkirim! 🎁','Free game claim sent! 🎁'],
+        ['Kursi kamu sudah ditahan tanpa perlu bayar. Admin akan mengonfirmasi klaim stempelmu sebentar lagi.','Your seat is held with nothing to pay. The admin will confirm your stamp claim shortly.']);
       setWaAdmin(p.wa_admin, `Halo admin TSMC, saya ${payload.name}, klaim permainan gratis ${currentCode} (kartu stempel penuh).`);
       return;
     }
-    let html = `Total: <b class="big">${rupiah(d.total)}</b>`;
+    LAST_PAY = { total: d.total, method: method, p: p };
     if(d.status === 'waitlist'){
-      showDone('Kamu masuk waiting list', 'Admin akan menghubungi kamu via WhatsApp jika ada kursi kosong. Belum perlu bayar dulu.');
+      showDone(['Kamu masuk waiting list','You are on the waiting list'],
+        ['Admin akan menghubungi kamu via WhatsApp jika ada kursi kosong. Belum perlu bayar dulu.','The admin will message you on WhatsApp if a seat frees up. Nothing to pay yet.']);
       setWaAdmin(p.wa_admin, `Halo admin TSMC, saya ${payload.name}, masuk waiting list ${currentCode}.`);
       return;
     }
     if(method === 'venue'){
-      showDone('Slot kamu tercatat! 🀄', 'Bayar langsung di tempat sebelum sesi dimulai. Tunjukkan kode booking ke admin.');
+      showDone(['Slot kamu tercatat! 🀄','Your seat is booked! 🀄'],
+        ['Bayar langsung di tempat sebelum sesi dimulai. Tunjukkan kode booking ke admin.','Pay at the venue before the session starts. Show your booking code to the admin.']);
       setWaAdmin(p.wa_admin, `Halo admin TSMC, saya ${payload.name}, sudah book slot ${currentCode} (bayar di tempat).`);
       return;
     }
-    if(method === 'qris'){
-      html += p.qris_image
-        ? `Scan QRIS di bawah ini:<img src="${p.qris_image}" alt="QRIS">`
-        : `<br>QRIS: minta kode QR ke admin via WhatsApp.`;
-    } else {
-      html += `<br>Transfer ke: <b>${esc(p.bank_name)} ${esc(p.bank_account)}</b><br>a.n. <b>${esc(p.bank_holder)}</b>`;
-    }
-    html += `<br><small style="color:var(--mut)">Setelah bayar, upload bukti di bawah. Slot ditahan 24 jam.</small>`;
-    document.getElementById('bk-payinfo').innerHTML = html;
+    paintPay();
     setWaAdmin(p.wa_admin, `Halo admin TSMC, saya ${payload.name}, sudah bayar untuk booking ${currentCode}.`);
     document.getElementById('bk-step1').classList.add('hidden');
     document.getElementById('bk-step2').classList.remove('hidden');
@@ -921,18 +950,39 @@ async function submitBooking(allowWaitlist){
     // finally ikut berjalan pada jalur "return" dini (venue/waitlist/reward),
     // jadi tombol tidak pernah tertinggal dalam keadaan mati
     btn.disabled = false;
-    btn.textContent = useReward ? 'Klaim Permainan Gratis 🎁' : 'Lanjut ke Pembayaran';
+    btn.textContent = useReward ? T('Klaim Permainan Gratis 🎁','Claim Your Free Game 🎁') : T('Lanjut ke Pembayaran','Continue to Payment');
   }
 }
 
+let LAST_PAY = null;   // rincian pembayaran terakhir, supaya bisa ditulis ulang saat ganti bahasa
+function paintPay(){
+  if(!LAST_PAY) return;
+  const { total, method, p } = LAST_PAY;
+  let html = `Total: <b class="big">${rupiah(total)}</b>`;
+  if(method === 'qris'){
+    html += p.qris_image
+      ? `${T('Scan QRIS di bawah ini:','Scan the QRIS code below:')}<img src="${p.qris_image}" alt="QRIS">`
+      : `<br>${T('QRIS: minta kode QR ke admin via WhatsApp.','QRIS: ask the admin for the QR code on WhatsApp.')}`;
+  } else {
+    html += `<br>${T('Transfer ke:','Transfer to:')} <b>${esc(p.bank_name)} ${esc(p.bank_account)}</b><br>${T('a.n.','in the name of')} <b>${esc(p.bank_holder)}</b>`;
+  }
+  html += `<br><small style="color:var(--mut)">${T('Setelah bayar, upload bukti di bawah. Slot ditahan 24 jam.','Once paid, upload your proof below. The seat is held for 24 hours.')}</small>`;
+  document.getElementById('bk-payinfo').innerHTML = html;
+}
 function setWaAdmin(wa, text){
   const a = document.getElementById('bk-wa-admin');
   if(wa) a.href = 'https://wa.me/' + wa.replace(/[^0-9]/g,'') + '?text=' + encodeURIComponent(text);
   else a.style.display = 'none';
 }
-function showDone(title, sub){
-  document.getElementById('bk-done-title').textContent = title;
-  document.getElementById('bk-done-sub').textContent = sub;
+let LAST_DONE = null;   // [id, en] judul & keterangan layar "selesai"
+function paintDone(){
+  if(!LAST_DONE) return;
+  document.getElementById('bk-done-title').textContent = T(LAST_DONE.t[0], LAST_DONE.t[1]);
+  document.getElementById('bk-done-sub').textContent = T(LAST_DONE.s[0], LAST_DONE.s[1]);
+}
+function showDone(title, sub){   // masing-masing berupa [Indonesia, Inggris]
+  LAST_DONE = { t: title, s: sub };
+  paintDone();
   document.getElementById('bk-step1').classList.add('hidden');
   document.getElementById('bk-step2').classList.add('hidden');
   document.getElementById('bk-step3').classList.remove('hidden');
@@ -956,12 +1006,18 @@ function compressImage(file, maxSide = 1280, quality = 0.75){
   });
 }
 
+let LAST_PROOF_NAME = '';
+function paintDrop(){
+  if(!LAST_PROOF_NAME) return;
+  document.getElementById('bk-drop').textContent = '✓ ' + LAST_PROOF_NAME + T(' siap dikirim',' ready to send');
+}
 document.getElementById('bk-file').addEventListener('change', async (e) => {
   const f = e.target.files[0];
   if(!f) return;
   proofData = await compressImage(f);
   const drop = document.getElementById('bk-drop');
-  drop.textContent = '✓ ' + f.name + ' siap dikirim';
+  LAST_PROOF_NAME = f.name;
+  paintDrop();
   drop.classList.add('got');
   document.getElementById('bk-proof-btn').disabled = false;
 });
@@ -969,14 +1025,15 @@ document.getElementById('bk-file').addEventListener('change', async (e) => {
 async function submitProof(){
   const btn = document.getElementById('bk-proof-btn');
   const errEl = document.getElementById('bk-err2');
-  errEl.textContent = ''; btn.disabled = true; btn.textContent = 'Mengirim…';
+  errEl.textContent = ''; btn.disabled = true; btn.textContent = T('Mengirim…','Sending…');
   try{
     const d = await (await fetch('/api/bookings/proof', {method:'POST',
       headers:{'content-type':'application/json'},
       body: JSON.stringify({code: currentCode, proof: proofData})})).json();
     if(!d.ok) throw new Error(d.error);
-    showDone('Bukti terkirim! 🀄', 'Admin akan memverifikasi pembayaran kamu. Cek status dengan kode booking di bawah.');
-  }catch(e){ errEl.textContent = e.message; btn.disabled = false; btn.textContent = 'Kirim Bukti Pembayaran'; }
+    showDone(['Bukti terkirim! 🀄','Proof sent! 🀄'],
+      ['Admin akan memverifikasi pembayaran kamu. Cek status dengan kode booking di bawah.','The admin will verify your payment. Check the status using the booking code below.']);
+  }catch(e){ errEl.textContent = e.message; btn.disabled = false; btn.textContent = T('Kirim Bukti Pembayaran','Send Proof of Payment'); }
 }
 
 /* ---------- cek status ---------- */
@@ -987,61 +1044,73 @@ function openLookup(){
 }
 const ST_LABEL = {pending:['MENUNGGU BAYAR','#C9A54A'], verifying:['SEDANG DIVERIFIKASI','#1E4D8C'],
   confirmed:['TERKONFIRMASI ✓','#087048'], canceled:['DIBATALKAN','#6B7A66'], waitlist:['WAITING LIST','#C02028']};
+const ST_LABEL_EN = {pending:'AWAITING PAYMENT', verifying:'BEING VERIFIED',
+  confirmed:'CONFIRMED ✓', canceled:'CANCELLED', waitlist:'WAITING LIST'};
 const METHOD_LABEL = {qris:'QRIS', transfer:'Transfer bank', venue:'Bayar di tempat'};
+const METHOD_LABEL_EN = {qris:'QRIS', transfer:'Bank transfer', venue:'Pay at the venue'};
+const methodLabel = m => T(METHOD_LABEL[m] || m, METHOD_LABEL_EN[m] || m);
 let LOOKUP_WA = '';   // nomor WA yang terverifikasi lewat pencarian / tersimpan di perangkat
 function bookingRow(b){
-  const [label, color] = ST_LABEL[b.status] || [b.status, '#6B7A66'];
+  const [labelId, color] = ST_LABEL[b.status] || [b.status, '#6B7A66'];
+  const label = T(labelId, ST_LABEL_EN[b.status] || labelId);
   const waCtx = stored('tsmc_wa') || LOOKUP_WA;
   const notPast = parseDate(b.date) >= new Date(new Date().setHours(0,0,0,0));
   // metode bisa diubah sendiri selama belum dibayar (bukan klaim reward)
   const canChg = waCtx && b.method !== 'reward' && ['pending','waitlist'].includes(b.status);
   // batalkan sendiri: booking aktif untuk sesi yang belum lewat
   const canCancel = waCtx && notPast && ['pending','waitlist','verifying','confirmed'].includes(b.status);
-  const methodTxt = b.method === 'reward' ? '' : ` · ${METHOD_LABEL[b.method] || esc(b.method)}`;
-  return `<div class="lk-row"><b>${esc(b.code)}</b> · ${esc(b.name)} · ${b.seats} kursi${b.method === 'reward' ? ' · <b style="color:var(--red)">🎁 GRATIS</b>' : methodTxt}<br>
+  const methodTxt = b.method === 'reward' ? '' : ` · ${methodLabel(b.method)}`;
+  return `<div class="lk-row"><b>${esc(b.code)}</b> · ${esc(b.name)} · ${b.seats} ${T('kursi', jml(b.seats,'seat'))}${b.method === 'reward' ? ` · <b style="color:var(--red)">🎁 ${T('GRATIS','FREE')}</b>` : methodTxt}<br>
     ${fmtTanggal(b.date)} · ${esc(b.time_start)} WIB · ${esc(b.venue)}<br>
     <span class="status-pill" style="background:${color};color:#fff">${label}</span>
     ${canChg ? `<select class="chg-method" onchange="if(this.value)userChangeMethod('${esc(b.code)}', this.value, this)">
-      <option value="">↔ ubah metode bayar…</option>
-      ${['qris','transfer','venue'].filter(x => x !== b.method).map(x => `<option value="${x}">jadi: ${METHOD_LABEL[x]}</option>`).join('')}
+      <option value="">↔ ${T('ubah metode bayar…','change payment method…')}</option>
+      ${['qris','transfer','venue'].filter(x => x !== b.method).map(x => `<option value="${x}">${T('jadi:','switch to:')} ${methodLabel(x)}</option>`).join('')}
     </select>` : ''}
-    ${canCancel ? `<button class="cancel-bk" onclick="userCancelBooking('${esc(b.code)}','${esc(b.method)}','${esc(b.status)}',this)">✕ Batalkan</button>` : ''}</div>`;
+    ${canCancel ? `<button class="cancel-bk" onclick="userCancelBooking('${esc(b.code)}','${esc(b.method)}','${esc(b.status)}',this)">✕ ${T('Batalkan','Cancel')}</button>` : ''}</div>`;
 }
 async function userCancelBooking(code, bMethod, bStatus, el){
   const wa = stored('tsmc_wa') || LOOKUP_WA;
-  if(!wa){ alert('Cari dulu booking kamu dengan nomor WhatsApp ya.'); return; }
+  if(!wa){ alert(T('Cari dulu booking kamu dengan nomor WhatsApp ya.','Please look up your booking with your WhatsApp number first.')); return; }
   // kalimat kedua hanya untuk yang SUDAH membayar (qris/transfer yang
   // buktinya terkirim / sudah dikonfirmasi) — bayar di tempat & reward tidak
   const sudahBayar = ['qris','transfer'].includes(bMethod) && ['verifying','confirmed'].includes(bStatus);
-  let msg = `Apakah kamu yakin ingin membatalkan booking ${code}?`;
-  if(sudahBayar) msg += '\n\nBooking yang dibatalkan kurang dari 24 jam sebelum sesi diadakan, uang yang sudah dibayarkan dianggap hangus.';
+  let msg = T(`Apakah kamu yakin ingin membatalkan booking ${code}?`, `Are you sure you want to cancel booking ${code}?`);
+  if(sudahBayar) msg += T('\n\nBooking yang dibatalkan kurang dari 24 jam sebelum sesi diadakan, uang yang sudah dibayarkan dianggap hangus.','\n\nIf you cancel less than 24 hours before the session, any money already paid is forfeited.');
   if(!confirm(msg)) return;
   el.disabled = true;
   try{
     const d = await (await fetch('/api/bookings/cancel', {method:'POST',
       headers:{'content-type':'application/json'}, body: JSON.stringify({code, wa})})).json();
     if(!d.ok) throw new Error(d.error);
-    alert(`Booking ${code} sudah dibatalkan.`);
+    alert(T(`Booking ${code} sudah dibatalkan.`, `Booking ${code} has been cancelled.`));
   }catch(e){ alert(e.message); el.disabled = false; return; }
   loadSite(); // slot kembali tersedia → refresh jadwal + "Booking Kamu"
   if(document.getElementById('lookup-modal').classList.contains('show')) doLookup();
 }
 async function userChangeMethod(code, m, el){
   const wa = stored('tsmc_wa') || LOOKUP_WA;
-  if(!wa){ alert('Cari dulu booking kamu dengan nomor WhatsApp ya.'); return; }
+  if(!wa){ alert(T('Cari dulu booking kamu dengan nomor WhatsApp ya.','Please look up your booking with your WhatsApp number first.')); return; }
   el.disabled = true;
   try{
     const d = await (await fetch('/api/bookings/change-method', {method:'POST',
       headers:{'content-type':'application/json'}, body: JSON.stringify({code, wa, method: m})})).json();
     if(!d.ok) throw new Error(d.error);
-    let info = `Metode pembayaran ${code} diubah ke ${METHOD_LABEL[m]}.`;
-    if(m === 'transfer') info += `\n\nTransfer ke ${d.payment.bank_name} ${d.payment.bank_account} a.n. ${d.payment.bank_holder}, lalu kirim bukti ke admin via WA.`;
-    if(m === 'qris') info += `\n\nScan QRIS dari admin (minta via WA jika belum punya), lalu kirim bukti pembayarannya.`;
-    if(m === 'venue') info += `\n\nBayar langsung di venue sebelum sesi dimulai — kursimu tetap dikunci.`;
+    let info = T(`Metode pembayaran ${code} diubah ke ${methodLabel(m)}.`, `Payment method for ${code} changed to ${methodLabel(m)}.`);
+    if(m === 'transfer') info += T(`\n\nTransfer ke ${d.payment.bank_name} ${d.payment.bank_account} a.n. ${d.payment.bank_holder}, lalu kirim bukti ke admin via WA.`, `\n\nTransfer to ${d.payment.bank_name} ${d.payment.bank_account} in the name of ${d.payment.bank_holder}, then send the proof to the admin on WhatsApp.`);
+    if(m === 'qris') info += T('\n\nScan QRIS dari admin (minta via WA jika belum punya), lalu kirim bukti pembayarannya.','\n\nScan the admin\'s QRIS code (ask on WhatsApp if you do not have it), then send the proof of payment.');
+    if(m === 'venue') info += T('\n\nBayar langsung di venue sebelum sesi dimulai — kursimu tetap dikunci.','\n\nPay at the venue before the session starts — your seat stays locked in.');
     alert(info);
   }catch(e){ alert(e.message); el.disabled = false; return; }
   renderMyBookings();
   if(document.getElementById('lookup-modal').classList.contains('show')) doLookup();
+}
+let LAST_LOOKUP = null;   // hasil pencarian terakhir, digambar ulang saat ganti bahasa
+function paintLookup(){
+  if(!LAST_LOOKUP) return;
+  document.getElementById('lk-results').innerHTML = LAST_LOOKUP.length
+    ? LAST_LOOKUP.map(bookingRow).join('')
+    : `<p class="sub">${T('Tidak ada booking ditemukan.','No bookings found.')}</p>`;
 }
 async function doLookup(){
   const q = document.getElementById('lk-q').value.trim();
@@ -1050,9 +1119,8 @@ async function doLookup(){
   try{
     const d = await (await fetch('/api/bookings/lookup?q=' + encodeURIComponent(q))).json();
     if(!d.ok) throw new Error(d.error);
-    document.getElementById('lk-results').innerHTML = d.bookings.length
-      ? d.bookings.map(bookingRow).join('')
-      : '<p class="sub">Tidak ada booking ditemukan.</p>';
+    LAST_LOOKUP = d.bookings;
+    paintLookup();
     // kalau dicari pakai nomor WA dan ketemu, ingat di perangkat ini
     // supaya bagian "Booking Kamu" + kartu stempel ikut muncul
     const waQ = q.replace(/[^0-9+]/g, '');
@@ -1080,14 +1148,15 @@ function updateNavMe(){
   const btn = document.getElementById('nav-me');
   const wa = stored('tsmc_wa');
   if(wa && LOYAL){
-    const nama = (stored('tsmc_name') || '').trim().split(/\s+/)[0] || 'Kamu';
+    const nama = (stored('tsmc_name') || '').trim().split(/\s+/)[0] || T('Kamu','You');
     btn.innerHTML = `${LOYAL.tier.icon} ${esc(nama)} · ${LOYAL.rewards_ready > 0 ? '🎁' : LOYAL.card + '/5 ✿'}`;
     btn.classList.add('known');
-    btn.title = `${LOYAL.tier.name} · ${LOYAL.plays_total}x main — klik untuk lihat booking & kartu stempelmu`;
+    btn.title = T(`${LOYAL.tier.name} · ${LOYAL.plays_total}x main — klik untuk lihat booking & kartu stempelmu`,
+      `${LOYAL.tier.name} · played ${LOYAL.plays_total}x — tap to see your bookings & stamp card`);
   }else{
-    btn.textContent = 'Cek Booking';
+    btn.textContent = T('Cek Booking','Check Booking');
     btn.classList.remove('known');
-    btn.title = 'Cek status booking kamu';
+    btn.title = T('Cek status booking kamu','Check your booking status');
   }
 }
 function navMeClick(){
@@ -1105,25 +1174,25 @@ function stampSVG(filled, idx){
     ? `<text x="30" y="50" font-size="28" text-anchor="middle" font-family="'Noto Serif TC',serif" font-weight="900" fill="#C02028">花</text>
        <text x="30" y="72" font-size="12" text-anchor="middle" fill="#78A818">❀</text>`
     : `<text x="30" y="52" font-size="24" text-anchor="middle" font-family="'DM Serif Display',serif" fill="#04331F" opacity="0.35">${idx}</text>`;
-  return `<svg viewBox="0 0 60 84" class="stamp" role="img" aria-label="stempel ${idx}${filled ? ' terisi' : ''}">${base}${face}</svg>`;
+  return `<svg viewBox="0 0 60 84" class="stamp" role="img" aria-label="${T('stempel','stamp')} ${idx}${filled ? T(' terisi',' filled') : ''}">${base}${face}</svg>`;
 }
 function renderLoyalty(l){
   const box = document.getElementById('loyal');
   if(!l){ box.innerHTML = ''; return; }
   const stamps = Array.from({length:5}, (_, i) => stampSVG(i < l.card, i + 1)).join('');
   const gift = l.rewards_ready > 0
-    ? `<span class="gift">🎁 ${l.rewards_ready} permainan GRATIS siap dipakai!</span>` : '';
+    ? `<span class="gift">🎁 ${l.rewards_ready} ${T('permainan GRATIS siap dipakai!', 'FREE ' + jml(l.rewards_ready,'game') + ' ready to use!')}</span>` : '';
   const next = l.next_tier
-    ? `<span class="lnext">${l.next_tier.need}x main lagi menuju ${l.next_tier.icon} ${esc(l.next_tier.name)}</span>`
-    : `<span class="lnext">Tier tertinggi — legenda meja! 👑</span>`;
+    ? `<span class="lnext">${T(`${l.next_tier.need}x main lagi menuju`, `${l.next_tier.need} more ${jml(l.next_tier.need,'session')} to`)} ${l.next_tier.icon} ${esc(l.next_tier.name)}</span>`
+    : `<span class="lnext">${T('Tier tertinggi — legenda meja! 👑','Top tier — a legend of the table! 👑')}</span>`;
   box.innerHTML = `
     <div class="loyal">
       <div class="lhead">
-        <span class="tierpill">${l.tier.icon} ${esc(l.tier.name)} · ${l.plays_total}x main</span>
+        <span class="tierpill">${l.tier.icon} ${esc(l.tier.name)} · ${l.plays_total}x ${T('main','played')}</span>
         ${next}
       </div>
       <div class="stamps">${stamps}${gift}</div>
-      <div class="lfoot">Setiap sesi yang kamu hadiri = 1 stempel · 5 stempel = 1 permainan gratis 🀄</div>
+      <div class="lfoot">${T('Setiap sesi yang kamu hadiri = 1 stempel · 5 stempel = 1 permainan gratis 🀄','Every session you attend = 1 stamp · 5 stamps = 1 free game 🀄')}</div>
     </div>`;
 }
 async function renderMyBookings(){
@@ -1146,12 +1215,29 @@ async function renderMyBookings(){
 
     document.getElementById('mybk-list').innerHTML = upcoming.length
       ? upcoming.map(bookingRow).join('')
-      : '<div class="lk-row" style="color:var(--mut)">Belum ada booking mendatang — pilih jadwal di bawah 👇</div>';
+      : `<div class="lk-row" style="color:var(--mut)">${T('Belum ada booking mendatang — pilih jadwal di bawah 👇','No upcoming bookings — pick a session below 👇')}</div>`;
     box.classList.remove('hidden');
   }catch(e){}
 }
 
 loadSite();
+// Ganti bahasa → semua yang digambar JavaScript ditulis ulang.
+if(window.I18N) window.I18N.onChange(() => {
+  if(SITE){
+    renderSchedules(SITE.schedules);
+    renderNews(SITE.news);
+    renderEvents(SITE.events);
+    renderGallery(SITE.gallery);
+  }
+  renderMyBookings();
+  updateNavMe();
+  paintSchedInfo();
+  paintPay();
+  paintDone();
+  paintLookup();
+  paintDrop();
+  toggleReward(document.getElementById('bk-use-reward').checked);
+});
 // datang dari halaman lain lewat tombol "Cek Booking" (/#cek) → langsung buka pencarian status
 if(location.hash === '#cek'){
   openLookup();

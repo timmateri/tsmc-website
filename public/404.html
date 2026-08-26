@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Halaman tidak ditemukan — The Social Mahjong Club</title>
+<title data-en="Page not found — The Social Mahjong Club">Halaman tidak ditemukan — The Social Mahjong Club</title>
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/png" href="/favicon.png">
 <meta name="theme-color" content="#087048">
@@ -26,16 +26,23 @@
     background:var(--green);color:var(--cream);box-shadow:0 3px 0 var(--green-dk)}
   .btn:active{transform:translateY(1px);box-shadow:none}
   .alt{display:block;margin-top:16px;font-size:14px;color:var(--green);font-weight:800;text-decoration:none}
+  .lang-switch{display:inline-flex;gap:2px;background:var(--cream);border:1.5px solid rgba(4,51,31,.2);
+    border-radius:99px;padding:2px}
+  .lang-switch button{border:none;background:transparent;cursor:pointer;font-family:inherit;font-size:11.5px;
+    font-weight:800;letter-spacing:.06em;color:var(--mut);padding:5px 11px;border-radius:99px;line-height:1}
+  .lang-switch button.on{background:var(--green);color:#fff}
 </style>
 </head>
 <body>
+  <div style="position:absolute;top:16px;right:18px" data-lang-switch></div>
   <div class="box">
     <div class="tile">東</div>
-    <div class="kick">404 · SALAH MEJA</div>
-    <h1>Halaman ini tidak ada</h1>
-    <p>Sepertinya tile-nya kececer. Halaman yang kamu cari sudah dipindah atau tidak pernah ada. Yuk balik ke meja utama.</p>
-    <a class="btn" href="/">← Kembali ke Beranda</a>
-    <a class="alt" href="/#jadwal">Lihat jadwal &amp; book slot →</a>
+    <div class="kick" data-en="404 · WRONG TABLE">404 · SALAH MEJA</div>
+    <h1 data-en="This page does not exist">Halaman ini tidak ada</h1>
+    <p data-en="Looks like a tile went missing. The page you were after has moved, or never existed. Let us head back to the main table.">Sepertinya tile-nya kececer. Halaman yang kamu cari sudah dipindah atau tidak pernah ada. Yuk balik ke meja utama.</p>
+    <a class="btn" href="/" data-en="← Back to Home">← Kembali ke Beranda</a>
+    <a class="alt" href="/#jadwal" data-en="See the schedule &amp; book a slot →">Lihat jadwal &amp; book slot →</a>
   </div>
+<script src="/i18n.js"></script>
 </body>
 </html>
