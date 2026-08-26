@@ -34,8 +34,10 @@
     // (Modul 02: "All Triplets (3) + Semi Flush (3) + ..." dihitung semua.)
     flush: { semiFlush: 3, fullFlush: 7 },
     // Poin tambahan — ditumpuk juga. Zimo (menang dari ambilan sendiri)
-    // bernilai +1 faan di TSMC.
-    add: { dragonPong: 1, roundWind: 1, seatWind: 1, zimo: 1 },
+    // bernilai +1 faan. Bunga/season dihitung di akhir permainan kalau kamu
+    // menang: 1 faan untuk setiap tile yang nomornya sama dengan nomor
+    // kursimu (bunga hitam maupun merah), jadi paling banyak 2 faan.
+    add: { dragonPong: 1, roundWind: 1, seatWind: 1, zimo: 1, flowerSeat: 1 },
     cap: 13,      // maksimum dihitung 13 faan
     min: 3,       // minimum boleh menyatakan menang
     unit: 'FAAN',
@@ -128,6 +130,8 @@
     joker: ['Joker dipakai', '1 poin per joker',
       'Jokers used', '1 point per joker'],
     noJoker: ['Tanpa joker', '', 'No joker', ''],
+    flowerSeat: ['Bunga / season sesuai kursi', '1 faan per tile yang nomornya sama dengan nomor kursimu',
+      'Flower / season matching your seat', '1 faan for each tile whose number matches your seat number'],
     flowerMatch: ['Bunga hitam sesuai kursi', '', 'Black flower matching your seat', ''],
     seasonOther: ['Bunga merah tidak sesuai kursi', '', 'Red flower not matching your seat', ''],
     seasonMatch: ['Bunga merah sesuai kursi', '', 'Red flower matching your seat', ''],
@@ -276,6 +280,12 @@
 
     honorPongLines(hand, FAAN.add).forEach((l) => lines.push(l));
     if (hand.ctx.zimo) lines.push({ key: 'zimo', value: FAAN.add.zimo });
+
+    // Bunga & season: 1 faan per tile yang nomornya sama dengan nomor kursi.
+    // Warnanya tidak dibedakan di TSMC — yang dilihat cuma nomornya.
+    const seatNo = SEAT_NO[hand.ctx.seat];
+    const cocok = (hand.ctx.flowers || []).filter((f) => parseInt(f.split(':')[1], 10) === seatNo).length;
+    if (cocok) lines.push({ key: 'flowerSeat', n: cocok, value: FAAN.add.flowerSeat * cocok });
 
     let total = lines.reduce((a, l) => a + l.value, 0);
     let capped = false;
@@ -568,12 +578,15 @@
   };
 
   // Arsitipe yang boleh muncul di tiap level (1–5).
+  // Level 4 & 5 sengaja masih menyimpan beberapa tangan "zona sehari-hari":
+  // di J2 tangan besar poinnya final (satu baris, tinggal dikenali), jadi
+  // tanpa selipan ini level tertinggi justru jadi paling gampang dihitung.
   const LEVELS = [
     ['chicken', 'allSequences', 'allTriplets', 'semiFlush'],
     ['chicken', 'allSequences', 'allTriplets', 'semiFlush', 'honorMix', 'triplesWithHonor'],
     ['allTriplets', 'semiFlush', 'honorMix', 'triplesWithHonor', 'fullFlush', 'mixedTerminals', 'sevenPairs', 'smallDragons'],
     ['semiFlush', 'fullFlush', 'mixedTerminals', 'sevenPairs', 'smallDragons', 'bigDragons', 'smallWinds', 'allConcealed', 'allHonours', 'allTerminals'],
-    ['fullFlush', 'sevenPairs', 'bigDragons', 'smallWinds', 'allConcealed', 'allHonours', 'allTerminals', 'bigWinds', 'nineGates', 'thirteenOrphans', 'fourKongs'],
+    ['semiFlush', 'triplesWithHonor', 'fullFlush', 'sevenPairs', 'bigDragons', 'smallWinds', 'allConcealed', 'allHonours', 'allTerminals', 'bigWinds', 'nineGates', 'thirteenOrphans', 'fourKongs'],
   ];
   const MAX_LEVEL = LEVELS.length;
 
@@ -585,26 +598,35 @@
       lastTile: false, robKong: false, buntut: false,
     };
     ctx.seatNo = SEAT_NO[ctx.seat];
-    // Zimo bernilai di kedua aturan: +1 faan di TSMC, +1 poin di J2.
-    if (level >= 2) ctx.zimo = Math.random() < 0.35;
-    // Sisanya khusus J2: joker, bunga, dan cara menang lain tidak dipakai TSMC.
+
+    // Tiap level menambah satu hal yang harus diperhitungkan, dan makin
+    // sering muncul: level 1 bentuk tangan saja, lalu cara menang, lalu
+    // bunga, lalu joker, sampai level puncak yang menumpuk semuanya.
+    // Level 1 sengaja bersih supaya pemain baru bisa fokus ke pola.
+    if (level >= 2) ctx.zimo = Math.random() < 0.2 + 0.09 * level;
+
+    // Bunga berlaku di KEDUA aturan: TSMC memberi 1 faan untuk tiap bunga
+    // atau season yang nomornya sama dengan nomor kursi, J2 punya tabelnya
+    // sendiri. Satu set mahjong hanya punya SATU keping tiap bunga, jadi
+    // tidak boleh kembar. Maksimalnya 5 keping — set lengkap 4 bunga sewarna
+    // sudah bisa keluar, tapi tetap jauh dari 7 keping yang di meja berarti
+    // instant win (kondisi itu tidak dimodelkan sebagai soal di kuis).
+    if (level >= 3 && Math.random() < 0.3 + 0.12 * (level - 2)) {
+      ctx.flowers = pickN(FLOWER_DECK, 1 + rnd(level >= 5 ? 5 : 3));
+    }
+
+    // Sisanya khusus J2: joker dan bonus cara menang tidak dipakai TSMC.
     if (mode !== 'j2') return ctx;
 
-    if (level >= 3) {
-      ctx.jokers = Math.random() < 0.45 ? 1 + rnd(2) : 0;
-      if (Math.random() < 0.55) {
-        // Satu set mahjong hanya punya SATU keping tiap bunga — tidak boleh kembar.
-        // Maksimal 5 keping: set lengkap 4 bunga sewarna sudah bisa keluar,
-        // tapi tetap jauh dari 7 keping yang di meja berarti instant win
-        // (kondisi itu tidak dimodelkan sebagai soal di kuis).
-        ctx.flowers = pickN(FLOWER_DECK, 1 + rnd(5));
-      }
+    if (level >= 3 && Math.random() < 0.3 + 0.1 * (level - 3)) {
+      ctx.jokers = 1 + rnd(level >= 5 ? 3 : 2);
     }
-    if (level >= 5) {
+    if (level >= 4) {
       const r = Math.random();
-      if (r < 0.18) ctx.lastTile = true;
-      else if (r < 0.34) ctx.robKong = true;
-      else if (r < 0.5) ctx.buntut = true;
+      const p = level >= 5 ? 0.2 : 0.12;   // di level puncak lebih sering muncul
+      if (r < p) ctx.lastTile = true;
+      else if (r < p * 2) ctx.robKong = true;
+      else if (r < p * 3) ctx.buntut = true;
     }
     return ctx;
   }

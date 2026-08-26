@@ -10,7 +10,9 @@
   const $ = (id) => document.getElementById(id);
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const HANDS_PER_LEVEL = 10;
+  // 5 tangan per level: naik levelnya cepat, dan tiap level menambah satu
+  // hal baru yang harus dihitung (lihat makeCtx di kuis.js).
+  const HANDS_PER_LEVEL = 5;
   const MODE = {
     faan: { unit: 'faan', unitEn: 'faan', modul: '/modul-02', store: 'tsmc.kuis.best.faan' },
     j2: { unit: 'poin', unitEn: 'points', modul: '/modul-04', store: 'tsmc.kuis.best.j2' },
@@ -119,10 +121,11 @@
       chip(t('Angin duduk', 'Seat wind'), K.WIND_CN[c.seat] + ' ' + W[c.seat], true),
       chip(t('Angin putaran', 'Round wind'), K.WIND_CN[c.round] + ' ' + W[c.round], true),
     ];
-    // Zimo bernilai di kedua aturan, jadi chip-nya selalu tampil.
+    // Zimo dan nomor kursi bernilai di kedua aturan, jadi chip-nya selalu
+    // tampil — di TSMC nomor kursi menentukan bunga mana yang berfaan.
     out.push(chip(t('Cara menang', 'How it was won'), c.zimo ? 'Zimo' : 'Ron', c.zimo));
+    out.push(chip(t('Nomor kursi', 'Seat number'), String(K.SEAT_NO[c.seat])));
     if (G.mode === 'j2') {
-      out.push(chip(t('Nomor kursi', 'Seat number'), String(K.SEAT_NO[c.seat])));
       out.push(chip(t('Tangan', 'Hand'),
         c.concealed ? t('Tertutup', 'Concealed') : t('Ada set terbuka', 'Has an open set'), c.concealed));
       out.push(chip(t('Joker dipakai', 'Jokers used'),
@@ -133,8 +136,10 @@
     }
     $('q-ctx').innerHTML = out.join('');
 
+    // Bunga dihitung di kedua aturan, jadi barisnya tampil di kedua mode.
+    // Disembunyikan di level awal, saat kuis belum pernah membagikan bunga.
     const fl = $('q-flowers');
-    if (G.mode === 'j2') {
+    if (c.flowers.length || G.level >= 3) {
       fl.style.display = '';
       fl.innerHTML = '<small>' + t('BUNGA DI DEPANMU', 'YOUR FLOWER TILES') + '</small>'
         + (c.flowers.length
