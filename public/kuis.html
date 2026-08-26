@@ -65,6 +65,7 @@
     <div data-en="🀄 Every hand shown has already won — your job is only to <b>work out its value</b>.">🀄 Setiap tangan sudah menang — tugasmu cuma <b>menghitung nilainya</b>.</div>
     <div data-en="📈 Five hands per level, five levels. Each level adds one more thing to reckon with — the way you won, then flower tiles, then jokers.">📈 Lima tangan per level, lima level. Tiap level menambah satu hal yang harus diperhitungkan — cara menang, lalu bunga, lalu joker.</div>
     <div data-en="💀 <b>One wrong answer ends the run.</b> Your score is the total value of every hand you counted correctly.">💀 <b>Satu jawaban salah, ronde selesai.</b> Skor = total nilai tangan yang berhasil kamu hitung benar.</div>
+    <div data-en="🏆 Count all 25 hands correctly and the trophy is yours — you finish as a mahjong expert.">🏆 Hitung benar seluruh 25 tangan dan pialanya jadi milikmu — kamu tamat sebagai ahli mahjong.</div>
     <div data-en="🧾 Every answer opens up line by line — even a wrong one teaches you something.">🧾 Tiap jawaban langsung dibuka rinciannya baris per baris — salah sekali pun tetap belajar.</div>
   </div>
 
@@ -108,6 +109,41 @@
 
 <!-- ============ LAYAR: HASIL ============ -->
 <section class="scr" id="scr-over" style="display:none">
+  <!-- juara: muncul hanya kalau semua tangan sampai level terakhir dijawab benar -->
+  <div class="champ" id="over-champ" style="display:none">
+    <svg class="trophy" viewBox="0 0 120 132" role="img" aria-label="Piala" data-en-label="Trophy">
+      <defs>
+        <linearGradient id="cup" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#F5DE8C"/><stop offset=".45" stop-color="#D4AF37"/>
+          <stop offset="1" stop-color="#9A7A1E"/>
+        </linearGradient>
+        <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+          <stop offset=".5" stop-color="#fff" stop-opacity=".75"/>
+          <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+        </linearGradient>
+        <clipPath id="cupclip"><path d="M30 12h60v26c0 18-13 30-30 30S30 56 30 38V12z"/></clipPath>
+      </defs>
+      <!-- gagang -->
+      <path d="M30 20H18a12 12 0 0 0 0 24h6" fill="none" stroke="url(#cup)" stroke-width="7" stroke-linecap="round"/>
+      <path d="M90 20h12a12 12 0 0 1 0 24h-6" fill="none" stroke="url(#cup)" stroke-width="7" stroke-linecap="round"/>
+      <!-- mangkuk -->
+      <path d="M30 12h60v26c0 18-13 30-30 30S30 56 30 38V12z" fill="url(#cup)"/>
+      <g clip-path="url(#cupclip)"><rect class="glint" x="-40" y="0" width="26" height="70" fill="url(#shine)"/></g>
+      <!-- kaki & alas -->
+      <rect x="54" y="68" width="12" height="20" fill="url(#cup)"/>
+      <rect x="38" y="88" width="44" height="10" rx="3" fill="url(#cup)"/>
+      <rect x="28" y="98" width="64" height="13" rx="4" fill="url(#cup)"/>
+      <!-- tile mahjong di badan piala -->
+      <rect x="49" y="24" width="22" height="28" rx="4" fill="#FAFCF5"/>
+      <text x="60" y="46" text-anchor="middle" font-family="'Noto Serif TC',serif" font-size="21" font-weight="900" fill="#C02028">中</text>
+    </svg>
+    <div class="champ-kick" id="champ-kick"></div>
+    <h2 class="champ-title" data-en="You are now a mahjong expert">Anda telah menjadi ahli mahjong</h2>
+    <div class="champ-rule" id="champ-rule"></div>
+  </div>
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+
   <div class="over">
     <img class="j2-logo j2-only" src="/j2-logo.png" alt="J2 Mahjong" width="211" height="216">
     <div class="badge" id="over-new" data-en="NEW BEST">REKOR BARU</div>
@@ -121,7 +157,7 @@
       <a class="kbtn ghost" id="over-modul" href="/modul-02" data-en="Open the table">Buka tabelnya</a>
     </div>
   </div>
-  <div class="over-tip" data-en="Miscounting is cheap here and expensive at the table. Keep going until the number arrives on its own.">Salah hitung itu murah di sini, mahal di meja. Ulangi sampai angkanya keluar sendiri di kepala.</div>
+  <div class="over-tip" id="over-tip" data-en="Miscounting is cheap here and expensive at the table. Keep going until the number arrives on its own.">Salah hitung itu murah di sini, mahal di meja. Ulangi sampai angkanya keluar sendiri di kepala.</div>
 </section>
 
 </div>

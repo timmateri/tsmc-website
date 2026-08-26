@@ -19,7 +19,12 @@
   };
 
   const G = { mode: 'faan', level: 1, handNo: 0, score: 0, hand: null, answer: 0,
-    locked: false, fb: null, best: 0 };
+    locked: false, fb: null, best: 0, champ: false };
+
+  // Menjawab benar sebanyak ini = tamat: 5 level × 5 tangan.
+  const TOTAL_HANDS = () => K.MAX_LEVEL * HANDS_PER_LEVEL;
+  // Nama aturan untuk ucapan selamat.
+  const ruleName = () => (G.mode === 'j2' ? 'J2 Style Rules' : 'TSMC Rules');
 
   // ---------- bahasa ----------
   // Teks yang digambar oleh JavaScript tidak bisa memakai atribut data-en,
@@ -212,7 +217,9 @@
   }
 
   function startGame(mode) {
-    G.mode = mode; G.level = 1; G.handNo = 0; G.score = 0;
+    G.mode = mode; G.level = 1; G.handNo = 0; G.score = 0; G.champ = false;
+    $('confetti').innerHTML = '';
+    $('over-champ').style.display = 'none';
     setTheme(mode, false);
     $('play-modul').href = MODE[mode].modul;
     $('over-modul').href = MODE[mode].modul;
@@ -252,18 +259,23 @@
     const fb = $('feedback');
     const u = unit();
     if (f.ok) {
-      fb.innerHTML = '<div class="fb ok"><div class="head"><b>' + t('Betul!', 'Correct!') + '</b>'
+      // Tangan terakhir dijawab benar → tamat, bukan lanjut ke soal berikutnya.
+      const tamat = G.handNo >= TOTAL_HANDS();
+      fb.innerHTML = '<div class="fb ok"><div class="head"><b>'
+        + (tamat ? t('Sempurna!', 'Perfect!') : t('Betul!', 'Correct!')) + '</b>'
         + '<span>+' + f.correct + ' ' + u + '</span></div>'
         + breakdownHTML(G.hand)
-        + '<button class="kbtn wide" id="fb-next">' + t('Lanjut →', 'Next hand →') + '</button></div>';
-      $('fb-next').onclick = () => nextHand(false);
+        + '<button class="kbtn wide" id="fb-next">'
+        + (tamat ? t('Terima pialamu 🏆', 'Claim your trophy 🏆') : t('Lanjut →', 'Next hand →'))
+        + '</button></div>';
+      $('fb-next').onclick = () => (tamat ? gameOver(true) : nextHand(false));
     } else {
       fb.innerHTML = '<div class="fb no"><div class="head"><b>' + t('Belum tepat', 'Not quite') + '</b><span>'
         + t('jawabanmu ' + f.given + ' · seharusnya ' + f.correct,
             'you said ' + f.given + ' · it was ' + f.correct) + '</span></div>'
         + breakdownHTML(G.hand)
         + '<button class="kbtn wide" id="fb-next">' + t('Lihat hasil →', 'See your result →') + '</button></div>';
-      $('fb-next').onclick = gameOver;
+      $('fb-next').onclick = () => gameOver(false);
     }
   }
 
@@ -290,25 +302,68 @@
 
   function paintOver() {
     const u = unit();
+    const n = TOTAL_HANDS();
     $('over-unit').textContent = u.toUpperCase();
-    $('over-sub').innerHTML = t(
-      'Sampai <b>level ' + G.level + '</b> · tumbang di tangan ke-<b>' + G.handNo + '</b>',
-      'Reached <b>level ' + G.level + '</b> · fell on hand <b>' + G.handNo + '</b>');
+    $('over-sub').innerHTML = G.champ
+      ? t('Tamat di <b>level ' + K.MAX_LEVEL + '</b> · <b>' + n + '</b> tangan, semuanya benar',
+          'Finished <b>level ' + K.MAX_LEVEL + '</b> · <b>' + n + '</b> hands, every one correct')
+      : t('Sampai <b>level ' + G.level + '</b> · tumbang di tangan ke-<b>' + G.handNo + '</b>',
+          'Reached <b>level ' + G.level + '</b> · fell on hand <b>' + G.handNo + '</b>');
     $('over-best').innerHTML = t(
       'Rekor di perangkat ini: <b>' + G.best + ' ' + u + '</b>',
       'Best on this device: <b>' + G.best + ' ' + u + '</b>');
+    $('champ-kick').textContent = t('RONDE SEMPURNA · ' + n + ' TANGAN',
+      'PERFECT RUN · ' + n + ' HANDS');
+    $('champ-rule').textContent = ruleName();
   }
 
-  function gameOver() {
+  // Hujan confetti — dibuat sekali, lalu membersihkan dirinya sendiri.
+  function confetti() {
+    const box = $('confetti');
+    if (!box) return;
+    box.innerHTML = '';
+    if (reduce) return;
+    const warna = G.mode === 'j2'
+      ? ['#D4AF37', '#F5DE8C', '#FAFCF5', '#C02028', '#8C6B12']
+      : ['#D4AF37', '#F5DE8C', '#FAFCF5', '#087048', '#C02028'];
+    let html = '';
+    for (let i = 0; i < 90; i++) {
+      const w = 6 + Math.random() * 7;
+      const h = 8 + Math.random() * 10;
+      html += '<i class="' + (Math.random() < 0.3 ? 'round' : '') + '" style="'
+        + 'left:' + (Math.random() * 100).toFixed(2) + '%;'
+        + 'width:' + w.toFixed(1) + 'px;height:' + (Math.random() < 0.3 ? w : h).toFixed(1) + 'px;'
+        + 'background:' + warna[i % warna.length] + ';'
+        + '--dx:' + Math.round(-120 + Math.random() * 240) + 'px;'
+        + 'animation-duration:' + (2.6 + Math.random() * 2.6).toFixed(2) + 's,'
+        + (0.7 + Math.random() * 1.4).toFixed(2) + 's;'
+        + 'animation-delay:' + (Math.random() * 1.6).toFixed(2) + 's,0s;'
+        + '"></i>';
+    }
+    box.innerHTML = html;
+    // Hapus setelah animasinya habis supaya tidak membebani halaman.
+    clearTimeout(confetti.t);
+    confetti.t = setTimeout(() => { box.innerHTML = ''; }, 7000);
+  }
+
+  function gameOver(champ) {
+    G.champ = !!champ;
     G.best = saveBest(G.mode, G.score);
     paintOver();
+    $('over-champ').style.display = G.champ ? '' : 'none';
+    // nasihat "ulangi lagi" tidak cocok untuk yang baru saja tamat
+    $('over-tip').style.display = G.champ ? 'none' : '';
     $('over-new').style.display = (G.score >= G.best && G.score > 0) ? '' : 'none';
     show('over');
     countUp($('over-score'), 0, G.score);
+    if (G.champ) confetti();
     if (window.scrollTo) window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
   }
 
   function toStart() {
+    $('confetti').innerHTML = '';
+    $('over-champ').style.display = 'none';
+    G.champ = false;
     $('best-faan').textContent = readBest('faan');
     $('best-j2').textContent = readBest('j2');
     show('start');
