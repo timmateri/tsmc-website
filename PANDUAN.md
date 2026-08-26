@@ -122,7 +122,9 @@ Masukkan password admin → kamu akan melihat 6 tab.
 
 Untuk mengubah jadwal, klik **✎ Edit** pada jadwal di daftar bawah. Untuk menutup pendaftaran tanpa menghapus, ubah statusnya jadi **Ditutup**.
 
-> Jadwal yang tanggalnya sudah lewat otomatis hilang dari website publik (tetap tersimpan di dashboard).
+**Setelah sesi berlangsung:** tekan **✅ Tandai Selesai** pada jadwalnya. Kartunya pindah ke bagian *"Jadwal yang Sudah Lewat"* di website (tampil abu-abu, tidak bisa di-book lagi) dan semua nama di daftar peserta langsung dapat **+1 stempel** loyalty card.
+
+> Jadwal yang tanggalnya sudah lewat memang pindah sendiri ke bagian itu, tapi **stempelnya tidak cair sebelum tombol ini ditekan.** Selama belum ditandai, jadwalnya diberi peringatan merah di dashboard.
 
 ### 📋 Tab "Booking" — Memverifikasi pembayaran (rutinitas paling penting!)
 
@@ -140,7 +142,19 @@ Tips:
 - Booking **MENUNGGU BAYAR** (kuning) yang tidak dibayar dalam 24 jam otomatis dilepas dari hitungan kursi — tidak perlu kamu apa-apakan.
 - Kalau sesi penuh, anggota baru masuk **WAITING LIST** (merah) — kalau ada yang batal, konfirmasi manual anggota waiting list lalu hubungi via WA.
 
-**Loyalty card (otomatis):** setiap sesi yang dihadiri anggota (booking terkonfirmasi yang tanggalnya sudah lewat) = 1 stempel, dihitung per nomor WA. 5 stempel = 1 permainan gratis, dan ada tier: 🐣 Chicken Hand (0–4x) → 🀄 Pong! (5–14x) → 🏆 Sik Wu (15–29x) → 👑 Limit Hand (30x+). Kartu stempelnya muncul otomatis di bagian "Booking Kamu" di website. Saat anggota menukar stempel, muncul booking berlabel **🎁 KLAIM REWARD** di tab Booking — cek sekilas (misalnya via WA), lalu tekan **✓ Konfirmasi**; stempelnya otomatis terpotong 5. Kamu tidak perlu mencatat apa pun manual.
+**Loyalty card (otomatis):** 1 sesi yang dihadiri = 1 stempel, dihitung per nomor WA (bukan per kursi — yang mengajak 2 teman tetap dapat 1). **8 stempel = 1 permainan gratis.**
+
+Stempel yang sama juga menaikkan **gelar** — +1 stempel selalu berarti +1 langkah menuju gelar berikutnya: 🐣 Chicken Hand (0–4 stempel) → 🀄 Pong! (5–14) → 🏆 Sik Wu (15–29) → 👑 Limit Hand (30+). Bedanya, kartu stempel habis dipakai saat menukar hadiah, sedangkan gelar dihitung dari seluruh stempel yang pernah didapat — jadi menukar permainan gratis tidak pernah menurunkan gelar. Kartu stempelnya muncul otomatis di bagian "Booking Kamu" di website. Saat anggota menukar stempel, muncul booking berlabel **🎁 KLAIM REWARD** di tab Booking — cek sekilas (misalnya via WA), lalu tekan **✓ Konfirmasi**; stempelnya otomatis terpotong 8. Kamu tidak perlu mencatat apa pun manual.
+
+Aturan stempelnya satu kalimat: **stempel keluar saat event ditandai selesai, bukan saat pembayaran dikonfirmasi.**
+
+1. Anggota daftar (transfer / QRIS / bayar di tempat) → kamu konfirmasi → namanya masuk **daftar peserta**. Belum ada stempel.
+2. Sesi selesai → kamu tekan **✅ Tandai Selesai** → semua nama di daftar peserta dapat **+1 stempel** sekaligus. Notifikasi menyebutkan berapa orang.
+3. Kamu cek siapa yang benar-benar datang. Kalau ada yang beda, buka **👥 Peserta** pada jadwal itu dan klik penanda **🀄 hadir / ⬜ tidak hadir** di baris orangnya — stempelnya langsung ikut berubah.
+
+Kalau tombol Selesai salah tekan, **↩ Aktifkan Lagi** menarik kembali semua stempel sesi itu. Membatalkan booking seseorang juga mencabut stempelnya.
+
+> Selama sebuah sesi belum ditandai selesai, pesertanya belum dapat stempel — jadwal yang tanggalnya sudah lewat tapi belum ditandai akan diberi peringatan merah di daftar jadwal.
 
 ### 🀄 Tab "Anggota" — Stempel loyalty & koreksi refund
 

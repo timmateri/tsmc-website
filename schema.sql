@@ -33,6 +33,11 @@ CREATE TABLE IF NOT EXISTS bookings (
   admin_note  TEXT DEFAULT '',
   created_at  TEXT DEFAULT (datetime('now')),
   FOREIGN KEY (schedule_id) REFERENCES schedules(id)
+  -- Catatan: kolom "attended" (0/1, penanda stempel) sengaja TIDAK ditulis
+  -- di sini. Kolomnya ditambahkan otomatis oleh worker.js saat pertama kali
+  -- jalan (ensureAttendedColumn), sekalian mengisi mundur sesi yang sudah
+  -- terlanjur ditandai selesai. Kalau ditulis di sini, database baru dan
+  -- database lama akan menempuh jalur yang berbeda.
 );
 
 CREATE TABLE IF NOT EXISTS news (

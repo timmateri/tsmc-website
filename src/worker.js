@@ -19,9 +19,14 @@ function err(message, status = 400) {
 // Booking yang belum dibayar lebih dari 24 jam tidak lagi menahan kursi —
 // KECUALI metode "bayar di tempat": kursinya ditahan sampai hari sesi,
 // karena memang baru dibayar di venue.
-const HOLD_EXPR = `(b.status IN ('confirmed','verifying')
-  OR (b.status = 'pending' AND b.method = 'venue')
-  OR (b.status = 'pending' AND b.created_at > datetime('now','-1 day')))`;
+// Dipakai juga sebagai definisi "nama yang muncul di daftar peserta":
+// persis orang-orang inilah yang dapat stempel saat sesi ditandai selesai.
+function holdExpr(p = 'b.') {
+  return `(${p}status IN ('confirmed','verifying')
+    OR (${p}status = 'pending' AND ${p}method = 'venue')
+    OR (${p}status = 'pending' AND ${p}created_at > datetime('now','-1 day')))`;
+}
+const HOLD_EXPR = holdExpr();
 
 // Kode booking acak, contoh: TSMC-7KQ4
 function makeCode() {
@@ -91,6 +96,41 @@ function mapUrlOk(u) {
   return !u || (/^https:\/\/\S+$/.test(u) && u.length <= 300);
 }
 
+// Kolom "attended" = penanda kehadiran, dan itulah SATU-SATUNYA sumber
+// stempel. Diisi saat admin menekan "Tandai Selesai" pada sebuah jadwal,
+// untuk setiap nama yang ada di daftar peserta sesi itu, lalu bisa
+// dikoreksi per orang kalau ternyata ada yang tidak jadi datang.
+//
+// Mengonfirmasi pembayaran TIDAK memberi stempel — itu hanya membuat
+// namanya muncul di daftar peserta.
+let attendedColumnEnsured = false;
+async function ensureAttendedColumn(db) {
+  if (attendedColumnEnsured) return;
+  try {
+    await db.prepare(`ALTER TABLE bookings ADD COLUMN attended INTEGER NOT NULL DEFAULT 0`).run();
+    // ALTER hanya berhasil sekali (saat kolomnya belum ada), jadi ini tempat
+    // yang aman untuk mengisi mundur. Dua-duanya diambil supaya tidak ada
+    // anggota yang kehilangan stempel yang sudah terlanjur tampil di kartunya:
+    //   a) peserta sesi yang sudah ditandai selesai — aturan baru, berlaku surut
+    //   b) booking lunas di sesi yang tanggalnya sudah lewat — aturan lama
+    await db.prepare(`
+      UPDATE bookings SET attended = 1
+      WHERE id IN (
+        SELECT b.id FROM bookings b JOIN schedules s ON s.id = b.schedule_id
+        WHERE s.status != 'canceled' AND (
+          (s.status = 'done' AND ${holdExpr('b.')})
+          OR (b.status = 'confirmed' AND s.date <= date('now'))
+        )
+      )
+    `).run();
+  } catch (e) { /* kolom sudah ada */ }
+  attendedColumnEnsured = true;
+}
+
+// Satu stempel = satu kehadiran yang sudah ditandai admin. Tidak ada
+// jalan lain: status pembayaran sama sekali tidak ikut menentukan.
+const HADIR_EXPR = `(b.attended = 1)`;
+
 async function ensureAdjTable(db) {
   await db.prepare(`CREATE TABLE IF NOT EXISTS loyalty_adj (
     wa TEXT PRIMARY KEY, delta INTEGER NOT NULL DEFAULT 0,
@@ -98,10 +138,10 @@ async function ensureAdjTable(db) {
 }
 
 async function getLoyalty(db, wa) {
+  await ensureAttendedColumn(db);
   const row = await db.prepare(`
     SELECT
-      SUM(CASE WHEN b.status = 'confirmed' AND s.date <= date('now') THEN 1 ELSE 0 END) AS plays_total,
-      SUM(CASE WHEN b.method != 'reward' AND b.status = 'confirmed' AND s.date <= date('now') THEN 1 ELSE 0 END) AS plays_stamp,
+      SUM(CASE WHEN b.method != 'reward' AND ${HADIR_EXPR} THEN 1 ELSE 0 END) AS plays_stamp,
       SUM(CASE WHEN b.method = 'reward' AND b.status != 'canceled' THEN 1 ELSE 0 END) AS rewards_used
     FROM bookings b JOIN schedules s ON s.id = b.schedule_id
     WHERE b.wa = ?
@@ -112,8 +152,12 @@ async function getLoyalty(db, wa) {
     const a = await db.prepare('SELECT delta FROM loyalty_adj WHERE wa = ?').bind(wa).first();
     delta = a ? a.delta : 0;
   } catch (e) { /* tabel belum dibuat */ }
-  const playsTotal = Math.max(0, (row.plays_total || 0) + delta);
-  const net = Math.max(0, (row.plays_stamp || 0) + delta - (row.rewards_used || 0) * STEMPEL_PER_HADIAH);
+  // Gelar memakai angka yang sama persis dengan stempel: 1 stempel = 1 langkah
+  // menuju gelar berikutnya. Bedanya, gelar dihitung dari SELURUH stempel yang
+  // pernah didapat — menukar hadiah gratis memotong kartu, tapi tidak pernah
+  // menurunkan gelar yang sudah diraih.
+  const playsTotal = Math.max(0, (row.plays_stamp || 0) + delta);
+  const net = Math.max(0, playsTotal - (row.rewards_used || 0) * STEMPEL_PER_HADIAH);
   const tier = TIERS.find((t) => playsTotal >= t.min);
   const nextIdx = TIERS.indexOf(tier) - 1;
   const next = nextIdx >= 0 ? TIERS[nextIdx] : null;
@@ -156,9 +200,7 @@ async function attachPlayers(db, list) {
   const ids = list.map((s) => s.id);
   const { results: parts } = await db.prepare(`
     SELECT schedule_id, name, seats, status, method, level FROM bookings
-    WHERE (status IN ('confirmed','verifying')
-           OR (status = 'pending' AND method = 'venue')
-           OR (status = 'pending' AND created_at > datetime('now','-1 day')))
+    WHERE ${holdExpr('')}
       AND schedule_id IN (${ids.map(() => '?').join(',')})
     ORDER BY id ASC
   `).bind(...ids).all();
@@ -402,8 +444,9 @@ export default {
         if (row.date < new Date().toISOString().slice(0, 10)) {
           return err('Sesi ini sudah lewat — booking tidak bisa dibatalkan lagi.');
         }
+        await ensureAttendedColumn(env.DB);
         await env.DB.prepare(
-          `UPDATE bookings SET status = 'canceled',
+          `UPDATE bookings SET status = 'canceled', attended = 0,
              admin_note = TRIM(admin_note || ' [dibatalkan sendiri oleh user]') WHERE id = ?`
         ).bind(row.id).run();
         return json({ ok: true });
@@ -491,10 +534,31 @@ export default {
               await db.prepare('UPDATE bookings SET method = ? WHERE id = ?').bind(b.method, m[1]).run();
               return json({ ok: true });
             }
+            // Koreksi kehadiran satu orang (tombol "hadir" di daftar peserta).
+            // Ini satu-satunya cara mengubah stempel selain tombol Selesai.
+            if (b.attended !== undefined) {
+              await ensureAttendedColumn(db);
+              const hadir = b.attended ? 1 : 0;
+              await db.prepare('UPDATE bookings SET attended = ? WHERE id = ?').bind(hadir, m[1]).run();
+              return json({ ok: true, attended: hadir });
+            }
             const ok = ['pending', 'verifying', 'confirmed', 'canceled', 'waitlist'];
             if (!ok.includes(b.status)) return err('Status tidak dikenal.');
+            await ensureAttendedColumn(db);
+            const prev = await db.prepare('SELECT status FROM bookings WHERE id = ?').bind(m[1]).first();
             await db.prepare('UPDATE bookings SET status = ?, admin_note = ? WHERE id = ?')
               .bind(b.status, b.admin_note || '', m[1]).run();
+            // Mengubah status pembayaran TIDAK menyentuh stempel — kecuali dua
+            // hal yang memang soal ikut/tidaknya orang itu: dibatalkan atau
+            // dipindah ke waiting list (stempel dicabut), dan dibatalkannya
+            // pembatalan pada sesi yang sudah selesai (stempel dikembalikan).
+            if (b.status === 'canceled' || b.status === 'waitlist') {
+              await db.prepare('UPDATE bookings SET attended = 0 WHERE id = ?').bind(m[1]).run();
+            } else if (prev && ['canceled', 'waitlist'].includes(prev.status)) {
+              await db.prepare(`UPDATE bookings SET attended = 1 WHERE id = ?
+                AND (SELECT status FROM schedules WHERE id = bookings.schedule_id) = 'done'`)
+                .bind(m[1]).run();
+            }
             return json({ ok: true });
           }
         }
@@ -502,10 +566,11 @@ export default {
         // ---- Anggota & stempel loyalty ----
         if (path === '/api/admin/members' && method === 'GET') {
           await ensureAdjTable(db);
+          await ensureAttendedColumn(db);
           const { results } = await db.prepare(`
             SELECT b.wa,
               (SELECT b2.name FROM bookings b2 WHERE b2.wa = b.wa ORDER BY b2.id DESC LIMIT 1) AS name,
-              SUM(CASE WHEN b.method != 'reward' AND b.status = 'confirmed' AND s.date <= date('now') THEN 1 ELSE 0 END) AS plays,
+              SUM(CASE WHEN b.method != 'reward' AND ${HADIR_EXPR} THEN 1 ELSE 0 END) AS plays,
               SUM(CASE WHEN b.method = 'reward' AND b.status != 'canceled' THEN 1 ELSE 0 END) AS rewards_used,
               COUNT(*) AS total_bookings
             FROM bookings b JOIN schedules s ON s.id = b.schedule_id
@@ -593,8 +658,26 @@ export default {
           if (m && method === 'POST') {
             const b = await req.json();
             if (!['open', 'closed', 'done', 'canceled'].includes(b.status)) return err('Status tidak dikenal.');
+            await ensureAttendedColumn(db);
             await db.prepare('UPDATE schedules SET status = ? WHERE id = ?').bind(b.status, m[1]).run();
-            return json({ ok: true });
+
+            // SELESAI  → semua nama di daftar peserta dapat +1 stempel.
+            // Batal selesai → stempelnya ditarik lagi, supaya tombolnya
+            // benar-benar bisa dibatalkan tanpa meninggalkan jejak.
+            let stamped = 0;
+            if (b.status === 'done') {
+              await db.prepare(`UPDATE bookings SET attended = 1
+                WHERE schedule_id = ? AND ${holdExpr('')}`).bind(m[1]).run();
+              // klaim hadiah gratis tidak menambah stempel baru — jangan dihitung
+              const c = await db.prepare(`SELECT COUNT(*) AS n FROM bookings b
+                WHERE b.schedule_id = ? AND b.attended = 1 AND b.method != 'reward'`)
+                .bind(m[1]).first();
+              stamped = (c && c.n) || 0;
+            } else {
+              await db.prepare('UPDATE bookings SET attended = 0 WHERE schedule_id = ?')
+                .bind(m[1]).run();
+            }
+            return json({ ok: true, stamped });
           }
         }
 

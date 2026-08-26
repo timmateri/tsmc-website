@@ -274,6 +274,9 @@ const rupiah = n => 'Rp ' + Number(n).toLocaleString('id-ID');
 const HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 function fmtTgl(iso){ if(!iso) return ''; const [y,m,d] = iso.split('-').map(Number);
   const dt = new Date(y, m-1, d); return `${HARI[dt.getDay()]}, ${d}/${m}/${y}`; }
+// tanggal hari ini (YYYY-MM-DD) untuk membandingkan dengan tanggal jadwal
+function hariIni(){ const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
 function flash(msg){ const f = $('flash'); f.textContent = msg; f.style.display='block';
   setTimeout(() => f.style.display='none', 2200); }
@@ -460,7 +463,7 @@ function filterMembers(){
         <a href="https://wa.me/${waLink}" target="_blank" style="color:var(--green);font-weight:800;font-size:13px">WA ${esc(m.wa)} ↗</a>
       </div>
       <div class="mut" style="margin-top:4px">
-        ${m.total}x main (otomatis ${m.plays}${m.delta ? ', koreksi ' + (m.delta > 0 ? '+' : '') + m.delta : ''})
+        ${m.total} stempel seumur hidup → gelar (dari kehadiran ${m.plays}${m.delta ? ', koreksi ' + (m.delta > 0 ? '+' : '') + m.delta : ''})
         · kartu: <b style="letter-spacing:3px">${stamps}</b> ${m.card}/${PER_REWARD}
         ${m.rewards_ready > 0 ? ' · <b style="color:var(--red)">🎁 ' + m.rewards_ready + ' gratis siap</b>' : ''}
         ${m.rewards_used > 0 ? ' · ' + m.rewards_used + 'x reward terpakai' : ''}
@@ -491,7 +494,9 @@ async function loadSchedules(){
       <b>${fmtTgl(s.date)}</b> ${esc(s.time_start)}–${esc(s.time_end)}
       <span class="pill sch-pill" style="background:${s.status==='open' ? '#087048' : s.status==='done' ? '#3F4A3C' : '#6B7A66'}"
         onclick="toggleSchedDetail(${s.id})" title="Klik untuk lihat peserta & status pembayaran">${s.status==='done' ? 'SELESAI' : s.status.toUpperCase()} ▾</span>
-      ${s.status==='done' ? '<span class="mut" style="font-size:12px">— tampil di bagian “Jadwal yang Sudah Lewat”</span>' : ''}
+      ${s.status==='done' ? '<span class="mut" style="font-size:12px">— tampil di bagian “Jadwal yang Sudah Lewat” · peserta sudah dapat stempel 🀄</span>' : ''}
+      ${s.status!=='done' && s.status!=='canceled' && s.date < hariIni()
+        ? '<span class="pill" style="background:#C02028" title="Tekan ✅ Tandai Selesai supaya stempel peserta cair">⚠ BELUM DITANDAI SELESAI — PESERTA BELUM DAPAT STEMPEL</span>' : ''}
     </div>
     <div class="mut">${esc(s.venue)}${s.map_url ? ` <a href="${esc(s.map_url)}" target="_blank" rel="noopener" title="Buka di Google Maps">🗺️</a>` : ''}${s.note ? ' · ' + esc(s.note) : ''} · ${s.tables} meja ·
       ${s.booked}/${s.capacity} kursi terisi · fee ${rupiah(s.fee)}</div>
@@ -512,13 +517,17 @@ async function loadSchedules(){
 async function setSchedStatus(id, status){
   const s = SCHEDULES.find(x => x.id === id);
   const tanya = status === 'done'
-    ? `Tandai jadwal ${s ? fmtTgl(s.date) : ''} sebagai SELESAI?\n\nJadwal akan pindah ke bagian "Jadwal yang Sudah Lewat" di website dan tidak bisa di-book lagi.`
-    : `Aktifkan lagi jadwal ${s ? fmtTgl(s.date) : ''}?\n\nJadwal akan kembali muncul sebagai jadwal aktif yang bisa di-book.`;
+    ? `Tandai jadwal ${s ? fmtTgl(s.date) : ''} sebagai SELESAI?\n\n· Jadwal pindah ke bagian "Jadwal yang Sudah Lewat" di website dan tidak bisa di-book lagi.\n· Semua nama di daftar peserta otomatis dapat +1 stempel loyalty card.\n· Kalau ada yang ternyata tidak datang, buka "👥 Peserta" lalu klik penanda hadirnya.`
+    : `Aktifkan lagi jadwal ${s ? fmtTgl(s.date) : ''}?\n\n· Jadwal kembali muncul sebagai jadwal aktif yang bisa di-book.\n· Stempel dari sesi ini ditarik kembali dari peserta.`;
   if(!confirm(tanya)) return;
   try{
-    await api('/api/admin/schedules/' + id + '/status', {method:'POST', body: JSON.stringify({status})});
-    flash(status === 'done' ? 'Jadwal ditandai selesai ✓' : 'Jadwal diaktifkan lagi ✓');
+    const r = await api('/api/admin/schedules/' + id + '/status', {method:'POST', body: JSON.stringify({status})});
+    flash(status === 'done'
+      ? `Jadwal ditandai selesai ✓ · ${r.stamped || 0} peserta dapat +1 stempel`
+      : 'Jadwal diaktifkan lagi ✓ · stempel sesi ini ditarik kembali');
     loadSchedules();
+    // daftar anggota ikut berubah — muat ulang kalau tabnya sudah pernah dibuka
+    if(MEMBERS.length) loadMembers();
   }catch(e){ alert('Gagal: ' + e.message); }
 }
 
@@ -540,6 +549,12 @@ async function toggleSchedDetail(id){
   const box = $('sch-det-' + id);
   if(!box.classList.contains('hidden')){ box.classList.add('hidden'); return; }
   box.classList.remove('hidden');
+  renderSchedDetail(id);
+}
+/* Daftar peserta satu jadwal, lengkap dengan penanda kehadiran.
+   Kehadiran inilah yang menentukan stempel — bukan status pembayaran. */
+async function renderSchedDetail(id){
+  const box = $('sch-det-' + id);
   box.innerHTML = '<span class="mut">Memuat peserta…</span>';
   try{
     if(!PAY_SETTINGS){ try{ PAY_SETTINGS = (await api('/api/admin/settings')).settings || {}; }catch(e){ PAY_SETTINGS = {}; } }
@@ -550,21 +565,42 @@ async function toggleSchedDetail(id){
     // urutan: terkonfirmasi → cek bukti → menunggu bayar → waiting list → dibatalkan
     const ORD = {confirmed:0, verifying:1, pending:2, waitlist:3, canceled:4};
     const urut = [...d.bookings].sort((a, b) => ((ORD[a.status] ?? 9) - (ORD[b.status] ?? 9)) || (b.id - a.id));
-    box.innerHTML = `<div class="mut" style="margin-bottom:6px"><b>${aktif.length}</b> booking aktif · <b>${kursi}</b> kursi</div>` +
+    const hadirCount = d.bookings.filter(b => b.attended && b.method !== 'reward').length;
+    box.innerHTML = `<div class="mut" style="margin-bottom:6px"><b>${aktif.length}</b> booking aktif · <b>${kursi}</b> kursi
+        · <b>${hadirCount}</b> hadir (dapat stempel)</div>` +
       urut.map(b => {
         const [label, color] = ST[b.status] || [b.status, '#6B7A66'];
         const wa = b.wa.replace(/[^0-9]/g,'').replace(/^0/, '62');
+        // tombol kehadiran: dipakai admin untuk mengoreksi setelah mengecek
+        // siapa yang benar-benar datang
+        const hadir = b.status === 'canceled' ? '' :
+          `<button class="btn ${b.attended ? '' : 'ghost '}sm" style="padding:3px 9px;font-size:11.5px"
+            onclick="setHadir(${b.id},${b.attended ? 0 : 1},${id})"
+            title="${b.attended ? 'Ternyata tidak datang? Klik untuk mencabut stempelnya.'
+                                : 'Ternyata datang? Klik untuk memberi +1 stempel.'}"
+            >${b.attended ? '🀄 hadir' : '⬜ tidak hadir'}</button>`;
         return `<div class="sdet-row${b.status === 'canceled' ? ' off' : ''}">
           <b>${esc(b.code)}</b> ${esc(b.name)} · ${b.seats} kursi · ${b.method === 'reward' ? '🎁 reward' : (METHOD_LABEL[b.method] || b.method)}
           ${b.level && LVL[b.level] ? `<span class="pill xs" style="background:${LVL[b.level][1]}" title="${LVL[b.level][0]}">${b.level}</span>` : ''}
           <span class="pill xs" style="background:${color}">${label}</span>
+          ${hadir}
           ${b.proof ? `<img src="${b.proof}" class="mini-proof s" onclick="viewImg(this.src)" title="Lihat bukti bayar">` : ''}
           <a href="https://wa.me/${wa}?text=${encodeURIComponent(waTemplate(b))}" target="_blank" title="WA ${esc(b.wa)}" style="text-decoration:none">💬</a>
         </div>`;
       }).join('') +
-      `<div style="margin-top:8px"><a href="#" onclick="gotoBookings(${id});return false"
+      `<div class="mut" style="margin-top:8px;font-size:12px">Stempel hanya mengikuti penanda hadir di atas — status pembayaran tidak memberi stempel.</div>
+       <div style="margin-top:6px"><a href="#" onclick="gotoBookings(${id});return false"
         style="font-weight:800;color:var(--green)">Kelola semua di tab Booking →</a></div>`;
   }catch(e){ box.innerHTML = '<span class="mut">Gagal memuat: ' + esc(e.message) + '</span>'; }
+}
+/* Koreksi kehadiran satu orang → langsung menambah/mencabut 1 stempel. */
+async function setHadir(bookingId, hadir, schedId){
+  try{
+    await api('/api/admin/bookings/' + bookingId, {method:'POST', body: JSON.stringify({attended: hadir})});
+    flash(hadir ? 'Ditandai hadir ✓ · +1 stempel' : 'Ditandai tidak hadir ✓ · stempel dicabut');
+    renderSchedDetail(schedId);
+    if(MEMBERS.length) loadMembers();
+  }catch(e){ alert('Gagal: ' + e.message); }
 }
 function gotoBookings(id){
   $('bk-filter').value = String(id);   // set filter dulu — showTab yang memanggil loadBookings

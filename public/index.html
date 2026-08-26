@@ -1198,8 +1198,8 @@ function updateNavMe(){
     const nama = (stored('tsmc_name') || '').trim().split(/\s+/)[0] || T('Kamu','You');
     btn.innerHTML = `${LOYAL.tier.icon} ${esc(nama)} · ${LOYAL.rewards_ready > 0 ? '🎁' : LOYAL.card + '/' + perReward() + ' ✿'}`;
     btn.classList.add('known');
-    btn.title = T(`${LOYAL.tier.name} · ${LOYAL.plays_total}x main — klik untuk lihat booking & kartu stempelmu`,
-      `${LOYAL.tier.name} · played ${LOYAL.plays_total}x — tap to see your bookings & stamp card`);
+    btn.title = T(`${LOYAL.tier.name} · ${LOYAL.plays_total} stempel — klik untuk lihat booking & kartu stempelmu`,
+      `${LOYAL.tier.name} · ${LOYAL.plays_total} ${jml(LOYAL.plays_total,'stamp')} — tap to see your bookings & stamp card`);
   }else{
     btn.textContent = T('Cek Booking','Check Booking');
     btn.classList.remove('known');
@@ -1230,18 +1230,20 @@ function renderLoyalty(l){
   const stamps = Array.from({length:n}, (_, i) => stampSVG(i < l.card, i + 1)).join('');
   const gift = l.rewards_ready > 0
     ? `<span class="gift">🎁 ${l.rewards_ready} ${T('permainan GRATIS siap dipakai!', 'FREE ' + jml(l.rewards_ready,'game') + ' ready to use!')}</span>` : '';
+  // Gelar naik mengikuti stempel — 1 stempel = 1 langkah, jadi angkanya
+  // disebut "stempel" supaya tidak terbaca sebagai hitungan yang berbeda.
   const next = l.next_tier
-    ? `<span class="lnext">${T(`${l.next_tier.need}x main lagi menuju`, `${l.next_tier.need} more ${jml(l.next_tier.need,'session')} to`)} ${l.next_tier.icon} ${esc(l.next_tier.name)}</span>`
+    ? `<span class="lnext">${T(`${l.next_tier.need} stempel lagi menuju`, `${l.next_tier.need} more ${jml(l.next_tier.need,'stamp')} to`)} ${l.next_tier.icon} ${esc(l.next_tier.name)}</span>`
     : `<span class="lnext">${T('Tier tertinggi — legenda meja! 👑','Top tier — a legend of the table! 👑')}</span>`;
   box.innerHTML = `
     <div class="loyal">
       <div class="lhead">
-        <span class="tierpill">${l.tier.icon} ${esc(l.tier.name)} · ${l.plays_total}x ${T('main','played')}</span>
+        <span class="tierpill">${l.tier.icon} ${esc(l.tier.name)} · ${l.plays_total} ${T('stempel','stamps')}</span>
         ${next}
       </div>
       <div class="stamps">${stamps}${gift}</div>
-      <div class="lfoot">${T(`Setiap sesi yang kamu hadiri = 1 stempel · ${n} stempel = 1 permainan gratis 🀄`,
-        `Every session you attend = 1 stamp · ${n} stamps = 1 free game 🀄`)}</div>
+      <div class="lfoot">${T(`Setiap sesi yang kamu hadiri = 1 stempel · ${n} stempel = 1 permainan gratis · stempel juga menaikkan gelarmu 🀄`,
+        `Every session you attend = 1 stamp · ${n} stamps = 1 free game · stamps also raise your title 🀄`)}</div>
     </div>`;
 }
 async function renderMyBookings(){
