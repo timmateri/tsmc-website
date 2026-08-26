@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Modul 02: Menghitung Faan — TSMC</title>
-<meta name="description" content="Cara menghitung faan mahjong Hong Kong style: tangga faan, tabel lengkap yang dipakai komunitas TSMC, dan contoh hitung langkah demi langkah.">
+<title data-en="Module 02: Counting Faan — TSMC">Modul 02: Menghitung Faan — TSMC</title>
+<meta name="description" content="Cara menghitung faan mahjong Hong Kong style: tangga faan, tabel lengkap yang dipakai komunitas TSMC, dan contoh hitung langkah demi langkah." data-en-content="How to count faan in Hong Kong style mahjong: the faan ladder, the full table used by the TSMC community, and worked examples step by step.">
 <link rel="icon" type="image/png" href="/favicon.png">
 <meta name="theme-color" content="#087048">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,148 +17,150 @@
 <nav class="top"><div class="wrap">
   <a class="logo" href="/"><img src="/tsmc-logo.png" alt="The Social Mahjong Club"></a>
   <div class="links" id="nav-links">
-    <a href="/#jadwal">Jadwal</a>
-    <a href="/#berita">Berita &amp; Event</a>
+    <a href="/#jadwal" data-en="Schedule">Jadwal</a>
+    <a href="/#berita" data-en="News &amp; Events">Berita &amp; Event</a>
     <div class="drop-wrap">
-      <a href="/#belajar">Belajar <span class="caret">▾</span></a>
+      <a href="/#belajar"><span data-en="Learn">Belajar</span> <span class="caret">▾</span></a>
       <div class="dropdown"><div class="dd-panel">
-        <a href="/modul-01"><small>MODUL 01</small><b>Kenali Tile &amp; Susunan Meja</b></a>
-        <a href="/modul-02" class="now"><small>MODUL 02</small><b>Menghitung Faan</b></a>
-        <a href="/modul-03"><small>MODUL 03</small><b>Etika &amp; Ritme Permainan</b></a>
-        <a href="/modul-04"><small>MODUL 04</small><b>J2 House Rules</b></a>
+        <a href="/modul-01"><small data-en="MODULE 01">MODUL 01</small><b data-en="Know the Tiles &amp; the Table">Kenali Tile &amp; Susunan Meja</b></a>
+        <a href="/modul-02" class="now"><small data-en="MODULE 02">MODUL 02</small><b data-en="Counting Faan">Menghitung Faan</b></a>
+        <a href="/modul-03"><small data-en="MODULE 03">MODUL 03</small><b data-en="Etiquette &amp; Rhythm of Play">Etika &amp; Ritme Permainan</b></a>
+        <a href="/modul-04"><small data-en="MODULE 04">MODUL 04</small><b>J2 House Rules</b></a>
       </div></div>
     </div>
-    <a href="/#galeri">Galeri</a>
-    <a href="/#anggota">Anggota</a>
+    <a href="/#galeri" data-en="Gallery">Galeri</a>
+    <a href="/#anggota" data-en="Members">Anggota</a>
     <a class="nav-quiz" href="/kuis" target="_blank" rel="noopener">Quiz</a>
-    <a class="only-mobile" href="/#cek">🀄 Cek Booking &amp; Kartu Stempel</a>
+    <a class="only-mobile" href="/#cek" data-en="🀄 Check Booking &amp; Stamp Card">🀄 Cek Booking &amp; Kartu Stempel</a>
+    <div data-lang-switch></div>
   </div>
-  <a class="btn ghost" href="/#cek">Cek Booking</a>
+  <a class="btn ghost" href="/#cek" data-en="Check Booking">Cek Booking</a>
   <a class="btn" href="/#jadwal">Book Slot</a>
-  <button class="burger" id="nav-burger" aria-label="Buka menu" aria-expanded="false" aria-controls="nav-links">☰</button>
+  <button class="burger" id="nav-burger" aria-label="Buka menu" aria-expanded="false" aria-controls="nav-links" data-en-label="Open menu">☰</button>
 </div></nav>
 
 <header class="mod"><div class="wrap">
-  <div class="no">MODUL 02 · NAIK LEVEL</div>
-  <h1>Menghitung Faan</h1>
-  <p>Menang itu satu hal — tapi menang <i>berapa</i>, itu urusan faan. Modul ini bikin kamu bisa menghitung nilai tanganmu sendiri, dari chicken hand yang malu-maluin sampai limit hand yang bakal diceritakan orang bertahun-tahun.</p>
+  <div class="no" data-en="MODULE 02 · LEVELLING UP">MODUL 02 · NAIK LEVEL</div>
+  <h1 data-en="Counting Faan">Menghitung Faan</h1>
+  <p data-en="Winning is one thing — winning <i>how much</i> is a matter of faan. This module teaches you to value your own hand, from an embarrassing chicken hand to a limit hand people will still be talking about years later.">Menang itu satu hal — tapi menang <i>berapa</i>, itu urusan faan. Modul ini bikin kamu bisa menghitung nilai tanganmu sendiri, dari chicken hand yang malu-maluin sampai limit hand yang bakal diceritakan orang bertahun-tahun.</p>
 </div></header>
 
 <main class="wrap">
 
 <section class="blok">
-  <h2>Faan itu <span class="em">apa?</span></h2>
-  <p><b>Faan (番)</b> adalah "nilai" tangan kemenanganmu. Makin sulit dan makin rapi pola tanganmu, makin banyak faan-nya. Satu tangan bisa mengumpulkan faan dari beberapa sumber sekaligus — polanya, cara menangnya, sampai tile bunga yang kamu dapat. Tinggal dijumlah semua.</p>
-  <div class="callout">📌 <b>House rule TSMC:</b> minimal <b>3 faan</b> untuk boleh menyatakan menang, dan maksimum dihitung <b>13 faan</b> (limit). Kita tidak main uang — faan dipakai untuk poin di papan skor dan gengsi di grup WA. 😎</div>
+  <h2 data-en="What <span class=&quot;em&quot;>is</span> faan?">Faan itu <span class="em">apa?</span></h2>
+  <p data-en="<b>Faan (番)</b> is the &quot;value&quot; of your winning hand. The harder and tidier the pattern, the more faan it earns. A single hand can collect faan from several sources at once — its shape, the way you won, even the flower tiles you drew. Add them all together."><b>Faan (番)</b> adalah &quot;nilai&quot; tangan kemenanganmu. Makin sulit dan makin rapi pola tanganmu, makin banyak faan-nya. Satu tangan bisa mengumpulkan faan dari beberapa sumber sekaligus — polanya, cara menangnya, sampai tile bunga yang kamu dapat. Tinggal dijumlah semua.</p>
+  <div class="callout" data-en="📌 <b>TSMC house rule:</b> a minimum of <b>3 faan</b> to declare a win, and a maximum of <b>13 faan</b> counted (the limit). We play for no money — faan is for the scoreboard and for bragging rights in the group chat. 😎">📌 <b>House rule TSMC:</b> minimal <b>3 faan</b> untuk boleh menyatakan menang, dan maksimum dihitung <b>13 faan</b> (limit). Kita tidak main uang — faan dipakai untuk poin di papan skor dan gengsi di grup WA. 😎</div>
 </section>
 
 <section class="blok">
-  <h2>Tangga <span class="em">faan</span></h2>
-  <p>Supaya kebayang petanya, ini tangga nilai dari terendah sampai tertinggi:</p>
+  <h2 data-en="The faan <span class=&quot;em&quot;>ladder</span>">Tangga <span class="em">faan</span></h2>
+  <p data-en="To get a feel for the map, here is the range from lowest to highest:">Supaya kebayang petanya, ini tangga nilai dari terendah sampai tertinggi:</p>
   <div class="ladder">
-    <div class="rung"><div class="fv" style="background:#7E8C77">0<small>FAAN</small></div><div><b>Chicken Hand — 雞糊</b><small class="d">Campuran chow &amp; pong tanpa pola. Sah secara bentuk, tapi nilainya nol — siap-siap diketawain semeja.</small></div></div>
-    <div class="rung"><div class="fv" style="background:#78A818">1<small>FAAN</small></div><div><b>Poin-poin pembuka</b><small class="d">All Sequences (semua chow), pong naga, pong angin putaran/duduk. Ditumpuk-tumpuk biar tembus minimum.</small></div></div>
-    <div class="rung"><div class="fv" style="background:#087048">3<small>FAAN</small></div><div><b>Pola serius pertama</b><small class="d">All Triplets (semua pong) atau Semi Flush (satu keluarga + honor). Target paling realistis buat pemula.</small></div></div>
-    <div class="rung"><div class="fv" style="background:#04552F">4–8<small>FAAN</small></div><div><b>Tangan bergengsi</b><small class="d">Mixed Terminals, Seven Pairs, Small 3 Dragons, Full Flush, sampai Big 3 Dragons. Semeja mulai berhenti mengobrol kalau kamu terlihat mengejar ini.</small></div></div>
-    <div class="rung"><div class="fv" style="background:#C02028">10–13<small>LIMIT</small></div><div><b>Special winning hands</b><small class="d">Small 4 Winds, All Honours, Nine Gates (10) sampai Big 4 Winds, 13 Orphans, dan 4 Kongs (13). Sekali seumur hidup — wajib difoto buat galeri TSMC. 📸</small></div></div>
+    <div class="rung"><div class="fv" style="background:#7E8C77">0<small>FAAN</small></div><div><b>Chicken Hand — 雞糊</b><small class="d" data-en="A mix of chows and pongs with no pattern. Structurally valid, but worth nothing — brace yourself for the laughter.">Campuran chow &amp; pong tanpa pola. Sah secara bentuk, tapi nilainya nol — siap-siap diketawain semeja.</small></div></div>
+    <div class="rung"><div class="fv" style="background:#78A818">1<small>FAAN</small></div><div><b data-en="Opening points">Poin-poin pembuka</b><small class="d" data-en="All Sequences (every set a chow), dragon pongs, round or seat wind pongs. Stack them up to clear the minimum.">All Sequences (semua chow), pong naga, pong angin putaran/duduk. Ditumpuk-tumpuk biar tembus minimum.</small></div></div>
+    <div class="rung"><div class="fv" style="background:#087048">3<small>FAAN</small></div><div><b data-en="Your first real pattern">Pola serius pertama</b><small class="d" data-en="All Triplets (every set a pong) or Semi Flush (one suit plus honours). The most realistic target for a beginner.">All Triplets (semua pong) atau Semi Flush (satu keluarga + honor). Target paling realistis buat pemula.</small></div></div>
+    <div class="rung"><div class="fv" style="background:#04552F">4–8<small>FAAN</small></div><div><b data-en="Hands with prestige">Tangan bergengsi</b><small class="d" data-en="Mixed Terminals, Seven Pairs, Small 3 Dragons, Full Flush, up to Big 3 Dragons. The table goes quiet once they notice you chasing one of these.">Mixed Terminals, Seven Pairs, Small 3 Dragons, Full Flush, sampai Big 3 Dragons. Semeja mulai berhenti mengobrol kalau kamu terlihat mengejar ini.</small></div></div>
+    <div class="rung"><div class="fv" style="background:#C02028">10–13<small>LIMIT</small></div><div><b>Special winning hands</b><small class="d" data-en="Small 4 Winds, All Honours and Nine Gates (10), up to Big 4 Winds, 13 Orphans and 4 Kongs (13). A once-in-a-lifetime hand — photograph it for the TSMC gallery. 📸">Small 4 Winds, All Honours, Nine Gates (10) sampai Big 4 Winds, 13 Orphans, dan 4 Kongs (13). Sekali seumur hidup — wajib difoto buat galeri TSMC. 📸</small></div></div>
   </div>
 </section>
 
 <section class="blok">
-  <h2>Tabel faan <span class="em">standar TSMC</span></h2>
-  <p>Ini tabel resmi yang dipakai TSMC di semua sesi — diadopsi dari <b>Hong Kong Mahjong Association (HKMA)</b>. Nilai faan bisa ditumpuk kecuali disebutkan sudah termasuk.</p>
+  <h2 data-en="The <span class=&quot;em&quot;>standard TSMC</span> faan table">Tabel faan <span class="em">standar TSMC</span></h2>
+  <p data-en="This is the official table TSMC uses at every session, adopted from the <b>Hong Kong Mahjong Association (HKMA)</b>. Faan values stack unless the entry says they are already included.">Ini tabel resmi yang dipakai TSMC di semua sesi — diadopsi dari <b>Hong Kong Mahjong Association (HKMA)</b>. Nilai faan bisa ditumpuk kecuali disebutkan sudah termasuk.</p>
   <div class="info">
     <div class="table-scroll">
     <table class="faan wide">
-      <tr><th>TANGAN / KONDISI</th><th>CARA DAPATNYA</th><th>FAAN</th></tr>
-      <tr class="sec"><td colspan="3">MAHJONG HANDS — TANGAN DASAR</td></tr>
-      <tr><td class="fn">Chicken Hand<small>雞糊 · gai wu</small></td><td>Campuran chow dan pong, tanpa pong honor. Sah menang, tapi nilainya nol.
+      <tr><th data-en="HAND / CONDITION">TANGAN / KONDISI</th><th data-en="HOW YOU GET IT">CARA DAPATNYA</th><th>FAAN</th></tr>
+      <tr class="sec"><td colspan="3" data-en="MAHJONG HANDS — THE BASIC SHAPES">MAHJONG HANDS — TANGAN DASAR</td></tr>
+      <tr><td class="fn">Chicken Hand<small>雞糊 · gai wu</small></td><td><span data-en="A mix of chows and pongs with no honour pong. A valid win, but worth nothing.">Campuran chow dan pong, tanpa pong honor. Sah menang, tapi nilainya nol.</span>
         <div class="tile-row xs" data-tiles="wan:1,wan:2,wan:3,|,sok:2,sok:2,sok:2,|,tung:4,tung:5,tung:6,|,sok:8,sok:8,sok:8,|,wind:n,wind:n"></div></td><td class="fv2">0</td></tr>
-      <tr><td class="fn">All Sequences<small>平糊 · 4 chows</small></td><td>Semua set adalah urutan (chow).
+      <tr><td class="fn">All Sequences<small>平糊 · 4 chows</small></td><td><span data-en="Every set is a run (chow).">Semua set adalah urutan (chow).</span>
         <div class="tile-row xs" data-tiles="wan:1,wan:2,wan:3,|,tung:4,tung:5,tung:6,|,sok:6,sok:7,sok:8,|,wan:4,wan:5,wan:6,|,tung:2,tung:2"></div></td><td class="fv2">1</td></tr>
-      <tr><td class="fn">All Triplets<small>對對糊 · 4 pongs</small></td><td>Semua set adalah kembar tiga (pong).
+      <tr><td class="fn">All Triplets<small>對對糊 · 4 pongs</small></td><td><span data-en="Every set is a triplet (pong).">Semua set adalah kembar tiga (pong).</span>
         <div class="tile-row xs" data-tiles="wan:2,wan:2,wan:2,|,sok:5,sok:5,sok:5,|,tung:7,tung:7,tung:7,|,wind:n,wind:n,wind:n,|,wan:9,wan:9"></div></td><td class="fv2">3</td></tr>
-      <tr><td class="fn">Mixed / Semi Flush<small>混一色 · wun yat sik</small></td><td>Seluruh tangan hanya 1 keluarga angka + honor (angin/naga).
+      <tr><td class="fn">Mixed / Semi Flush<small>混一色 · wun yat sik</small></td><td><span data-en="The whole hand uses only one number suit plus honours (winds and dragons).">Seluruh tangan hanya 1 keluarga angka + honor (angin/naga).</span>
         <div class="tile-row xs" data-tiles="sok:1,sok:2,sok:3,|,sok:4,sok:5,sok:6,|,sok:7,sok:7,sok:7,|,dragon:f,dragon:f,dragon:f,|,wind:w,wind:w"></div></td><td class="fv2">3</td></tr>
-      <tr><td class="fn">Mixed Terminals<small>混幺九 · wun yiu gau</small></td><td>Seluruh tangan hanya 1, 9, dan honor. Nilai 4 <b>sudah termasuk</b> 3 faan dari All Triplets.
+      <tr><td class="fn">Mixed Terminals<small>混幺九 · wun yiu gau</small></td><td><span data-en="The whole hand uses only 1s, 9s and honours. The value of 4 <b>already includes</b> the 3 faan for All Triplets.">Seluruh tangan hanya 1, 9, dan honor. Nilai 4 <b>sudah termasuk</b> 3 faan dari All Triplets.</span>
         <div class="tile-row xs" data-tiles="wan:1,wan:1,wan:1,|,sok:9,sok:9,sok:9,|,tung:1,tung:1,tung:1,|,wind:n,wind:n,wind:n,|,dragon:c,dragon:c"></div></td><td class="fv2">4</td></tr>
-      <tr><td class="fn">Seven Pairs<small>七對子 · chat deui zi</small></td><td>Tangan berisi 7 pasang kembar. Bisa ditumpuk dengan All Honours, Semi Flush, atau Full Flush. Gong tidak diizinkan dalam tangan ini.
+      <tr><td class="fn">Seven Pairs<small>七對子 · chat deui zi</small></td><td><span data-en="The hand is seven identical pairs. It can stack with All Honours, Semi Flush or Full Flush. Gongs are not allowed in this hand.">Tangan berisi 7 pasang kembar. Bisa ditumpuk dengan All Honours, Semi Flush, atau Full Flush. Gong tidak diizinkan dalam tangan ini.</span>
         <div class="tile-row xs" data-tiles="wan:3,wan:3,|,sok:6,sok:6,|,tung:9,tung:9,|,wind:e,wind:e,|,dragon:f,dragon:f,|,wan:8,wan:8,|,tung:2,tung:2"></div></td><td class="fv2">4</td></tr>
-      <tr><td class="fn">Small Three Dragons<small>小三元 · siu sam yun</small></td><td>2 pong naga + pasang naga ketiga sebagai mata.
+      <tr><td class="fn">Small Three Dragons<small>小三元 · siu sam yun</small></td><td><span data-en="Two dragon pongs plus a pair of the third dragon as the eyes.">2 pong naga + pasang naga ketiga sebagai mata.</span>
         <div class="tile-row xs" data-tiles="dragon:c,dragon:c,dragon:c,|,dragon:f,dragon:f,dragon:f,|,dragon:b,dragon:b,|,sok:3,sok:4,sok:5,|,tung:6,tung:7,tung:8"></div></td><td class="fv2">5</td></tr>
-      <tr><td class="fn">Full Colour / Full Flush<small>清一色 · ching yat sik</small></td><td>Seluruh tangan satu keluarga angka, tanpa honor sama sekali.
+      <tr><td class="fn">Full Colour / Full Flush<small>清一色 · ching yat sik</small></td><td><span data-en="The whole hand is a single number suit, with no honours at all.">Seluruh tangan satu keluarga angka, tanpa honor sama sekali.</span>
         <div class="tile-row xs" data-tiles="tung:1,tung:2,tung:3,|,tung:4,tung:5,tung:6,|,tung:7,tung:8,tung:9,|,tung:5,tung:5,tung:5,|,tung:9,tung:9"></div></td><td class="fv2">7</td></tr>
-      <tr><td class="fn">3 Scholars / Big 3 Dragons<small>大三元 · dai sam yun</small></td><td>3 pong naga lengkap (中 + 發 + 白) + 1 set dan 1 pasang bebas.
+      <tr><td class="fn">3 Scholars / Big 3 Dragons<small>大三元 · dai sam yun</small></td><td><span data-en="All three dragon pongs (中 + 發 + 白) plus one free set and one free pair.">3 pong naga lengkap (中 + 發 + 白) + 1 set dan 1 pasang bebas.</span>
         <div class="tile-row xs" data-tiles="dragon:c,dragon:c,dragon:c,|,dragon:f,dragon:f,dragon:f,|,dragon:b,dragon:b,dragon:b,|,sok:5,sok:6,sok:7,|,wan:2,wan:2"></div></td><td class="fv2">8</td></tr>
-      <tr><td class="fn">Small Four Winds<small>小四喜 · siu sei hei</small></td><td>3 pong angin + pasang angin keempat sebagai mata.
+      <tr><td class="fn">Small Four Winds<small>小四喜 · siu sei hei</small></td><td><span data-en="Three wind pongs plus a pair of the fourth wind as the eyes.">3 pong angin + pasang angin keempat sebagai mata.</span>
         <div class="tile-row xs" data-tiles="wind:e,wind:e,wind:e,|,wind:s,wind:s,wind:s,|,wind:w,wind:w,wind:w,|,wan:6,wan:6,wan:6,|,wind:n,wind:n"></div></td><td class="fv2">10</td></tr>
       <tr class="sec"><td colspan="3">SPECIAL WINNING HANDS</td></tr>
-      <tr><td class="fn">All Concealed Triplets<small>坎坎糊 · gang gang wu</small></td><td>Semua set pong dan tidak ada satu pun tile dari pemain lain — menang zi mo, atau dari buangan hanya untuk melengkapi mata.
+      <tr><td class="fn">All Concealed Triplets<small>坎坎糊 · gang gang wu</small></td><td><span data-en="Every set is a pong and not a single tile came from another player — won by self-draw, or off a discard only to complete the eyes.">Semua set pong dan tidak ada satu pun tile dari pemain lain — menang zi mo, atau dari buangan hanya untuk melengkapi mata.</span>
         <div class="tile-row xs" data-tiles="sok:2,sok:2,sok:2,|,wan:8,wan:8,wan:8,|,tung:4,tung:4,tung:4,|,tung:1,tung:1,tung:1,|,wan:2,wan:2"></div></td><td class="fv2">10</td></tr>
-      <tr><td class="fn">All Honours<small>字一色 · zi yat sik</small></td><td>4 pong + 1 pasang, semuanya honor. Nilai sudah termasuk 3 faan All Triplets.
+      <tr><td class="fn">All Honours<small>字一色 · zi yat sik</small></td><td><span data-en="Four pongs and a pair, every one of them an honour. The value already includes the 3 faan for All Triplets.">4 pong + 1 pasang, semuanya honor. Nilai sudah termasuk 3 faan All Triplets.</span>
         <div class="tile-row xs" data-tiles="dragon:c,dragon:c,dragon:c,|,dragon:b,dragon:b,dragon:b,|,wind:s,wind:s,wind:s,|,wind:w,wind:w,wind:w,|,wind:n,wind:n"></div></td><td class="fv2">10</td></tr>
-      <tr><td class="fn">All Terminals<small>清幺九 · hanya 1 &amp; 9</small></td><td>4 pong + 1 pasang, semuanya tile 1 dan 9. Nilai sudah termasuk 3 faan All Triplets.
+      <tr><td class="fn">All Terminals<small>清幺九 · hanya 1 &amp; 9</small></td><td><span data-en="Four pongs and a pair, all made of 1s and 9s. The value already includes the 3 faan for All Triplets.">4 pong + 1 pasang, semuanya tile 1 dan 9. Nilai sudah termasuk 3 faan All Triplets.</span>
         <div class="tile-row xs" data-tiles="wan:1,wan:1,wan:1,|,wan:9,wan:9,wan:9,|,sok:1,sok:1,sok:1,|,tung:9,tung:9,tung:9,|,tung:1,tung:1"></div></td><td class="fv2">10</td></tr>
-      <tr><td class="fn">Nine Gates<small>九蓮寶燈 · gau lin bou dang</small></td><td>1112345678999 satu keluarga + tile ke-14 dari keluarga yang sama.
+      <tr><td class="fn">Nine Gates<small>九蓮寶燈 · gau lin bou dang</small></td><td><span data-en="1112345678999 in a single suit, plus a 14th tile from that same suit.">1112345678999 satu keluarga + tile ke-14 dari keluarga yang sama.</span>
         <div class="tile-row xs" data-tiles="wan:1,wan:1,wan:1,wan:2,wan:3,wan:4,wan:5,wan:6,wan:7,wan:8,wan:9,wan:9,wan:9,|,wan:2"></div></td><td class="fv2">10</td></tr>
-      <tr><td class="fn">4 Blessings / Big 4 Winds<small>大四喜 · dai sei hei</small></td><td>4 pong angin lengkap + 1 pasang bebas.
+      <tr><td class="fn">4 Blessings / Big 4 Winds<small>大四喜 · dai sei hei</small></td><td><span data-en="All four wind pongs plus one free pair.">4 pong angin lengkap + 1 pasang bebas.</span>
         <div class="tile-row xs" data-tiles="wind:e,wind:e,wind:e,|,wind:s,wind:s,wind:s,|,wind:w,wind:w,wind:w,|,wind:n,wind:n,wind:n,|,tung:5,tung:5"></div></td><td class="fv2">13</td></tr>
-      <tr><td class="fn">13 Orphans<small>十三幺 · sap sam yiu</small></td><td>Satu dari tiap 1 &amp; 9 semua keluarga + semua honor + 1 tile yang berpasangan dengan salah satunya.
+      <tr><td class="fn">13 Orphans<small>十三幺 · sap sam yiu</small></td><td><span data-en="One of every 1 and 9 from all three suits, every honour, plus one tile that pairs with any of them.">Satu dari tiap 1 &amp; 9 semua keluarga + semua honor + 1 tile yang berpasangan dengan salah satunya.</span>
         <div class="tile-row xs" data-tiles="wan:1,wan:9,sok:1,sok:9,tung:1,tung:9,wind:e,wind:s,wind:w,wind:n,dragon:c,dragon:f,dragon:b,|,wan:1"></div></td><td class="fv2">13</td></tr>
-      <tr><td class="fn">All Quadruplets / 4 Kongs<small>十八羅漢 · sap bat lo hon</small></td><td>Keempat set berupa gong (4 kembar) — total 18 tile.
+      <tr><td class="fn">All Quadruplets / 4 Kongs<small>十八羅漢 · sap bat lo hon</small></td><td><span data-en="All four sets are kongs (four of a kind) — 18 tiles in total.">Keempat set berupa gong (4 kembar) — total 18 tile.</span>
         <div class="tile-row xs" data-tiles="wan:3,wan:3,wan:3,wan:3,|,sok:6,sok:6,sok:6,sok:6,|,tung:8,tung:8,tung:8,tung:8,|,wind:e,wind:e,wind:e,wind:e,|,wan:6,wan:6"></div></td><td class="fv2">13</td></tr>
-      <tr class="sec"><td colspan="3">ADDITIONAL POINTS — POIN TAMBAHAN</td></tr>
-      <tr><td class="fn">Dragon<small>pong naga · 中 / 白 / 發</small></td><td>Pong naga jenis apa pun. Dihitung per set — tiga pong naga = 3 faan tambahan.
+      <tr class="sec"><td colspan="3" data-en="ADDITIONAL POINTS">ADDITIONAL POINTS — POIN TAMBAHAN</td></tr>
+      <tr><td class="fn" data-en="Dragon&lt;small&gt;dragon pong · 中 / 白 / 發&lt;/small&gt;">Dragon<small>pong naga · 中 / 白 / 發</small></td><td><span data-en="A pong of any dragon. Counted per set — three dragon pongs means 3 extra faan.">Pong naga jenis apa pun. Dihitung per set — tiga pong naga = 3 faan tambahan.</span>
         <div class="tile-row xs" data-tiles="dragon:c,dragon:c,dragon:c,|,dragon:b,dragon:b,dragon:b,|,dragon:f,dragon:f,dragon:f"></div></td><td class="fv2">1</td></tr>
-      <tr><td class="fn">Round / Seat Wind<small>angin putaran / angin duduk</small></td><td>Pong angin putaran atau angin dudukmu. Kalau satu pong merangkap keduanya, dihitung 2 faan.
+      <tr><td class="fn" data-en="Round / Seat Wind&lt;small&gt;round wind / seat wind&lt;/small&gt;">Round / Seat Wind<small>angin putaran / angin duduk</small></td><td><span data-en="A pong of the round wind or of your own seat wind. If one pong is both at once, it counts 2 faan.">Pong angin putaran atau angin dudukmu. Kalau satu pong merangkap keduanya, dihitung 2 faan.</span>
         <div class="tile-row xs" data-tiles="wind:e,wind:e,wind:e"></div></td><td class="fv2">1</td></tr>
     </table>
     </div>
-    <div class="info-note">Faan bisa ditumpuk: misalnya semua pong (3) + campur satu keluarga (3) + zi mo (1) dihitung semuanya. Maksimum tetap 13.</div>
+    <div class="info-note" data-en="Faan values stack: for example all pongs (3) + one suit plus honours (3) + zi mo (1) are all counted. The maximum stays 13.">Faan bisa ditumpuk: misalnya semua pong (3) + campur satu keluarga (3) + zi mo (1) dihitung semuanya. Maksimum tetap 13.</div>
   </div>
 </section>
 
 <section class="blok">
-  <h2>Latihan: <span class="em">hitung bareng</span></h2>
-  <p>Teori tanpa contoh itu seperti pong tanpa tile ketiga. Ayo hitung dua tangan ini:</p>
+  <h2 data-en="Practice: <span class=&quot;em&quot;>count them together</span>">Latihan: <span class="em">hitung bareng</span></h2>
+  <p data-en="Theory without examples is like a pong without its third tile. Let us count these two hands:">Teori tanpa contoh itu seperti pong tanpa tile ketiga. Ayo hitung dua tangan ini:</p>
 
   <div class="info">
-    <div class="cap">CONTOH 1 — TANGAN PEMULA YANG LOLOS MINIMUM (3 FAAN)</div>
+    <div class="cap" data-en="EXAMPLE 1 — A BEGINNER HAND THAT CLEARS THE MINIMUM (3 FAAN)">CONTOH 1 — TANGAN PEMULA YANG LOLOS MINIMUM (3 FAAN)</div>
     <div class="tile-row" data-tiles="sok:1,sok:2,sok:3,|,sok:5,sok:6,sok:7,|,sok:8,sok:8,sok:8,|,wind:w,wind:w,wind:w,|,dragon:b,dragon:b"></div>
     <div class="calc">
-      <div class="line"><span>Semua tile cuma bambu + honor → <b>Semi Flush (Wun Yat Sik)</b></span><b class="v">+3</b></div>
-      <div class="tot"><span>TOTAL — lolos minimum, sah menang!</span><b>3 FAAN</b></div>
+      <div class="line"><span data-en="Every tile is bamboo or an honour → <b>Semi Flush (Wun Yat Sik)</b>">Semua tile cuma bambu + honor → <b>Semi Flush (Wun Yat Sik)</b></span><b class="v">+3</b></div>
+      <div class="tot"><span data-en="TOTAL — clears the minimum, a valid win!">TOTAL — lolos minimum, sah menang!</span><b>3 FAAN</b></div>
     </div>
   </div>
 
   <div class="info">
-    <div class="cap">CONTOH 2 — TANGAN YANG BIKIN SEMEJA TEPUK TANGAN</div>
+    <div class="cap" data-en="EXAMPLE 2 — THE HAND THAT GETS A ROUND OF APPLAUSE">CONTOH 2 — TANGAN YANG BIKIN SEMEJA TEPUK TANGAN</div>
     <div class="tile-row" data-tiles="tung:3,tung:3,tung:3,|,tung:5,tung:5,tung:5,|,tung:9,tung:9,tung:9,|,dragon:c,dragon:c,dragon:c,|,wind:e,wind:e"></div>
     <div class="calc">
-      <div class="line"><span>Empat set semuanya kembar → <b>All Triplets</b></span><b class="v">+3</b></div>
-      <div class="line"><span>Hanya lingkaran + honor → <b>Semi Flush</b></span><b class="v">+3</b></div>
-      <div class="line"><span>Ada pong naga merah 中 → <b>Dragon</b></span><b class="v">+1</b></div>
+      <div class="line"><span data-en="All four sets are triplets → <b>All Triplets</b>">Empat set semuanya kembar → <b>All Triplets</b></span><b class="v">+3</b></div>
+      <div class="line"><span data-en="Circles and honours only → <b>Semi Flush</b>">Hanya lingkaran + honor → <b>Semi Flush</b></span><b class="v">+3</b></div>
+      <div class="line"><span data-en="There is a red dragon pong 中 → <b>Dragon</b>">Ada pong naga merah 中 → <b>Dragon</b></span><b class="v">+1</b></div>
       <div class="tot"><span>TOTAL</span><b>7 FAAN</b></div>
     </div>
   </div>
 
-  <div class="callout">🎯 <b>Strategi pemula:</b> jangan pusing mengejar tangan legendaris. Dua jalan paling gampang menuju 3 faan: kumpulkan <b>satu keluarga saja</b> (Semi Flush), atau <b>kembar semua</b> (All Triplets). Pilih satu arah sejak awal, buang keluarga lain lebih dulu.</div>
+  <div class="callout" data-en="🎯 <b>Beginner strategy:</b> do not chase the legendary hands. The two easiest routes to 3 faan are: collect <b>a single suit</b> (Semi Flush), or go <b>all triplets</b> (All Triplets). Pick one direction early and discard the other suits first.">🎯 <b>Strategi pemula:</b> jangan pusing mengejar tangan legendaris. Dua jalan paling gampang menuju 3 faan: kumpulkan <b>satu keluarga saja</b> (Semi Flush), atau <b>kembar semua</b> (All Triplets). Pilih satu arah sejak awal, buang keluarga lain lebih dulu.</div>
 </section>
 
-<div class="callout">🎯 <b>Sudah paham tabelnya?</b> Uji hitunganmu di <a href="/kuis" style="color:#BCD96A;text-decoration:underline">Kuis Tebak Poin</a> — tangan acak, kamu tebak nilainya, salah sekali ronde selesai.</div>
+<div class="callout" data-en="🎯 <b>Got the table down?</b> Test your counting in the <a href=&quot;/kuis&quot; style=&quot;color:#BCD96A;text-decoration:underline&quot;>Score Quiz</a> — random hands, you name the value, one wrong answer ends the run.">🎯 <b>Sudah paham tabelnya?</b> Uji hitunganmu di <a href="/kuis" style="color:#BCD96A;text-decoration:underline">Kuis Tebak Poin</a> — tangan acak, kamu tebak nilainya, salah sekali ronde selesai.</div>
 
 <div class="mod-nav">
-  <a href="/modul-01"><small>← MODUL 01</small><b>Kenali Tile &amp; Meja</b></a>
-  <a href="/modul-03" class="next"><small>LANJUT · MODUL 03 →</small><b>Etika &amp; Ritme Permainan</b></a>
+  <a href="/modul-01"><small data-en="← MODULE 01">← MODUL 01</small><b data-en="Tiles &amp; the Table">Kenali Tile &amp; Meja</b></a>
+  <a href="/modul-03" class="next"><small data-en="NEXT · MODULE 03 →">LANJUT · MODUL 03 →</small><b data-en="Etiquette &amp; Rhythm of Play">Etika &amp; Ritme Permainan</b></a>
 </div>
 
 </main>
 
-<footer class="foot"><div class="wrap">
+<footer class="foot"><div class="wrap" data-en="Can you count now? <a href=&quot;/#jadwal&quot;>Prove it at the table — book a slot →</a>">
   Sudah bisa berhitung? <a href="/#jadwal">Buktikan di meja — book slot →</a>
 </div></footer>
 
 <script src="/belajar.js"></script>
+<script src="/i18n.js"></script>
 <script src="/nav.js"></script>
 </body>
 </html>

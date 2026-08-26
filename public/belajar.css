@@ -34,6 +34,15 @@ nav.top .links a.nav-quiz{opacity:1;color:#fff;background:var(--red);border-radi
 nav.top .links a.nav-quiz:hover{color:#fff;transform:translateY(-1px);box-shadow:0 4px 0 #8E1A20}
 nav.top .links a.nav-quiz:active{transform:translateY(2px);box-shadow:0 1px 0 #8E1A20}
 nav.top .links a.nav-quiz::after{content:"↗";font-size:10px;margin-left:5px;opacity:.85}
+/* peralih bahasa ID / EN */
+.lang-switch{display:inline-flex;gap:2px;background:var(--cream);border:1.5px solid rgba(4,51,31,.2);
+  border-radius:99px;padding:2px;flex:0 0 auto}
+.lang-switch button{border:none;background:transparent;cursor:pointer;font-family:inherit;
+  font-size:11.5px;font-weight:800;letter-spacing:.06em;color:var(--mut);padding:5px 11px;
+  border-radius:99px;line-height:1;transition:background .12s,color .12s;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.lang-switch button:hover{color:var(--ink)}
+.lang-switch button.on{background:var(--green);color:#fff}
 nav.top .btn{padding:9px 18px;font-size:13.5px;margin-left:6px;white-space:nowrap;opacity:1}
 /* dropdown Belajar */
 nav.top .drop-wrap{position:relative}
@@ -89,6 +98,7 @@ nav.top .only-mobile{display:none}   /* tautan yang hanya muncul di menu mobile 
   nav.top .dd-panel a.now small::after{content:" · SEDANG DIBUKA"}
   nav.top .only-mobile{display:block;padding:14px 6px;opacity:1;color:var(--green);
     font-weight:800;border-bottom:none}
+  nav.top .links .lang-switch{align-self:flex-start;margin:10px 6px 2px}
 }
 @media(max-width:480px){nav.top .btn{padding:8px 12px;font-size:12.5px}}
 

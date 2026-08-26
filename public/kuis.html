@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kuis Tebak Poin — TSMC</title>
-<meta name="description" content="Kuis menghitung nilai tangan mahjong dari The Social Mahjong Club. Pilih aturan faan standar TSMC atau poin J2 house rules, lihat tangannya, tebak nilainya.">
+<title data-en="Mahjong Score Quiz — TSMC">Kuis Tebak Poin — TSMC</title>
+<meta name="description" content="Kuis menghitung nilai tangan mahjong dari The Social Mahjong Club. Pilih aturan faan standar TSMC atau poin J2 house rules, lihat tangannya, tebak nilainya." data-en-content="A mahjong hand-scoring quiz from The Social Mahjong Club. Pick the TSMC faan table or the J2 house rules, look at the hand, and name its value.">
 <link rel="icon" type="image/png" href="/favicon.png">
 <meta name="theme-color" content="#04331F">
 <meta property="og:title" content="Kuis Tebak Poin — TSMC">
@@ -23,11 +23,12 @@
 <nav class="kq-nav"><div class="in">
   <a class="logo" href="/"><img src="/tsmc-logo.png" alt="The Social Mahjong Club"></a>
   <div class="links">
-    <a href="/#jadwal">Jadwal</a>
-    <a href="/#berita">Berita</a>
-    <a href="/#belajar">Belajar</a>
-    <a href="/kuis" class="now keep">Kuis</a>
+    <a href="/#jadwal" data-en="Schedule">Jadwal</a>
+    <a href="/#berita" data-en="News">Berita</a>
+    <a href="/#belajar" data-en="Learn">Belajar</a>
+    <a href="/kuis" class="now keep" data-en="Quiz">Kuis</a>
   </div>
+  <div data-lang-switch></div>
 </div></nav>
 
 <main class="kq">
@@ -38,53 +39,53 @@
   <div class="hero">
     <img class="j2-logo j2-only" src="/j2-logo.png" alt="J2 Mahjong" width="211" height="216">
     <div class="eyebrow" id="hero-eyebrow">THE SOCIAL MAHJONG CLUB</div>
-    <h1>Tebak <em>Poin</em></h1>
-    <p>Tangannya sudah menang. Pertanyaannya cuma satu: <b>berapa nilainya?</b> Salah sekali, ronde selesai.</p>
+    <h1 data-en="Count the <em>Hand</em>">Tebak <em>Poin</em></h1>
+    <p data-en="The hand has already won. There is only one question left: <b>what is it worth?</b> One wrong answer ends the run.">Tangannya sudah menang. Pertanyaannya cuma satu: <b>berapa nilainya?</b> Salah sekali, ronde selesai.</p>
   </div>
 
   <div class="modes">
     <div class="mode-card sel" data-mode="faan" role="button" tabindex="0" aria-pressed="true">
       <small>MODUL 02 · HKMA</small>
-      <h3>Faan — standar TSMC</h3>
-      <p>Tabel faan yang dipakai di semua sesi TSMC. Minimum 3 faan, maksimum dihitung 13.</p>
-      <span class="rec">Rekor kamu: <b id="best-faan">0</b> faan</span>
+      <h3 data-en="Faan — the TSMC table">Faan — standar TSMC</h3>
+      <p data-en="The faan table used at every TSMC session. Minimum 3 faan, capped at 13.">Tabel faan yang dipakai di semua sesi TSMC. Minimum 3 faan, maksimum dihitung 13.</p>
+      <span class="rec" data-en="Your best: <b id=&quot;best-faan&quot;>0</b> faan">Rekor kamu: <b id="best-faan">0</b> faan</span>
     </div>
     <div class="mode-card" data-mode="j2" role="button" tabindex="0" aria-pressed="false">
       <img class="j2-badge" src="/j2-logo.png" alt="" width="211" height="216">
       <small>MODUL 04 · J2 STYLE</small>
-      <h3>Poin — J2 house rules</h3>
-      <p>Aturan rumah komunitas partner: joker, bunga sesuai kursi, zimo, dan nilai ganda tangan besar.</p>
-      <span class="rec">Rekor kamu: <b id="best-j2">0</b> poin</span>
+      <h3 data-en="Points — J2 house rules">Poin — J2 house rules</h3>
+      <p data-en="Our partner club's house rules: jokers, seat-matching flowers, zimo, and double values for the big hands.">Aturan rumah komunitas partner: joker, bunga sesuai kursi, zimo, dan nilai ganda tangan besar.</p>
+      <span class="rec" data-en="Your best: <b id=&quot;best-j2&quot;>0</b> points">Rekor kamu: <b id="best-j2">0</b> poin</span>
     </div>
   </div>
 
   <button class="kbtn wide" id="start-go">Mulai kuis faan</button>
 
   <div class="howto">
-    <div>🀄 Setiap tangan sudah menang — tugasmu cuma <b>menghitung nilainya</b>.</div>
-    <div>📈 Sepuluh tangan per level, lima level. Makin tinggi, makin banyak pola yang muncul.</div>
-    <div>💀 <b>Satu jawaban salah, ronde selesai.</b> Skor = total nilai tangan yang berhasil kamu hitung benar.</div>
-    <div>🧾 Tiap jawaban langsung dibuka rinciannya baris per baris — salah sekali pun tetap belajar.</div>
+    <div data-en="🀄 Every hand shown has already won — your job is only to <b>work out its value</b>.">🀄 Setiap tangan sudah menang — tugasmu cuma <b>menghitung nilainya</b>.</div>
+    <div data-en="📈 Ten hands per level, five levels. The higher you go, the more patterns turn up.">📈 Sepuluh tangan per level, lima level. Makin tinggi, makin banyak pola yang muncul.</div>
+    <div data-en="💀 <b>One wrong answer ends the run.</b> Your score is the total value of every hand you counted correctly.">💀 <b>Satu jawaban salah, ronde selesai.</b> Skor = total nilai tangan yang berhasil kamu hitung benar.</div>
+    <div data-en="🧾 Every answer opens up line by line — even a wrong one teaches you something.">🧾 Tiap jawaban langsung dibuka rinciannya baris per baris — salah sekali pun tetap belajar.</div>
   </div>
 
-  <div class="startfoot">Butuh contekan? <a href="/modul-02">Tabel faan TSMC</a> · <a href="/modul-04">Tabel poin J2</a></div>
+  <div class="startfoot" data-en="Need the cheat sheet? <a href=&quot;/modul-02&quot;>TSMC faan table</a> · <a href=&quot;/modul-04&quot;>J2 points table</a>">Butuh contekan? <a href="/modul-02">Tabel faan TSMC</a> · <a href="/modul-04">Tabel poin J2</a></div>
 </section>
 
 <!-- ============ LAYAR: MAIN ============ -->
 <section class="scr" id="scr-play" style="display:none">
   <div class="hud">
     <img class="j2-chip j2-only" src="/j2-logo.png" alt="J2 Mahjong" width="211" height="216">
-    <span class="m">LEVEL<b id="hud-lv">1</b></span>
-    <span class="dots" id="hud-dots" aria-label="tangan ke berapa di level ini"></span>
-    <span class="m" style="margin-left:14px">SKOR<b id="hud-score">0</b></span>
+    <span class="m"><span data-en="LEVEL">LEVEL</span><b id="hud-lv">1</b></span>
+    <span class="dots" id="hud-dots" aria-label="tangan ke berapa di level ini" data-en-label="which hand of this level"></span>
+    <span class="m" style="margin-left:14px"><span data-en="SCORE">SKOR</span><b id="hud-score">0</b></span>
     <span class="right">
-      <a class="tab" id="play-modul" href="/modul-02" target="_blank" rel="noopener">Buka tabel ↗</a>
-      <a class="tab" href="/kuis">Keluar</a>
+      <a class="tab" id="play-modul" href="/modul-02" target="_blank" rel="noopener" data-en="Open the table ↗">Buka tabel ↗</a>
+      <a class="tab" href="/kuis" data-en="Quit">Keluar</a>
     </span>
   </div>
 
-  <div class="ask">Tangan ini bernilai <em>berapa</em>?</div>
-  <div class="ask-sub" id="ask-sub">Set bergaris putus-putus = terbuka, pernah diklaim dari pemain lain.</div>
+  <div class="ask" data-en="What is this hand <em>worth</em>?">Tangan ini bernilai <em>berapa</em>?</div>
+  <div class="ask-sub" id="ask-sub" data-en="A dashed border means the set is open — it was claimed from another player.">Set bergaris putus-putus = terbuka, pernah diklaim dari pemain lain.</div>
 
   <div class="sets" id="q-sets"></div>
   <div class="ctx" id="q-ctx"></div>
@@ -92,14 +93,14 @@
 
   <div class="dock" id="dock">
     <div class="stepper">
-      <button class="sm" id="ans-minus5" aria-label="kurang lima">−5</button>
-      <button id="ans-minus" aria-label="kurang satu">−</button>
+      <button class="sm" id="ans-minus5" aria-label="kurang lima" data-en-label="minus five">−5</button>
+      <button id="ans-minus" aria-label="kurang satu" data-en-label="minus one">−</button>
       <div class="val"><b id="ans-val">0</b><small id="ans-unit">FAAN</small></div>
-      <button id="ans-plus" aria-label="tambah satu">+</button>
-      <button class="sm" id="ans-plus5" aria-label="tambah lima">+5</button>
+      <button id="ans-plus" aria-label="tambah satu" data-en-label="plus one">+</button>
+      <button class="sm" id="ans-plus5" aria-label="tambah lima" data-en-label="plus five">+5</button>
     </div>
-    <button class="kbtn" id="ans-submit">Jawab</button>
-    <div class="hint">Keyboard: ↑ ↓ atau ketik angkanya · Enter untuk menjawab</div>
+    <button class="kbtn" id="ans-submit" data-en="Answer">Jawab</button>
+    <div class="hint" data-en="Keyboard: ↑ ↓ or type the number · Enter to answer">Keyboard: ↑ ↓ atau ketik angkanya · Enter untuk menjawab</div>
   </div>
 
   <div id="feedback"></div>
@@ -109,31 +110,32 @@
 <section class="scr" id="scr-over" style="display:none">
   <div class="over">
     <img class="j2-logo j2-only" src="/j2-logo.png" alt="J2 Mahjong" width="211" height="216">
-    <div class="badge" id="over-new">REKOR BARU</div>
+    <div class="badge" id="over-new" data-en="NEW BEST">REKOR BARU</div>
     <div class="num" id="over-score">0</div>
-    <div class="unit"><span id="over-unit">FAAN</span> TERKUMPUL</div>
+    <div class="unit"><span id="over-unit">FAAN</span> <span data-en="COLLECTED">TERKUMPUL</span></div>
     <div class="sub" id="over-sub"></div>
     <div class="rec" id="over-best"></div>
     <div class="acts">
-      <button class="kbtn" id="over-again">Main lagi</button>
-      <button class="kbtn ghost" id="over-home">Ganti aturan</button>
-      <a class="kbtn ghost" id="over-modul" href="/modul-02">Buka tabelnya</a>
+      <button class="kbtn" id="over-again" data-en="Play again">Main lagi</button>
+      <button class="kbtn ghost" id="over-home" data-en="Change ruleset">Ganti aturan</button>
+      <a class="kbtn ghost" id="over-modul" href="/modul-02" data-en="Open the table">Buka tabelnya</a>
     </div>
   </div>
-  <div class="over-tip">Salah hitung itu murah di sini, mahal di meja. Ulangi sampai angkanya keluar sendiri di kepala.</div>
+  <div class="over-tip" data-en="Miscounting is cheap here and expensive at the table. Keep going until the number arrives on its own.">Salah hitung itu murah di sini, mahal di meja. Ulangi sampai angkanya keluar sendiri di kepala.</div>
 </section>
 
 </div>
 </main>
 
-<div class="levelup" id="levelup"><b></b><span>LEVEL BARU</span></div>
+<div class="levelup" id="levelup"><b></b><span data-en="LEVEL UP">LEVEL BARU</span></div>
 
-<footer class="kq-foot">
+<footer class="kq-foot" data-en="Counting like a pro now? <a href=&quot;/#jadwal&quot;>Prove it at the table — book a slot →</a>">
   Sudah jago berhitung? <a href="/#jadwal">Buktikan di meja — book slot →</a>
 </footer>
 
 <!-- belajar.js dipakai hanya sebagai pustaka gambar tile (SVG), bukan bagian modul belajar -->
 <script src="/belajar.js"></script>
+<script src="/i18n.js"></script>
 <script src="/kuis.js"></script>
 <script src="/kuis-ui.js"></script>
 </body>

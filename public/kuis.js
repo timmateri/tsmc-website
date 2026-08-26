@@ -69,43 +69,70 @@
     unit: 'POIN',
   };
 
-  // Nama tampilan tiap pola/bonus (Indonesia).
+  // Nama tampilan tiap pola/bonus: [nama ID, keterangan ID, nama EN, keterangan EN].
   const LABEL = {
-    chicken: ['Chicken Hand', 'campuran chow &amp; pong, tanpa pong honor'],
-    allSequences: ['All Sequences', 'keempat set berupa chow'],
-    allTriplets: ['All Triplets', 'keempat set berupa pong'],
-    mixedTerminals: ['Mixed Terminals', 'hanya 1, 9, dan honor — sudah termasuk All Triplets'],
-    sevenPairs: ['Seven Pairs', 'tujuh pasang kembar'],
-    smallDragons: ['Small Three Dragons', '2 pong naga + pasang naga ketiga'],
-    bigDragons: ['3 Scholars / Big 3 Dragons', 'tiga pong naga lengkap'],
-    allConcealed: ['All Concealed Triplets', 'semua pong, tidak ada tile dari lawan'],
-    smallWinds: ['Small Four Winds', '3 pong angin + pasang angin keempat'],
-    bigWinds: ['4 Blessings / Big 4 Winds', 'empat pong angin lengkap'],
-    allHonours: ['All Honours', 'seluruh tangan honor — sudah termasuk All Triplets'],
-    allTerminals: ['All Terminals', 'seluruh tangan 1 &amp; 9 — sudah termasuk All Triplets'],
-    nineGates: ['Nine Gates', '1112345678999 satu keluarga'],
-    thirteenOrphans: ['13 Orphans', '1 &amp; 9 semua keluarga + semua honor'],
-    fourKongs: ['All Quadruplets / 4 Kongs', 'keempat set berupa kong'],
-    semiFlush: ['Mixed / Semi Flush', 'satu keluarga angka + honor'],
-    fullFlush: ['Full Colour / Full Flush', 'satu keluarga angka, tanpa honor'],
-    none: ['Tanpa pola dasar', 'bentuknya sah, tapi tidak masuk tabel pola'],
-    dragonPong: ['Pong naga', 'dihitung per set'],
-    roundWind: ['Pong angin putaran', ''],
-    seatWind: ['Pong angin duduk', ''],
-    eye28: ['Pair penutup 2 / 8', 'mata penutup angka 2 atau 8'],
-    concealed: ['Hand tertutup', 'tidak ada tile dari pemain lain'],
-    zimo: ['Zimo', 'menang dari ambilan sendiri'],
-    plainHand: ['Tanpa bunga, naga &amp; angin', 'polos total'],
-    joker: ['Joker dipakai', '1 poin per joker'],
-    noJoker: ['Tanpa joker', ''],
-    flowerMatch: ['Bunga hitam sesuai kursi', ''],
-    seasonOther: ['Bunga merah tidak sesuai kursi', ''],
-    seasonMatch: ['Bunga merah sesuai kursi', ''],
-    lastTile: ['Last tile / last discard', ''],
-    robKong: ['Mencuri kong', ''],
-    buntut: ['Menang dari buntut', 'tile pengganti kong atau bunga'],
-    flowerSetBlack: ['Set bunga hitam', 'satu set lengkap 4 bunga hitam'],
-    flowerSetRed: ['Set bunga merah', 'satu set lengkap 4 bunga merah'],
+    chicken: ['Chicken Hand', 'campuran chow &amp; pong, tanpa pong honor',
+      'Chicken Hand', 'mixed chows &amp; pongs, no honour pong'],
+    allSequences: ['All Sequences', 'keempat set berupa chow',
+      'All Sequences', 'all four sets are chows'],
+    allTriplets: ['All Triplets', 'keempat set berupa pong',
+      'All Triplets', 'all four sets are pongs'],
+    mixedTerminals: ['Mixed Terminals', 'hanya 1, 9, dan honor — sudah termasuk All Triplets',
+      'Mixed Terminals', 'only 1s, 9s and honours — All Triplets already included'],
+    sevenPairs: ['Seven Pairs', 'tujuh pasang kembar',
+      'Seven Pairs', 'seven identical pairs'],
+    smallDragons: ['Small Three Dragons', '2 pong naga + pasang naga ketiga',
+      'Small Three Dragons', 'two dragon pongs + a pair of the third'],
+    bigDragons: ['3 Scholars / Big 3 Dragons', 'tiga pong naga lengkap',
+      '3 Scholars / Big 3 Dragons', 'all three dragon pongs'],
+    allConcealed: ['All Concealed Triplets', 'semua pong, tidak ada tile dari lawan',
+      'All Concealed Triplets', 'all pongs, no tile claimed from anyone'],
+    smallWinds: ['Small Four Winds', '3 pong angin + pasang angin keempat',
+      'Small Four Winds', 'three wind pongs + a pair of the fourth'],
+    bigWinds: ['4 Blessings / Big 4 Winds', 'empat pong angin lengkap',
+      '4 Blessings / Big 4 Winds', 'all four wind pongs'],
+    allHonours: ['All Honours', 'seluruh tangan honor — sudah termasuk All Triplets',
+      'All Honours', 'every tile an honour — All Triplets already included'],
+    allTerminals: ['All Terminals', 'seluruh tangan 1 &amp; 9 — sudah termasuk All Triplets',
+      'All Terminals', 'every tile a 1 or a 9 — All Triplets already included'],
+    nineGates: ['Nine Gates', '1112345678999 satu keluarga',
+      'Nine Gates', '1112345678999 in a single suit'],
+    thirteenOrphans: ['13 Orphans', '1 &amp; 9 semua keluarga + semua honor',
+      '13 Orphans', '1s &amp; 9s of every suit + every honour'],
+    fourKongs: ['All Quadruplets / 4 Kongs', 'keempat set berupa kong',
+      'All Quadruplets / 4 Kongs', 'all four sets are kongs'],
+    semiFlush: ['Mixed / Semi Flush', 'satu keluarga angka + honor',
+      'Mixed / Semi Flush', 'one suit plus honours'],
+    fullFlush: ['Full Colour / Full Flush', 'satu keluarga angka, tanpa honor',
+      'Full Colour / Full Flush', 'one suit only, no honours'],
+    none: ['Tanpa pola dasar', 'bentuknya sah, tapi tidak masuk tabel pola',
+      'No listed pattern', 'a valid hand, but not in the pattern table'],
+    dragonPong: ['Pong naga', 'dihitung per set',
+      'Dragon pong', 'counted per set'],
+    roundWind: ['Pong angin putaran', '', 'Round wind pong', ''],
+    seatWind: ['Pong angin duduk', '', 'Seat wind pong', ''],
+    eye28: ['Pair penutup 2 / 8', 'mata penutup angka 2 atau 8',
+      'Closing pair of 2s or 8s', 'the eyes are a 2 or an 8'],
+    concealed: ['Hand tertutup', 'tidak ada tile dari pemain lain',
+      'Concealed hand', 'no tile taken from another player'],
+    zimo: ['Zimo', 'menang dari ambilan sendiri',
+      'Zimo', 'won on a self-drawn tile'],
+    plainHand: ['Tanpa bunga, naga &amp; angin', 'polos total',
+      'No flowers, dragons or winds', 'completely plain'],
+    joker: ['Joker dipakai', '1 poin per joker',
+      'Jokers used', '1 point per joker'],
+    noJoker: ['Tanpa joker', '', 'No joker', ''],
+    flowerMatch: ['Bunga hitam sesuai kursi', '', 'Black flower matching your seat', ''],
+    seasonOther: ['Bunga merah tidak sesuai kursi', '', 'Red flower not matching your seat', ''],
+    seasonMatch: ['Bunga merah sesuai kursi', '', 'Red flower matching your seat', ''],
+    lastTile: ['Last tile / last discard', '', 'Last tile / last discard', ''],
+    robKong: ['Mencuri kong', '', 'Robbing the kong', ''],
+    buntut: ['Menang dari buntut', 'tile pengganti kong atau bunga',
+      'Win on a replacement tile', 'drawn after a kong or a flower'],
+    flowerSetBlack: ['Set bunga hitam', 'satu set lengkap 4 bunga hitam',
+      'Full black flower set', 'all four black flowers'],
+    flowerSetRed: ['Set bunga merah', 'satu set lengkap 4 bunga merah',
+      'Full red flower set', 'all four red flowers'],
   };
 
   // ==========================================================
@@ -116,6 +143,7 @@
   const DRAGONS = ['c', 'f', 'b'];
   const WIND_CN = { e: '東', s: '南', w: '西', n: '北' };
   const WIND_ID = { e: 'Timur', s: 'Selatan', w: 'Barat', n: 'Utara' };
+  const WIND_EN = { e: 'East', s: 'South', w: 'West', n: 'North' };
   const SEAT_NO = { e: 1, s: 2, w: 3, n: 4 };   // penomoran kursi (Modul 04)
 
   const isSuit = (t) => SUITS.indexOf(t.split(':')[0]) >= 0;
@@ -629,19 +657,20 @@
   // ==========================================================
   // 5. TEKS
   // ==========================================================
-  function lineText(l, mode) {
-    const L = LABEL[l.key] || [l.key, ''];
-    let name = L[0];
+  function lineText(l, lang) {
+    const L = LABEL[l.key] || [l.key, '', l.key, ''];
+    const en = lang === 'en';
+    let name = en ? L[2] : L[0];
     if (l.n && l.n > 1) name += ' ×' + l.n;
-    let sub = L[1];
-    if (l.dual) sub = 'nilai kolom &ldquo;tanpa joker&rdquo;';
+    let sub = en ? L[3] : L[1];
+    if (l.dual) sub = en ? 'the &ldquo;no joker&rdquo; column' : 'nilai kolom &ldquo;tanpa joker&rdquo;';
     return { name: name, sub: sub, value: l.value };
   }
 
   const API = {
     fallbacks: 0,
     RULES: { faan: FAAN, j2: J2 },
-    LABEL: LABEL, WIND_CN: WIND_CN, WIND_ID: WIND_ID, SEAT_NO: SEAT_NO,
+    LABEL: LABEL, WIND_CN: WIND_CN, WIND_ID: WIND_ID, WIND_EN: WIND_EN, SEAT_NO: SEAT_NO,
     LEVELS: LEVELS, MAX_LEVEL: MAX_LEVEL, ARCH: ARCH,
     buildHand: buildHand, score: score, scoreFaan: scoreFaan, scoreJ2: scoreJ2,
     shapeKeys: shapeKeys, flushKey: flushKey, lineText: lineText,

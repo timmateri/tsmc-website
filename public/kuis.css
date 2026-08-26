@@ -71,6 +71,15 @@ nav.kq-nav .links a.now{opacity:1;border-bottom-color:var(--gold)}
 @media(max-width:420px){nav.kq-nav .in{gap:12px;padding:0 14px}nav.kq-nav .links{gap:11px;font-size:12px}
   nav.kq-nav .logo img{height:24px}}
 
+/* peralih bahasa ID / EN */
+.lang-switch{display:inline-flex;gap:2px;background:rgba(0,0,0,.3);border:1px solid var(--line);
+  border-radius:99px;padding:2px;flex:0 0 auto}
+.lang-switch button{border:none;background:transparent;cursor:pointer;font-family:inherit;
+  font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--mut-2);padding:5px 10px;
+  border-radius:99px;line-height:1;transition:background .12s,color .12s}
+.lang-switch button:hover{color:var(--cream)}
+.lang-switch button.on{background:var(--gold);color:var(--btn-fg)}
+@media(max-width:420px){.lang-switch button{padding:5px 8px;font-size:10.5px}}
 .kbtn{display:inline-block;border:none;cursor:pointer;text-decoration:none;text-align:center;
   font-weight:800;border-radius:13px;background:var(--gold);color:var(--btn-fg);
   box-shadow:0 4px 0 var(--gold-dk);transition:transform .09s,box-shadow .09s;padding:13px 26px;font-size:15px}

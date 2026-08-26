@@ -12,11 +12,22 @@
 
   const HANDS_PER_LEVEL = 10;
   const MODE = {
-    faan: { unit: 'faan', modul: '/modul-02', store: 'tsmc.kuis.best.faan' },
-    j2: { unit: 'poin', modul: '/modul-04', store: 'tsmc.kuis.best.j2' },
+    faan: { unit: 'faan', unitEn: 'faan', modul: '/modul-02', store: 'tsmc.kuis.best.faan' },
+    j2: { unit: 'poin', unitEn: 'points', modul: '/modul-04', store: 'tsmc.kuis.best.j2' },
   };
 
-  const G = { mode: 'faan', level: 1, handNo: 0, score: 0, hand: null, answer: 0, locked: false };
+  const G = { mode: 'faan', level: 1, handNo: 0, score: 0, hand: null, answer: 0,
+    locked: false, fb: null, best: 0 };
+
+  // ---------- bahasa ----------
+  // Teks yang digambar oleh JavaScript tidak bisa memakai atribut data-en,
+  // jadi pasangan Indonesia/Inggrisnya ditulis langsung di pemanggilan t().
+  const lang = () => (window.I18N ? window.I18N.get() : 'id');
+  const t = (id, en) => (lang() === 'en' ? en : id);
+  const unit = (m) => (lang() === 'en' ? MODE[m || G.mode].unitEn : MODE[m || G.mode].unit);
+  const startLabel = () => (G.mode === 'faan'
+    ? t('Mulai kuis faan', 'Start the faan quiz')
+    : t('Mulai kuis poin J2', 'Start the J2 points quiz'));
 
   // ---------- rekor tersimpan di perangkat ----------
   function readBest(mode) {
@@ -77,6 +88,13 @@
     return MJ.tileSVG(spec).replace('class="mtile"', 'class="mt" style="--i:' + i + '"');
   }
 
+  function setTag(s) {
+    if (s.open) return t('TERBUKA', 'OPEN');
+    if (s.k === 'kong') return 'KONG';
+    if (s.k === 'pair') return t('PASANGAN', 'PAIR');
+    return '';
+  }
+
   function renderHand(hand) {
     const box = $('q-sets');
     box.className = 'sets' + (hand.kind === 'std' || hand.kind === 'pairs' ? '' : ' solo');
@@ -84,7 +102,7 @@
     box.innerHTML = hand.sets.map((s) => {
       const jok = s.j || [];
       const row = s.t.map((t, ti) => tile(jok.indexOf(ti) >= 0 ? 'joker' : t, i++)).join('');
-      const tag = s.open ? 'TERBUKA' : (s.k === 'kong' ? 'KONG' : (s.k === 'pair' ? 'PASANGAN' : ''));
+      const tag = setTag(s);
       return '<div class="set' + (s.open ? ' open' : '') + '"><div class="row">' + row + '</div>'
         + (tag ? '<span class="tag">' + tag + '</span>' : '') + '</div>';
     }).join('');
@@ -96,28 +114,31 @@
 
   function renderCtx(hand) {
     const c = hand.ctx;
+    const W = lang() === 'en' ? K.WIND_EN : K.WIND_ID;
     const out = [
-      chip('Angin duduk', K.WIND_CN[c.seat] + ' ' + K.WIND_ID[c.seat], true),
-      chip('Angin putaran', K.WIND_CN[c.round] + ' ' + K.WIND_ID[c.round], true),
+      chip(t('Angin duduk', 'Seat wind'), K.WIND_CN[c.seat] + ' ' + W[c.seat], true),
+      chip(t('Angin putaran', 'Round wind'), K.WIND_CN[c.round] + ' ' + W[c.round], true),
     ];
     if (G.mode === 'j2') {
-      out.push(chip('Nomor kursi', String(K.SEAT_NO[c.seat])));
-      out.push(chip('Cara menang', c.zimo ? 'Zimo' : 'Ron', c.zimo));
-      out.push(chip('Tangan', c.concealed ? 'Tertutup' : 'Ada set terbuka', c.concealed));
-      out.push(chip('Joker dipakai', c.jokers ? String(c.jokers) : 'tidak ada', !!c.jokers));
+      out.push(chip(t('Nomor kursi', 'Seat number'), String(K.SEAT_NO[c.seat])));
+      out.push(chip(t('Cara menang', 'How it was won'), c.zimo ? 'Zimo' : 'Ron', c.zimo));
+      out.push(chip(t('Tangan', 'Hand'),
+        c.concealed ? t('Tertutup', 'Concealed') : t('Ada set terbuka', 'Has an open set'), c.concealed));
+      out.push(chip(t('Joker dipakai', 'Jokers used'),
+        c.jokers ? String(c.jokers) : t('tidak ada', 'none'), !!c.jokers));
       if (c.lastTile) out.push(chip('Bonus', 'Last tile', true));
-      if (c.robKong) out.push(chip('Bonus', 'Mencuri kong', true));
-      if (c.buntut) out.push(chip('Bonus', 'Menang dari buntut', true));
+      if (c.robKong) out.push(chip('Bonus', t('Mencuri kong', 'Robbing the kong'), true));
+      if (c.buntut) out.push(chip('Bonus', t('Menang dari buntut', 'Replacement tile'), true));
     }
     $('q-ctx').innerHTML = out.join('');
 
     const fl = $('q-flowers');
     if (G.mode === 'j2') {
       fl.style.display = '';
-      fl.innerHTML = '<small>BUNGA DI DEPANMU</small>'
+      fl.innerHTML = '<small>' + t('BUNGA DI DEPANMU', 'YOUR FLOWER TILES') + '</small>'
         + (c.flowers.length
           ? '<span class="row">' + c.flowers.map((f, i) => tile(f, i)).join('') + '</span>'
-          : '<span class="no">tidak ada</span>');
+          : '<span class="no">' + t('tidak ada', 'none') + '</span>');
     } else {
       fl.style.display = 'none';
     }
@@ -127,18 +148,24 @@
   function breakdownHTML(hand) {
     const res = hand.result;
     const rows = res.lines.map((l, i) => {
-      const t = K.lineText(l, G.mode);
-      return '<div class="ln" style="animation-delay:' + (i * 55) + 'ms"><span><b>' + t.name + '</b>'
-        + (t.sub ? '<small>' + t.sub + '</small>' : '') + '</span>'
+      const x = K.lineText(l, lang());
+      return '<div class="ln" style="animation-delay:' + (i * 55) + 'ms"><span><b>' + x.name + '</b>'
+        + (x.sub ? '<small>' + x.sub + '</small>' : '') + '</span>'
         + '<i>' + (l.value >= 0 ? '+' : '') + l.value + '</i></div>';
     }).join('');
-    const unit = MODE[G.mode].unit;
+    const u = unit();
     let note = '';
-    if (res.capped) note = '<div class="note">Totalnya lebih dari 13, tapi maksimum yang dihitung tetap <b>13 faan</b>.</div>';
-    else if (res.total < res.rules.min) note = '<div class="note">Di bawah minimum ' + res.rules.min + ' ' + unit
-      + ' — tangan seperti ini belum boleh dideklarasikan menang.</div>';
+    if (res.capped) {
+      note = '<div class="note">' + t(
+        'Totalnya lebih dari 13, tapi maksimum yang dihitung tetap <b>13 faan</b>.',
+        'The total runs past 13, but the maximum that counts is still <b>13 faan</b>.') + '</div>';
+    } else if (res.total < res.rules.min) {
+      note = '<div class="note">' + t(
+        'Di bawah minimum ' + res.rules.min + ' ' + u + ' — tangan seperti ini belum boleh dideklarasikan menang.',
+        'Below the ' + res.rules.min + '-' + u + ' minimum — a hand like this cannot be declared a win.') + '</div>';
+    }
     return '<div class="bd">' + rows
-      + '<div class="tot"><span>TOTAL</span><b>' + res.total + ' ' + unit.toUpperCase() + '</b></div>'
+      + '<div class="tot"><span>TOTAL</span><b>' + res.total + ' ' + u.toUpperCase() + '</b></div>'
       + note + '</div>';
   }
 
@@ -179,7 +206,7 @@
     setTheme(mode, false);
     $('play-modul').href = MODE[mode].modul;
     $('over-modul').href = MODE[mode].modul;
-    $('ans-unit').textContent = MODE[mode].unit.toUpperCase();
+    $('ans-unit').textContent = unit(mode).toUpperCase();
     $('hud-score').textContent = '0';
     show('play');
     nextHand(true);
@@ -197,6 +224,7 @@
     $('hud-lv').textContent = G.level;
     dots((G.handNo - 1) % HANDS_PER_LEVEL + 1);
     setAnswer(0, true);
+    G.fb = null;
     $('dock').style.display = '';
     $('feedback').innerHTML = '';
   }
@@ -208,41 +236,63 @@
     if (!silent && !reduce) { el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
   }
 
+  function paintFeedback() {
+    const f = G.fb;
+    if (!f) return;
+    const fb = $('feedback');
+    const u = unit();
+    if (f.ok) {
+      fb.innerHTML = '<div class="fb ok"><div class="head"><b>' + t('Betul!', 'Correct!') + '</b>'
+        + '<span>+' + f.correct + ' ' + u + '</span></div>'
+        + breakdownHTML(G.hand)
+        + '<button class="kbtn wide" id="fb-next">' + t('Lanjut →', 'Next hand →') + '</button></div>';
+      $('fb-next').onclick = () => nextHand(false);
+    } else {
+      fb.innerHTML = '<div class="fb no"><div class="head"><b>' + t('Belum tepat', 'Not quite') + '</b><span>'
+        + t('jawabanmu ' + f.given + ' · seharusnya ' + f.correct,
+            'you said ' + f.given + ' · it was ' + f.correct) + '</span></div>'
+        + breakdownHTML(G.hand)
+        + '<button class="kbtn wide" id="fb-next">' + t('Lihat hasil →', 'See your result →') + '</button></div>';
+      $('fb-next').onclick = gameOver;
+    }
+  }
+
   function submit() {
     if (G.locked) return;
     G.locked = true;
     const correct = G.hand.answer;
     const ok = G.answer === correct;
-    const sets = $('q-sets');
+    G.fb = { ok: ok, correct: correct, given: G.answer };
     $('dock').style.display = 'none';
-    const fb = $('feedback');
-
+    const sets = $('q-sets');
     if (ok) {
       const before = G.score;
       G.score += correct;
       countUp($('hud-score'), before, G.score);
       sets.classList.add('win');
-      fb.innerHTML = '<div class="fb ok"><div class="head"><b>Betul!</b><span>+' + correct + ' ' + MODE[G.mode].unit + '</span></div>'
-        + breakdownHTML(G.hand)
-        + '<button class="kbtn wide" id="fb-next">Lanjut →</button></div>';
-      $('fb-next').onclick = () => nextHand(false);
     } else {
       sets.classList.add('lose');
-      fb.innerHTML = '<div class="fb no"><div class="head"><b>Belum tepat</b><span>jawabanmu ' + G.answer
-        + ' · seharusnya ' + correct + '</span></div>'
-        + breakdownHTML(G.hand)
-        + '<button class="kbtn wide" id="fb-next">Lihat hasil →</button></div>';
-      $('fb-next').onclick = gameOver;
     }
+    paintFeedback();
+    const fb = $('feedback');
     if (fb.scrollIntoView) fb.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' });
   }
 
+  function paintOver() {
+    const u = unit();
+    $('over-unit').textContent = u.toUpperCase();
+    $('over-sub').innerHTML = t(
+      'Sampai <b>level ' + G.level + '</b> · tumbang di tangan ke-<b>' + G.handNo + '</b>',
+      'Reached <b>level ' + G.level + '</b> · fell on hand <b>' + G.handNo + '</b>');
+    $('over-best').innerHTML = t(
+      'Rekor di perangkat ini: <b>' + G.best + ' ' + u + '</b>',
+      'Best on this device: <b>' + G.best + ' ' + u + '</b>');
+  }
+
   function gameOver() {
-    const b = saveBest(G.mode, G.score);
-    $('over-unit').textContent = MODE[G.mode].unit.toUpperCase();
-    $('over-sub').innerHTML = 'Sampai <b>level ' + G.level + '</b> · tumbang di tangan ke-<b>' + G.handNo + '</b>';
-    $('over-best').innerHTML = 'Rekor di perangkat ini: <b>' + b + ' ' + MODE[G.mode].unit + '</b>';
-    $('over-new').style.display = (G.score >= b && G.score > 0) ? '' : 'none';
+    G.best = saveBest(G.mode, G.score);
+    paintOver();
+    $('over-new').style.display = (G.score >= G.best && G.score > 0) ? '' : 'none';
     show('over');
     countUp($('over-score'), 0, G.score);
     if (window.scrollTo) window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
@@ -263,7 +313,7 @@
         });
         el.classList.add('sel'); el.setAttribute('aria-pressed', 'true');
         G.mode = el.dataset.mode;
-        $('start-go').textContent = 'Mulai kuis ' + (G.mode === 'faan' ? 'faan' : 'poin J2');
+        $('start-go').textContent = startLabel();
         setTheme(G.mode, true);
       };
       el.onkeydown = (e) => {
@@ -291,11 +341,32 @@
     });
   }
 
+  // Dipanggil tiap kali bahasa berganti: teks yang sudah terlanjur digambar
+  // oleh JavaScript perlu ditulis ulang dalam bahasa yang baru.
+  function relang() {
+    $('start-go').textContent = startLabel();
+    $('ans-unit').textContent = unit().toUpperCase();
+    // teks rekor ikut tertulis ulang saat kalimat pembungkusnya diganti
+    $('best-faan').textContent = readBest('faan');
+    $('best-j2').textContent = readBest('j2');
+    if (G.hand && $('scr-play').style.display !== 'none') {
+      $('q-sets').querySelectorAll('.set').forEach((el, i) => {
+        const tag = el.querySelector('.tag');
+        if (tag && G.hand.sets[i]) tag.textContent = setTag(G.hand.sets[i]);
+      });
+      renderCtx(G.hand);
+      if (G.locked) paintFeedback();
+    }
+    if ($('scr-over').style.display !== 'none') paintOver();
+  }
+
   function init() {
     if (!K || !MJ) return;
     document.body.setAttribute('data-theme', 'tsmc');
     buildRain();
     bind();
+    if (window.I18N) window.I18N.onChange(relang);
+    $('start-go').textContent = startLabel();
     toStart();
   }
 
