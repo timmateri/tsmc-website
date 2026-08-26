@@ -16,7 +16,7 @@
 
 <nav class="top"><div class="wrap">
   <a class="logo" href="/"><img src="/tsmc-logo.png" alt="The Social Mahjong Club"></a>
-  <div class="links">
+  <div class="links" id="nav-links">
     <a href="/#jadwal">Jadwal</a>
     <a href="/#berita">Berita &amp; Event</a>
     <div class="drop-wrap">
@@ -30,9 +30,12 @@
     </div>
     <a href="/#galeri">Galeri</a>
     <a href="/#anggota">Anggota</a>
+    <a class="nav-quiz" href="/kuis" target="_blank" rel="noopener">Quiz</a>
+    <a class="only-mobile" href="/#cek">🀄 Cek Booking &amp; Kartu Stempel</a>
   </div>
   <a class="btn ghost" href="/#cek">Cek Booking</a>
   <a class="btn" href="/#jadwal">Book Slot</a>
+  <button class="burger" id="nav-burger" aria-label="Buka menu" aria-expanded="false" aria-controls="nav-links">☰</button>
 </div></nav>
 
 <header class="mod"><div class="wrap">
@@ -182,12 +185,17 @@
         <div class="tile-row xs" data-tiles="season:1,season:2,season:3,season:4"></div></td><td class="fv2">+1</td></tr>
       <tr><td class="fn">Bunga merah sesuai kursi</td><td>Bunga merah yang nomornya sama dengan nomor kursimu. Rezeki dobel.
         <div class="tile-row xs" data-tiles="season:2"></div></td><td class="fv2">+2</td></tr>
+      <tr><td class="fn">Set bunga hitam</td><td>Satu set lengkap 4 bunga hitam (梅蘭菊竹) di depanmu.
+        <div class="tile-row xs" data-tiles="flower:1,flower:2,flower:3,flower:4"></div></td><td class="fv2">+5</td></tr>
+      <tr><td class="fn">Set bunga merah</td><td>Satu set lengkap 4 bunga merah (春夏秋冬) di depanmu.
+        <div class="tile-row xs" data-tiles="season:1,season:2,season:3,season:4"></div></td><td class="fv2">+5</td></tr>
       <tr class="sec"><td colspan="3">DARI CARA MENANG</td></tr>
       <tr><td class="fn">Last tile / last discard</td><td>Menang dari tile terakhir tembok atau buangan terakhir. Drama penutup ronde.</td><td class="fv2">+1</td></tr>
       <tr><td class="fn">Mencuri kong<small>stealing kong</small></td><td>Menang dengan merebut tile yang baru ditambahkan lawan ke pong terbukanya (merampok kong).</td><td class="fv2">+1</td></tr>
+      <tr><td class="fn">Menang dari buntut</td><td>Menang dengan tile pengganti yang kamu ambil dari buntut tembok setelah kong atau setelah dapat bunga.</td><td class="fv2">+1</td></tr>
     </table>
     </div>
-    <div class="info-note">Perhatikan: rulebook hanya memberi poin untuk <b>bunga hitam yang sesuai kursi</b> — bunga hitam lain tidak disebut, jadi tidak menambah poin. Seperti biasa, setiap tile bunga yang kamu dapat langsung diganti dengan ambilan baru dari tembok.</div>
+    <div class="info-note">Perhatikan: rulebook hanya memberi poin untuk <b>bunga hitam yang sesuai kursi</b> — bunga hitam lain tidak disebut, jadi tidak menambah poin. Rulebook juga tidak menyebut apakah bonus <b>set bunga +5</b> ditumpuk di atas poin per-bunga; sepakati dulu di awal sesi. Seperti biasa, setiap tile bunga yang kamu dapat langsung diganti dengan ambilan baru dari tembok.</div>
   </div>
 </section>
 
@@ -299,6 +307,8 @@
   <div class="callout">📖 Isi modul ini mengikuti rulebook resmi <b>J2 Style Mahjong</b> milik komunitas <b>temenmahjong</b>, versi yang dipakai pada Piala Kemerdekaan J2. Kalau ada revisi dari panitia, aturan merekalah yang berlaku — kabari admin TSMC supaya halaman ini ikut diperbarui.</div>
 </section>
 
+<div class="callout">🎯 <b>Sudah paham tabelnya?</b> Uji hitunganmu di <a href="/kuis" style="color:#BCD96A;text-decoration:underline">Kuis Tebak Poin</a> — tangan acak, kamu tebak nilainya, salah sekali ronde selesai.</div>
+
 <div class="mod-nav">
   <a href="/modul-03"><small>← MODUL 03</small><b>Etika &amp; Ritme Permainan</b></a>
   <a href="/#jadwal" class="next"><small>SIAP TANDING 🀄</small><b>Book Slot Sesi Berikutnya</b></a>
@@ -311,5 +321,6 @@
 </div></footer>
 
 <script src="/belajar.js"></script>
+<script src="/nav.js"></script>
 </body>
 </html>

@@ -91,6 +91,13 @@ nav .links .dd-panel a small{display:block;font-size:10px;font-weight:800;letter
 nav .links .dd-panel a b{font-size:13.5px;color:var(--ink)}
 nav .links .dd-panel a:hover{background:var(--cream);color:var(--ink)}
 nav .links .dd-panel a:hover b{color:var(--green)}
+/* tautan "Quiz" — sengaja beda warna supaya menonjol, dan buka di tab baru */
+nav .links a.nav-quiz{opacity:1;color:#fff;background:var(--red);border-radius:99px;
+  padding:7px 15px;font-weight:800;letter-spacing:.02em;white-space:nowrap;
+  box-shadow:0 3px 0 #8E1A20;transition:transform .1s,box-shadow .1s}
+nav .links a.nav-quiz:hover{color:#fff;transform:translateY(-1px);box-shadow:0 4px 0 #8E1A20}
+nav .links a.nav-quiz:active{transform:translateY(2px);box-shadow:0 1px 0 #8E1A20}
+nav .links a.nav-quiz::after{content:"↗";font-size:10px;margin-left:5px;opacity:.85}
 nav .btn{padding:9px 18px;font-size:13.5px;margin-left:6px;white-space:nowrap}
 #nav-me.known{box-shadow:inset 0 0 0 1.5px var(--green);color:var(--green);font-weight:800}
 /* tombol hamburger — hanya tampil di mobile */
@@ -111,6 +118,8 @@ nav .btn{padding:9px 18px;font-size:13.5px;margin-left:6px;white-space:nowrap}
   nav .links.open{display:flex}
   nav .links>a,#nav-cek-mobile{display:block;padding:14px 6px;opacity:1;
     border-bottom:1px dashed rgba(5,42,27,.14)}
+  nav .links>a.nav-quiz{display:inline-flex;align-items:center;width:fit-content;
+    margin:12px 6px 4px;padding:11px 20px;border-bottom:none}
   nav .links .drop-wrap{position:static}
   nav .links .caret{display:none}
   nav .links .dropdown{position:static;opacity:1;visibility:visible;pointer-events:auto;
@@ -354,6 +363,7 @@ footer small{opacity:.7;display:block;margin-top:4px}
       </div>
       <a href="#galeri">Galeri</a>
       <a href="#anggota">Anggota</a>
+      <a class="nav-quiz" href="/kuis" target="_blank" rel="noopener">Quiz</a>
       <a href="#" id="nav-cek-mobile" onclick="navMeClick();closeNav();return false;">🀄 Cek Booking &amp; Kartu Stempel</a>
     </div>
     <button class="btn ghost" id="nav-me" onclick="navMeClick()">Cek Booking</button>
@@ -431,13 +441,14 @@ footer small{opacity:.7;display:block;margin-top:4px}
   <div class="wrap">
     <div class="sec-head">
       <h2>Belajar Mahjong</h2>
-      <div class="sub">Belajar dari nol lewat empat modul singkat</div>
+      <div class="sub">Belajar dari nol lewat empat modul singkat — lalu uji hitunganmu di kuis</div>
     </div>
     <div class="learn-grid">
       <a class="lcard" href="/modul-01"><small>MODUL 01</small><h3>Kenali tile &amp; susunan meja</h3><p>144 tile, angin duduk, dan cara set meja Hong Kong style dari nol.</p><span class="mlink">Buka modul →</span></a>
       <a class="lcard" href="/modul-02"><small>MODUL 02</small><h3>Menghitung faan</h3><p>Dari chicken hand sampai limit hand — tabel faan standar yang dipakai komunitas.</p><span class="mlink">Buka modul →</span></a>
       <a class="lcard" href="/modul-03"><small>MODUL 03</small><h3>Etika &amp; ritme permainan</h3><p>Cuci tile, urutan giliran, klaim pong/gong, dan kapan menyebut sik wu.</p><span class="mlink">Buka modul →</span></a>
       <a class="lcard" href="/modul-04"><small>MODUL 04</small><h3>J2 house rules</h3><p>Aturan rumah komunitas temenmahjong: sistem poin, joker, bunga, dan instant win.</p><span class="mlink">Buka modul →</span></a>
+      <a class="lcard" href="/kuis"><small>LATIHAN</small><h3>Kuis tebak poin</h3><p>Tangan sudah menang — tinggal dihitung. Pilih tabel faan TSMC atau poin J2, lalu tebak nilainya. Salah sekali, ronde selesai.</p><span class="mlink">Main kuis →</span></a>
     </div>
   </div>
 </section>

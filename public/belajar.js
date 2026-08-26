@@ -217,4 +217,7 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render);
   else render();
+
+  // Dipakai halaman yang menggambar tile secara dinamis (mis. /kuis).
+  window.MJ = { tileSVG: tileSVG, render: render };
 })();

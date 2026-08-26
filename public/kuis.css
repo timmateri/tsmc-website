@@ -1,0 +1,325 @@
+/* ============================================================
+   TSMC — Kuis Tebak Poin
+   Stylesheet BERDIRI SENDIRI. Sengaja tidak memakai belajar.css
+   supaya halaman kuis bisa diubah tanpa menyentuh modul belajar.
+   ============================================================ */
+/* --- tema TSMC (bawaan): meja felt hijau --- */
+:root, body.kq[data-theme="tsmc"]{
+  --felt:#04331F; --felt-2:#06432A; --felt-3:#0A5636;
+  --cream:#EAF3DF; --gold:#BCD96A; --gold-dk:#78A818;
+  --accent:#0C8A57; --accent-fg:#FFFFFF; --red:#E0464E; --red-dk:#C02028;
+  --line:rgba(234,243,223,.16); --line-2:rgba(234,243,223,.28);
+  --mut:rgba(234,243,223,.62); --mut-2:rgba(234,243,223,.42);
+  --glass:rgba(255,255,255,.055); --gold-soft:rgba(188,217,106,.10); --gold-soft-2:rgba(188,217,106,.52);
+  --nav:rgba(4,51,31,.74); --fade:rgba(4,51,31,.93);
+  --btn-fg:#12240D;
+}
+/* --- tema J2 Style Mahjong: maroon gelap + emas, mengikuti rulebook
+       J2 Style Mahjong milik komunitas temenmahjong --- */
+body.kq[data-theme="j2"]{
+  --felt:#231518; --felt-2:#2C1A1E; --felt-3:#3E2429;
+  --cream:#F2E9DC; --gold:#D4AF37; --gold-dk:#8A6A18;
+  --accent:#5B2A2F; --accent-fg:#F0D77A; --red:#E0645A; --red-dk:#8E2226;
+  --line:rgba(212,175,55,.20); --line-2:rgba(212,175,55,.38);
+  --mut:rgba(242,233,220,.66); --mut-2:rgba(242,233,220,.44);
+  --glass:rgba(212,175,55,.055); --gold-soft:rgba(212,175,55,.12); --gold-soft-2:rgba(212,175,55,.55);
+  --nav:rgba(35,21,24,.82); --fade:rgba(35,21,24,.94);
+  --btn-fg:#231518;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body.kq{
+  min-height:100vh;min-height:100dvh;background:var(--felt);color:var(--cream);
+  font-family:'Schibsted Grotesk',system-ui,sans-serif;line-height:1.6;
+  overflow-x:hidden;position:relative;
+  -webkit-tap-highlight-color:transparent;
+}
+body.kq::before{ /* meja felt + vignette */
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(120% 80% at 50% -10%, var(--felt-3) 0%, var(--felt-2) 42%, var(--felt) 78%),
+    radial-gradient(90% 60% at 50% 110%, rgba(0,0,0,.45), transparent 60%);
+}
+img{max-width:100%;height:auto;display:block}
+button{font-family:inherit;touch-action:manipulation}
+a{touch-action:manipulation}
+
+/* ---------- hujan tile latar ---------- */
+.rain{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.rain span{position:absolute;top:0;display:block;will-change:transform;
+  animation:rain-fall linear infinite, rain-wobble ease-in-out infinite}
+.rain svg{width:100%;height:auto;display:block;filter:saturate(.5)}
+@keyframes rain-fall{
+  from{transform:translate3d(0,-22vh,0) rotate(var(--r0))}
+  to{transform:translate3d(var(--dx),122vh,0) rotate(var(--r1))}
+}
+@keyframes rain-wobble{0%,100%{margin-left:0}50%{margin-left:14px}}
+
+/* ---------- rangka halaman ---------- */
+.kq-wrap{position:relative;z-index:2;max-width:940px;margin:0 auto;padding:0 18px}
+nav.kq-nav{position:sticky;top:0;z-index:40;backdrop-filter:blur(10px);
+  background:var(--nav);border-bottom:1px solid var(--line)}
+nav.kq-nav .in{max-width:1100px;margin:0 auto;padding:0 18px;height:60px;
+  display:flex;align-items:center;gap:20px}
+nav.kq-nav .logo img{height:32px;width:auto;filter:brightness(0) invert(1) opacity(.92)}
+nav.kq-nav .links{display:flex;gap:18px;margin-left:auto;font-size:14px;font-weight:700}
+nav.kq-nav .links a{color:var(--cream);text-decoration:none;opacity:.7;padding:4px 0;
+  border-bottom:2px solid transparent;transition:opacity .15s,border-color .15s}
+nav.kq-nav .links a:hover{opacity:1}
+nav.kq-nav .links a.now{opacity:1;border-bottom-color:var(--gold)}
+@media(max-width:620px){nav.kq-nav .links{gap:13px;font-size:12.5px}nav.kq-nav .logo img{height:26px}}
+@media(max-width:420px){nav.kq-nav .in{gap:12px;padding:0 14px}nav.kq-nav .links{gap:11px;font-size:12px}
+  nav.kq-nav .logo img{height:24px}}
+
+.kbtn{display:inline-block;border:none;cursor:pointer;text-decoration:none;text-align:center;
+  font-weight:800;border-radius:13px;background:var(--gold);color:var(--btn-fg);
+  box-shadow:0 4px 0 var(--gold-dk);transition:transform .09s,box-shadow .09s;padding:13px 26px;font-size:15px}
+.kbtn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--gold-dk)}
+.kbtn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--gold-dk)}
+.kbtn.ghost{background:transparent;color:var(--cream);box-shadow:inset 0 0 0 1.5px var(--line-2)}
+.kbtn.ghost:hover{box-shadow:inset 0 0 0 1.5px var(--gold);color:var(--gold)}
+.kbtn.wide{display:block;width:100%;padding:17px;font-size:17px;border-radius:16px}
+
+main.kq{position:relative;z-index:2;padding:26px 0 60px;min-height:70vh}
+.scr{animation:rise .38s cubic-bezier(.2,.8,.3,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+/* ---------- layar mulai ---------- */
+.hero{text-align:center;padding:22px 0 6px}
+.hero .eyebrow{font-size:11px;font-weight:800;letter-spacing:.26em;color:var(--gold);margin-bottom:10px}
+.hero h1{font-family:'DM Serif Display',serif;font-weight:400;line-height:1;
+  font-size:clamp(42px,9vw,76px);animation:float 5.5s ease-in-out infinite}
+.hero h1 em{font-style:normal;color:var(--gold)}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.hero p{color:var(--mut);font-size:16px;max-width:46ch;margin:14px auto 0}
+
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:28px 0 16px}
+@media(max-width:640px){.modes{grid-template-columns:1fr}}
+.mode-card{cursor:pointer;text-align:left;background:var(--glass);border:1.5px solid var(--line);
+  border-radius:18px;padding:20px;transition:transform .14s,border-color .14s,background .14s;position:relative;overflow:hidden}
+.mode-card:hover{transform:translateY(-3px);border-color:var(--line-2)}
+.mode-card.sel{border-color:var(--gold);background:var(--gold-soft)}
+.mode-card.sel::after{content:"✓";position:absolute;top:14px;right:16px;color:var(--gold);font-weight:800}
+.mode-card small{font-size:10.5px;font-weight:800;letter-spacing:.18em;color:var(--gold)}
+.mode-card h3{font-family:'DM Serif Display',serif;font-weight:400;font-size:25px;margin:7px 0 6px}
+.mode-card p{font-size:14px;color:var(--mut)}
+.mode-card .rec{display:inline-block;margin-top:13px;font-size:12.5px;font-weight:700;color:var(--mut-2)}
+.mode-card .rec b{color:var(--gold);font-size:15px}
+
+.howto{display:grid;gap:8px;margin-top:18px}
+.howto div{font-size:14px;color:var(--mut);border:1px dashed var(--line);border-radius:12px;padding:10px 15px}
+.howto b{color:var(--cream)}
+.startfoot{text-align:center;margin-top:22px;font-size:13px;color:var(--mut-2)}
+.startfoot a{color:var(--gold)}
+
+/* ---------- HUD ---------- */
+.hud{display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+  background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:99px;padding:9px 8px 9px 18px}
+.hud .m{font-size:11px;font-weight:800;letter-spacing:.14em;color:var(--mut-2)}
+.hud .m b{color:var(--gold);font-family:'DM Serif Display',serif;font-size:19px;letter-spacing:0;margin-left:5px}
+.hud .dots{display:flex;gap:4px;margin-left:4px}
+.hud .dots i{width:7px;height:7px;border-radius:50%;background:var(--line-2);transition:background .25s,transform .25s}
+.hud .dots i.on{background:var(--gold);transform:scale(1.25)}
+.hud .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.hud .tab{font-size:11.5px;font-weight:700;color:var(--mut);text-decoration:none;
+  border:1px solid var(--line);border-radius:99px;padding:6px 13px;white-space:nowrap}
+.hud .tab:hover{color:var(--gold);border-color:var(--gold)}
+@media(max-width:560px){.hud{padding:9px 12px;border-radius:18px}.hud .right{width:100%;margin-left:0}}
+
+.ask{text-align:center;margin:26px 0 3px;font-family:'DM Serif Display',serif;
+  font-size:clamp(22px,4vw,30px)}
+.ask em{font-style:normal;color:var(--gold)}
+.ask-sub{text-align:center;font-size:12.5px;color:var(--mut-2);margin-bottom:20px}
+
+/* ---------- tangan ---------- */
+.sets{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.sets.solo .set{flex:1 1 100%}
+.set{background:var(--glass);border:1.5px solid var(--line);border-radius:16px;
+  padding:12px 12px 9px;box-shadow:0 10px 26px rgba(0,0,0,.28)}
+.set.open{border-style:dashed;border-color:var(--gold-soft-2);background:var(--gold-soft)}
+.set .row{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.set .tag{display:block;text-align:center;font-size:9px;font-weight:800;letter-spacing:.14em;
+  color:var(--mut-2);margin-top:8px}
+.set.open .tag{color:var(--gold)}
+.mt{width:46px;height:auto;border-radius:8px;user-select:none;-webkit-user-select:none;
+  filter:drop-shadow(0 3px 0 rgba(0,0,0,.35)) drop-shadow(0 8px 14px rgba(0,0,0,.3));
+  animation:deal .42s cubic-bezier(.2,.9,.3,1.2) both;animation-delay:calc(var(--i,0) * 42ms)}
+@keyframes deal{from{opacity:0;transform:translateY(26px) scale(.8) rotate(-7deg)}to{opacity:1;transform:none}}
+@media(max-width:600px){.mt{width:34px}.set{padding:9px 8px 7px;border-radius:13px}}
+@media(max-width:380px){.mt{width:29px}}
+
+.sets.win .mt{animation:bounce .5s ease both;animation-delay:calc(var(--i,0) * 34ms)}
+@keyframes bounce{0%,100%{transform:translateY(0)}42%{transform:translateY(-14px) scale(1.07)}72%{transform:translateY(-4px)}}
+.sets.lose{animation:shake .45s ease both}
+@keyframes shake{0%,100%{transform:translateX(0)}18%{transform:translateX(-9px) rotate(-1.2deg)}
+  38%{transform:translateX(8px) rotate(1.2deg)}58%{transform:translateX(-5px)}78%{transform:translateX(4px)}}
+
+/* ---------- konteks meja ---------- */
+.ctx{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:20px}
+.chip{background:rgba(0,0,0,.24);border:1px solid var(--line);border-radius:12px;padding:6px 13px;
+  font-size:13.5px;font-weight:700;color:var(--cream);animation:rise .4s both;animation-delay:.25s}
+.chip small{display:block;font-size:9.5px;font-weight:800;letter-spacing:.13em;color:var(--mut-2)}
+.chip.on{border-color:var(--gold-soft-2);background:var(--gold-soft)}
+.chip.on b{color:var(--gold)}
+.flowers{display:flex;align-items:center;gap:11px;justify-content:center;flex-wrap:wrap;
+  margin:12px auto 0;width:fit-content;background:rgba(0,0,0,.24);border:1px solid var(--line);
+  border-radius:14px;padding:8px 15px;animation:rise .4s both;animation-delay:.3s}
+.flowers small{font-size:9.5px;font-weight:800;letter-spacing:.13em;color:var(--mut-2)}
+.flowers .row{display:flex;gap:4px}
+.flowers .mt{width:30px;animation:none}
+.flowers .no{font-size:13px;color:var(--mut)}
+
+/* ---------- kotak jawaban ---------- */
+.dock{position:sticky;bottom:0;z-index:25;margin:28px -18px 0;
+  padding:16px 18px calc(20px + env(safe-area-inset-bottom));
+  display:flex;gap:11px;align-items:center;justify-content:center;flex-wrap:wrap;
+  background:linear-gradient(transparent,var(--fade) 34%)}
+.stepper{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.4);
+  border:1.5px solid var(--line-2);border-radius:17px;padding:7px;backdrop-filter:blur(6px)}
+.stepper button{width:46px;height:46px;border:none;border-radius:12px;background:rgba(255,255,255,.09);
+  color:var(--cream);font-size:20px;font-weight:800;cursor:pointer;
+  transition:background .12s,transform .08s;user-select:none;-webkit-user-select:none}
+.stepper button.sm{width:40px;font-size:12.5px}
+.stepper button:hover{background:var(--gold);color:var(--btn-fg)}
+.stepper button:active{transform:scale(.92)}
+.stepper .val{min-width:84px;text-align:center}
+.stepper .val b{display:block;font-family:'DM Serif Display',serif;font-size:33px;line-height:1;color:var(--gold)}
+.stepper .val b.bump{animation:bump .2s ease}
+@keyframes bump{50%{transform:scale(1.22)}}
+.stepper .val small{font-size:9px;font-weight:800;letter-spacing:.16em;color:var(--mut-2)}
+.hint{width:100%;text-align:center;font-size:11.5px;color:var(--mut-2);margin-top:-2px}
+@media(max-width:600px){.hint{display:none}.dock{gap:9px}}
+
+/* ---------- umpan balik ---------- */
+.fb{margin:24px 0 8px;border-radius:20px;padding:20px;border:1.5px solid;
+  background:rgba(0,0,0,.34);backdrop-filter:blur(6px);animation:rise .35s both}
+.fb.ok{border-color:var(--gold)}
+.fb.no{border-color:var(--red)}
+.fb .head{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;margin-bottom:14px}
+.fb .head b{font-family:'DM Serif Display',serif;font-weight:400;font-size:28px}
+.fb.ok .head b{color:var(--gold)}
+.fb.no .head b{color:var(--red)}
+.fb .head span{font-size:13.5px;color:var(--mut);font-weight:700}
+.bd{display:grid;gap:6px}
+.bd .ln{display:flex;justify-content:space-between;align-items:center;gap:12px;
+  background:rgba(255,255,255,.06);border-radius:11px;padding:9px 14px;animation:rise .3s both}
+.bd .ln b{font-size:14.5px}
+.bd .ln small{display:block;font-size:12px;color:var(--mut);font-weight:400}
+.bd .ln i{font-style:normal;font-family:'DM Serif Display',serif;font-size:21px;color:var(--gold)}
+.bd .tot{display:flex;justify-content:space-between;align-items:center;background:var(--accent);color:var(--accent-fg);
+  border-radius:11px;padding:12px 14px;font-weight:800;font-size:12px;letter-spacing:.14em}
+.bd .tot b{font-family:'DM Serif Display',serif;font-size:26px;letter-spacing:0;font-weight:400}
+.bd .note{font-size:13px;color:var(--mut);border:1px dashed var(--line-2);border-radius:11px;padding:10px 14px}
+.fb .kbtn{margin-top:16px}
+
+/* ---------- layar hasil ---------- */
+.over{text-align:center;background:rgba(0,0,0,.34);border:1.5px solid var(--line-2);
+  border-radius:24px;padding:34px 22px;backdrop-filter:blur(6px);margin-top:10px}
+.over .badge{display:inline-block;background:var(--red-dk);font-size:10.5px;font-weight:800;
+  letter-spacing:.18em;border-radius:99px;padding:5px 14px;margin-bottom:10px;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.over .num{font-family:'DM Serif Display',serif;font-size:clamp(58px,13vw,92px);line-height:1;color:var(--gold)}
+.over .unit{font-size:11px;font-weight:800;letter-spacing:.24em;color:var(--mut-2);margin-top:6px}
+.over .sub{font-size:15px;color:var(--mut);margin-top:14px}
+.over .sub b{color:var(--cream)}
+.over .rec{font-size:13px;color:var(--mut-2);margin-top:4px}
+.over .acts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.over-tip{text-align:center;font-size:13.5px;color:var(--mut);margin-top:18px;max-width:52ch;
+  margin-inline:auto}
+
+/* ---------- banner naik level ---------- */
+.levelup{position:fixed;left:50%;top:22%;z-index:60;transform:translateX(-50%);
+  pointer-events:none;opacity:0;text-align:center}
+.levelup.show{animation:lvl 1.5s ease both}
+.levelup b{display:block;font-family:'DM Serif Display',serif;font-size:clamp(38px,9vw,64px);color:var(--gold);
+  text-shadow:0 6px 30px rgba(0,0,0,.6)}
+.levelup span{font-size:11px;font-weight:800;letter-spacing:.28em;color:var(--cream)}
+@keyframes lvl{
+  0%{opacity:0;transform:translateX(-50%) scale(.7)}
+  18%{opacity:1;transform:translateX(-50%) scale(1.04)}
+  30%{transform:translateX(-50%) scale(1)}
+  78%{opacity:1}
+  100%{opacity:0;transform:translateX(-50%) translateY(-22px) scale(1)}
+}
+
+footer.kq-foot{position:relative;z-index:2;border-top:1px solid var(--line);margin-top:40px;
+  padding:22px 0;text-align:center;font-size:13px;color:var(--mut)}
+footer.kq-foot a{color:var(--gold);font-weight:700}
+
+/* ---------- identitas J2 ----------
+   Logo J2 Mahjong hanya muncul saat tema J2 aktif; lencana
+   kecil di kartu pilihan selalu tampil supaya modenya mudah dikenali. */
+.j2-only{display:none}
+body.kq[data-theme="j2"] .j2-only{display:block}
+.j2-badge{position:absolute;top:13px;right:13px;width:54px;height:auto;
+  filter:drop-shadow(0 3px 10px rgba(0,0,0,.55));transition:transform .2s}
+.mode-card[data-mode="j2"]:hover .j2-badge{transform:scale(1.07) rotate(-3deg)}
+.mode-card[data-mode="j2"].sel::after{display:none}
+.mode-card[data-mode="j2"] small,
+.mode-card[data-mode="j2"] h3,
+.mode-card[data-mode="j2"] p{padding-right:70px}
+.j2-logo{width:clamp(104px,18vw,132px);height:auto;margin:0 auto 14px;
+  filter:drop-shadow(0 8px 26px rgba(212,175,55,.3));animation:float 5.5s ease-in-out infinite}
+.over .j2-logo{width:96px;height:auto;margin-bottom:12px}
+.j2-chip{height:30px;width:auto;flex:0 0 auto}
+/* kilat halus saat tema berganti */
+body.kq.swap::after{content:"";position:fixed;inset:0;z-index:70;pointer-events:none;
+  background:radial-gradient(65% 45% at 50% 32%, var(--gold-soft), transparent 72%);
+  animation:swapflash .55s ease both}
+@keyframes swapflash{0%{opacity:0}28%{opacity:1}100%{opacity:0}}
+
+/* ---------- penyesuaian layar HP ---------- */
+@media(max-width:600px){
+  main.kq{padding:18px 0 40px}
+  .hero{padding:12px 0 4px}
+  .hero p{font-size:15px;margin-top:12px}
+  .modes{gap:12px;margin:22px 0 14px}
+  .mode-card{padding:17px;border-radius:16px}
+  .mode-card h3{font-size:22px}
+  .kbtn.wide{padding:16px;font-size:16px;border-radius:14px}
+  .howto{gap:7px;margin-top:16px}
+  .howto div{font-size:13.5px;padding:9px 13px}
+  .ask{margin:20px 0 3px}
+  .ask-sub{margin-bottom:14px}
+  .sets{gap:8px}
+  .ctx{gap:6px;margin-top:14px}
+  .chip{font-size:12.5px;padding:5px 11px}
+  .flowers{padding:7px 13px;margin-top:10px}
+  .dock{gap:8px;margin-top:20px}
+  .dock #ans-submit{flex:1 1 100%;padding:14px}   /* tombol kunci selebar layar */
+  .stepper{padding:6px;border-radius:15px}
+  .stepper .val{min-width:72px}
+  .stepper .val b{font-size:29px}
+  .fb{padding:16px;border-radius:16px;margin-top:20px}
+  .fb .head b{font-size:24px}
+  .bd .ln{padding:8px 12px}
+  .bd .ln b{font-size:14px}
+  .over{padding:26px 18px;border-radius:20px}
+  .over .acts .kbtn{flex:1 1 auto}
+  /* blur berat dimatikan di HP — hemat baterai, animasi tetap mulus */
+  .stepper,.fb,.over{backdrop-filter:none}
+}
+@media(max-width:380px){
+  .kq-wrap{padding:0 14px}
+  .dock{margin:20px -14px 0;padding:14px 14px calc(16px + env(safe-area-inset-bottom))}
+  .stepper button{width:42px;height:42px}
+  .stepper button.sm{width:36px}
+  .stepper .val{min-width:62px}
+  .chip{font-size:12px;padding:5px 10px}
+  .over .acts .kbtn{flex:1 1 100%}
+}
+/* perangkat sentuh: efek hover tidak berguna dan malah "nyangkut" */
+@media(hover:none){
+  .mode-card:hover{transform:none;border-color:var(--line)}
+  .mode-card.sel:hover{border-color:var(--gold)}
+  .kbtn:hover{transform:none;box-shadow:0 4px 0 var(--gold-dk)}
+  .stepper button:hover{background:rgba(255,255,255,.09);color:var(--cream)}
+  .stepper button:active{background:var(--gold);color:var(--btn-fg)}
+  .hud .tab:hover{color:var(--mut);border-color:var(--line)}
+}
+
+/* ---------- hormati preferensi gerak ---------- */
+@media (prefers-reduced-motion: reduce){
+  .rain{display:none}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
