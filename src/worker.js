@@ -121,17 +121,56 @@ async function getLoyalty(db, wa) {
   };
 }
 
-async function schedulesWithAvailability(db) {
+// Jadwal AKTIF  = belum lewat tanggalnya DAN belum ditandai selesai admin.
+// Jadwal LAMPAU = sudah ditandai 'done' ATAU tanggalnya sudah lewat.
+// Jadi kalau admin lupa menekan "Selesai", sesi kemarin tetap pindah sendiri.
+const PAST_LIMIT = 6;
+async function schedulesWithAvailability(db, mode = 'active') {
+  const kondisi = mode === 'past'
+    ? `s.status != 'canceled' AND (s.status = 'done' OR s.date < date('now'))`
+    : `s.status NOT IN ('canceled','done') AND s.date >= date('now')`;
+  const urut = mode === 'past' ? 'DESC' : 'ASC';
+  const batas = mode === 'past' ? `LIMIT ${PAST_LIMIT}` : '';
   const { results } = await db.prepare(`
     SELECT s.*, COALESCE((
       SELECT SUM(b.seats) FROM bookings b
       WHERE b.schedule_id = s.id AND ${HOLD_EXPR}
     ), 0) AS booked
     FROM schedules s
-    WHERE s.status != 'canceled' AND s.date >= date('now','-1 day')
-    ORDER BY s.date ASC
+    WHERE ${kondisi}
+    ORDER BY s.date ${urut}
+    ${batas}
   `).all();
   return results.map((s) => ({ ...s, left: Math.max(0, s.capacity - s.booked) }));
+}
+
+// Daftar peserta per jadwal — nama sudah disingkat demi privasi.
+async function attachPlayers(db, list) {
+  if (!list.length) return list;
+  const ids = list.map((s) => s.id);
+  const { results: parts } = await db.prepare(`
+    SELECT schedule_id, name, seats, status, method, level FROM bookings
+    WHERE (status IN ('confirmed','verifying')
+           OR (status = 'pending' AND method = 'venue')
+           OR (status = 'pending' AND created_at > datetime('now','-1 day')))
+      AND schedule_id IN (${ids.map(() => '?').join(',')})
+    ORDER BY id ASC
+  `).bind(...ids).all();
+  const byId = {};
+  for (const p of parts) {
+    (byId[p.schedule_id] = byId[p.schedule_id] || []).push({
+      n: shortName(p.name),
+      x: Math.max(0, p.seats - 1),   // kursi ekstra yang dia bawa
+      v: p.status === 'verifying' ? 1 : 0,
+      l: p.level || '',              // level bermain (N/B/I)
+      // 'v' = bayar di tempat · 'l' = lunas · 'p' = menunggu pembayaran
+      pay: p.method === 'venue' ? 'v'
+        : p.status === 'confirmed' ? 'l'
+        : p.status === 'pending' ? 'p' : '',
+    });
+  }
+  for (const s of list) s.players = byId[s.id] || [];
+  return list;
 }
 
 // ---------- Proteksi brute-force login admin ----------
@@ -212,8 +251,9 @@ export default {
       if (path === '/api/site' && method === 'GET') {
         const db = env.DB;
         await ensureLevelColumn(db);
-        const [schedules, news, events, gallery, settings] = await Promise.all([
-          schedulesWithAvailability(db),
+        const [schedules, past, news, events, gallery, settings] = await Promise.all([
+          schedulesWithAvailability(db, 'active'),
+          schedulesWithAvailability(db, 'past'),
           db.prepare(`SELECT id, tag, title, blurb, date, image FROM news
                       WHERE published = 1 ORDER BY date DESC, id DESC LIMIT 30`).all()
             .then((r) => r.results),
@@ -224,44 +264,12 @@ export default {
             .then((r) => r.results),
           getSettings(db),
         ]);
-        // daftar peserta per jadwal: semua yang masih menahan kursi
-        // (sinkron dengan HOLD_EXPR) — terkonfirmasi, sedang diverifikasi,
-        // bayar di tempat, dan pending QRIS/transfer (<24 jam) dengan
-        // keterangan masing-masing. Nama sudah disingkat demi privasi.
-        if (schedules.length) {
-          const ids = schedules.map((s) => s.id);
-          const { results: parts } = await db.prepare(`
-            SELECT schedule_id, name, seats, status, method, level FROM bookings
-            WHERE (status IN ('confirmed','verifying')
-                   OR (status = 'pending' AND method = 'venue')
-                   OR (status = 'pending' AND created_at > datetime('now','-1 day')))
-              AND schedule_id IN (${ids.map(() => '?').join(',')})
-            ORDER BY id ASC
-          `).bind(...ids).all();
-          const byId = {};
-          for (const p of parts) {
-            (byId[p.schedule_id] = byId[p.schedule_id] || []).push({
-              n: shortName(p.name),
-              x: Math.max(0, p.seats - 1),   // kursi ekstra yang dia bawa
-              v: p.status === 'verifying' ? 1 : 0,
-              l: p.level || '',              // level bermain (N/B/I)
-              // status bayar untuk badge di daftar peserta:
-              // 'v' = bayar di tempat (SELALU, walau sudah dikonfirmasi admin —
-              //       uangnya memang baru diterima di venue pada hari sesi)
-              // 'l' = lunas (QRIS/transfer terkonfirmasi)
-              // 'p' = menunggu pembayaran (QRIS/transfer) · '' = lainnya
-              pay: p.method === 'venue' ? 'v'
-                : p.status === 'confirmed' ? 'l'
-                : p.status === 'pending' ? 'p' : '',
-            });
-          }
-          for (const s of schedules) s.players = byId[s.id] || [];
-        }
+        await Promise.all([attachPlayers(db, schedules), attachPlayers(db, past)]);
         // hanya kirim pengaturan yang memang untuk publik
         const pub = (({ announcement, wa_admin, instagram, wa_group, email,
           stat_members, stat_sessions }) =>
           ({ announcement, wa_admin, instagram, wa_group, email, stat_members, stat_sessions }))(settings);
-        return json({ ok: true, schedules, news, events, gallery, settings: pub });
+        return json({ ok: true, schedules, past, news, events, gallery, settings: pub });
       }
 
       // Isi lengkap satu berita
@@ -569,6 +577,17 @@ export default {
           if (m && method === 'DELETE') {
             await db.prepare('DELETE FROM bookings WHERE schedule_id = ?').bind(m[1]).run();
             await db.prepare('DELETE FROM schedules WHERE id = ?').bind(m[1]).run();
+            return json({ ok: true });
+          }
+        }
+
+        // Tandai jadwal selesai (pindah ke bagian "sudah lewat") atau aktifkan lagi
+        {
+          const m = path.match(/^\/api\/admin\/schedules\/(\d+)\/status$/);
+          if (m && method === 'POST') {
+            const b = await req.json();
+            if (!['open', 'closed', 'done', 'canceled'].includes(b.status)) return err('Status tidak dikenal.');
+            await db.prepare('UPDATE schedules SET status = ? WHERE id = ?').bind(b.status, m[1]).run();
             return json({ ok: true });
           }
         }

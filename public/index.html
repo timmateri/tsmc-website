@@ -176,6 +176,18 @@ section{padding:64px 0}
 .sched-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:22px}
 .scard{background:#fff;border:1.5px solid rgba(5,42,27,.15);border-radius:16px;padding:22px;
   display:flex;flex-direction:column;gap:12px;box-shadow:0 4px 0 rgba(5,42,27,.08)}
+/* ---------- jadwal yang sudah lewat ---------- */
+/* Kartunya dibuat hitam-putih supaya jelas terbaca sebagai arsip, bukan
+   sesi yang masih bisa di-book. Tetap dibuat cukup terang agar nama
+   peserta masih nyaman dibaca. */
+#lewat{background:var(--cream);border-block:1.5px solid rgba(5,42,27,.12)}
+.scard.past{filter:grayscale(1);opacity:.78;box-shadow:0 4px 0 rgba(5,42,27,.06);
+  border-color:rgba(5,42,27,.14);transition:filter .18s,opacity .18s}
+.scard.past:hover{filter:grayscale(.55);opacity:1}
+.scard.past .datebox{border-color:#6B7A66}
+.scard.past .players{background:rgba(5,42,27,.04)}
+.donemark{font-size:12.5px;font-weight:800;letter-spacing:.04em;color:#6B7A66;
+  border:1.5px dashed rgba(5,42,27,.28);border-radius:99px;padding:7px 14px;white-space:nowrap}
 /* sorotan saat dibuka lewat link share jadwal (#jadwal-N) */
 .scard.hl{border-color:var(--green);animation:hlPulse 1.1s ease 3}
 @keyframes hlPulse{0%,100%{box-shadow:0 4px 0 rgba(5,42,27,.08)}
@@ -438,6 +450,16 @@ footer small{opacity:.7;display:block;margin-top:4px}
   </div>
 </section>
 
+<section id="lewat" class="hidden">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 data-en="Past Sessions">Jadwal yang Sudah Lewat</h2>
+      <div class="sub" data-en="Sessions already played — kept as a record of the tables we have had">Sesi yang sudah berlalu — disimpan sebagai catatan meja yang pernah digelar</div>
+    </div>
+    <div class="sched-grid" id="past-grid"></div>
+  </div>
+</section>
+
 <section id="berita">
   <div class="wrap">
     <div class="sec-head">
@@ -664,6 +686,7 @@ async function loadSite(){
     SITE = d;
     renderAnnouncement(d.settings);
     renderSchedules(d.schedules);
+    renderPast(d.past);
     renderNews(d.news);
     renderEvents(d.events);
     renderGallery(d.gallery);
@@ -732,32 +755,50 @@ function renderSchedules(list){
   document.getElementById('next-meta').innerHTML = `${esc(n.time_start)} WIB · ${venueHTML(n)}`;
   document.getElementById('stat-tables').textContent = n.tables;
 
-  grid.innerHTML = list.map(s => {
-    const st = schedState(s);
-    const d = parseDate(s.date);
-    const pct = Math.min(100, Math.round(s.booked / s.capacity * 100));
-    return `
-    <div class="scard" id="jadwal-${s.id}">
+  grid.innerHTML = list.map(s => schedCard(s, false)).join('');
+}
+
+/* Satu pembuat kartu untuk dua tempat: jadwal aktif dan jadwal yang sudah
+   lewat. Versi lampau memakai kelas .past (abu-abu) dan tanpa tombol book. */
+function schedCard(s, past){
+  const st = schedState(s);
+  const d = parseDate(s.date);
+  const pct = Math.min(100, Math.round(s.booked / s.capacity * 100));
+  const warna = past ? '#6B7A66' : st.color;
+  const hadir = (s.players || []).reduce((t, p) => t + 1 + (p.x || 0), 0);
+  return `
+    <div class="scard${past ? ' past' : ''}" id="jadwal-${s.id}">
       <div class="top">
         <div class="datebox"><b>${d.getDate()}</b><span>${bulan(d.getMonth())}</span></div>
         <div><h3>${hari(d.getDay())} ${parseInt(s.time_start) < 11 ? T('Pagi','Morning') : parseInt(s.time_start) < 17 ? T('Siang','Afternoon') : T('Malam','Evening')}</h3>
           <small>${esc(s.time_start)} – ${esc(s.time_end)} WIB</small></div>
-        <span class="tag badge" style="background:${st.color};color:#fff">${st.label}</span>
+        <span class="tag badge" style="background:${warna};color:#fff">${past ? T('SELESAI','DONE') : st.label}</span>
       </div>
       <div class="meta">📍 ${venueHTML(s)}${s.note ? ' · ' + esc(s.note) : ''}</div>
-      <div class="bar"><i style="width:${pct}%;background:${st.color}"></i></div>
-      <div class="meta">${s.booked}/${s.capacity} ${T('kursi terisi','seats taken')} · <b style="color:${st.color}">${s.left > 0 ? s.left + T(' slot tersisa', ' ' + jml(s.left,'slot') + ' left') : 'waiting list'}</b></div>
-      ${renderPlayers(s)}
+      <div class="bar"><i style="width:${pct}%;background:${warna}"></i></div>
+      <div class="meta">${past
+        ? `${hadir} ${T('pemain hadir', jml(hadir,'player') + ' attended')} · ${s.booked}/${s.capacity} ${T('kursi terisi','seats taken')}`
+        : `${s.booked}/${s.capacity} ${T('kursi terisi','seats taken')} · <b style="color:${st.color}">${s.left > 0 ? s.left + T(' slot tersisa', ' ' + jml(s.left,'slot') + ' left') : 'waiting list'}</b>`}</div>
+      ${renderPlayers(s, past)}
       <div class="foot">
         <div class="fee"><small>${T('FEE / ORANG','FEE / PERSON')}</small><b>${rupiah(s.fee)}</b></div>
-        <div style="display:flex;gap:8px;align-items:center">
+        ${past
+          ? `<span class="donemark">🀄 ${T('Sesi selesai','Session finished')}</span>`
+          : `<div style="display:flex;gap:8px;align-items:center">
           <button class="btn ghost share-btn" onclick="shareSchedule(${s.id})" title="${T('Bagikan jadwal ini ke WhatsApp / sosial media','Share this session to WhatsApp / social media')}">📤</button>
           <button class="btn ${st.full ? 'ghost' : ''}" ${s.status==='closed' ? 'disabled' : ''}
             onclick="openBooking(${s.id})">${st.btn}</button>
-        </div>
+        </div>`}
       </div>
     </div>`;
-  }).join('');
+}
+
+function renderPast(list){
+  const sec = document.getElementById('lewat');
+  const grid = document.getElementById('past-grid');
+  if(!list || !list.length){ sec.classList.add('hidden'); return; }
+  sec.classList.remove('hidden');
+  grid.innerHTML = list.map(s => schedCard(s, true)).join('');
 }
 
 // Daftar peserta sebagai list bernomor ke bawah.
@@ -770,19 +811,20 @@ function payMark(p){
   if(p.pay === 'p') return `<span class="waitmark" title="${T('Slot ditahan 24 jam sampai pembayaran masuk','Seat held for 24 hours until payment arrives')}">${T('menunggu pembayaran','awaiting payment')}</span>`;
   return '';
 }
-function renderPlayers(s){
+function renderPlayers(s, past){
   const players = s.players || [];
   const seats = players.flatMap(p =>
     Array.from({length: 1 + (p.x || 0)}, () =>
       `<li class="${p.v ? 'verif' : ''}">${esc(p.n)}${p.l ? `<i class="lvl" style="background:${LVL_COLOR[p.l] || '#6B7A66'}" title="${lvlName(p.l)}">${p.l}</i>` : ''}${payMark(p)}</li>`));
   const pending = Math.max(0, s.booked - players.reduce((t, p) => t + 1 + (p.x || 0), 0));
   if(!seats.length){
+    if(past) return `<div class="players">👥 ${T('Tidak ada peserta tercatat.','No players recorded.')}</div>`;
     return `<div class="players">👥 ${pending > 0
       ? `${pending} ${T('kursi menunggu pembayaran — belum ada peserta terkonfirmasi.', jml(pending,'seat') + ' awaiting payment — no confirmed players yet.')}`
       : T('Belum ada peserta terkonfirmasi — jadi yang pertama!','No confirmed players yet — be the first!')}</div>`;
   }
-  return `<div class="players">👥 <b>${T('Sudah daftar:','Signed up:')}</b><ol>${seats.join('')}</ol>${
-    pending > 0 ? `<div class="pend">⏳ +${pending} ${T('kursi menunggu pembayaran', jml(pending,'seat') + ' awaiting payment')}</div>` : ''}</div>`;
+  return `<div class="players">👥 <b>${past ? T('Yang hadir:','Who came:') : T('Sudah daftar:','Signed up:')}</b><ol>${seats.join('')}</ol>${
+    !past && pending > 0 ? `<div class="pend">⏳ +${pending} ${T('kursi menunggu pembayaran', jml(pending,'seat') + ' awaiting payment')}</div>` : ''}</div>`;
 }
 
 function tagClass(t){
@@ -1225,6 +1267,7 @@ loadSite();
 if(window.I18N) window.I18N.onChange(() => {
   if(SITE){
     renderSchedules(SITE.schedules);
+    renderPast(SITE.past);
     renderNews(SITE.news);
     renderEvents(SITE.events);
     renderGallery(SITE.gallery);

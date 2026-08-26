@@ -485,26 +485,48 @@ async function loadSchedules(){
   $('sch-list').innerHTML = SCHEDULES.map(s => `<div class="card">
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
       <b>${fmtTgl(s.date)}</b> ${esc(s.time_start)}–${esc(s.time_end)}
-      <span class="pill sch-pill" style="background:${s.status==='open' ? '#087048' : '#6B7A66'}"
-        onclick="toggleSchedDetail(${s.id})" title="Klik untuk lihat peserta & status pembayaran">${s.status.toUpperCase()} ▾</span>
+      <span class="pill sch-pill" style="background:${s.status==='open' ? '#087048' : s.status==='done' ? '#3F4A3C' : '#6B7A66'}"
+        onclick="toggleSchedDetail(${s.id})" title="Klik untuk lihat peserta & status pembayaran">${s.status==='done' ? 'SELESAI' : s.status.toUpperCase()} ▾</span>
+      ${s.status==='done' ? '<span class="mut" style="font-size:12px">— tampil di bagian “Jadwal yang Sudah Lewat”</span>' : ''}
     </div>
     <div class="mut">${esc(s.venue)}${s.map_url ? ` <a href="${esc(s.map_url)}" target="_blank" rel="noopener" title="Buka di Google Maps">🗺️</a>` : ''}${s.note ? ' · ' + esc(s.note) : ''} · ${s.tables} meja ·
       ${s.booked}/${s.capacity} kursi terisi · fee ${rupiah(s.fee)}</div>
     <div style="display:flex;gap:8px;margin-top:10px">
       <button class="btn ghost sm" onclick="toggleSchedDetail(${s.id})">👥 Peserta ▾</button>
       <button class="btn ghost sm" onclick="adminShareSchedule(${s.id})" title="Bagikan kartu jadwal ke grup WA / sosial media">📤 Bagikan</button>
+      ${s.status === 'done'
+        ? `<button class="btn ghost sm" onclick="setSchedStatus(${s.id},'open')" title="Kembalikan ke daftar jadwal aktif">↩ Aktifkan Lagi</button>`
+        : `<button class="btn ghost sm" onclick="setSchedStatus(${s.id},'done')" title="Pindahkan ke bagian “Jadwal yang Sudah Lewat” di website">✅ Tandai Selesai</button>`}
       <button class="btn ghost sm" onclick="editSchedule(${s.id})">✎ Edit</button>
       <button class="btn red sm" onclick="if(confirm('Hapus jadwal ini beserta semua bookingnya?'))delSchedule(${s.id})">Hapus</button>
     </div>
     <div class="sch-det hidden" id="sch-det-${s.id}"></div></div>`).join('') || '<p class="mut">Belum ada jadwal.</p>';
 }
+/* Tandai jadwal selesai → langsung pindah ke bagian "Jadwal yang Sudah Lewat"
+   di website, kartunya jadi abu-abu dan tidak bisa di-book lagi.
+   Sesi yang tanggalnya sudah lewat pindah sendiri walau tombol ini tidak ditekan. */
+async function setSchedStatus(id, status){
+  const s = SCHEDULES.find(x => x.id === id);
+  const tanya = status === 'done'
+    ? `Tandai jadwal ${s ? fmtTgl(s.date) : ''} sebagai SELESAI?\n\nJadwal akan pindah ke bagian "Jadwal yang Sudah Lewat" di website dan tidak bisa di-book lagi.`
+    : `Aktifkan lagi jadwal ${s ? fmtTgl(s.date) : ''}?\n\nJadwal akan kembali muncul sebagai jadwal aktif yang bisa di-book.`;
+  if(!confirm(tanya)) return;
+  try{
+    await api('/api/admin/schedules/' + id + '/status', {method:'POST', body:{status}});
+    flash(status === 'done' ? 'Jadwal ditandai selesai ✓' : 'Jadwal diaktifkan lagi ✓');
+    loadSchedules();
+  }catch(e){ alert('Gagal: ' + e.message); }
+}
+
 /* bagikan kartu jadwal — pakai data publik (/api/site) agar nama peserta
    sudah tersamarkan seperti di website, aman untuk grup */
 async function adminShareSchedule(id){
   try{
     const d = await (await fetch('/api/site')).json();
-    const s = d.schedules.find(x => x.id === id);
-    if(!s){ alert('Jadwal ini tidak tampil di website publik (sudah lewat / dibatalkan) — tidak bisa dibagikan.'); return; }
+    // cari di jadwal aktif maupun di bagian "sudah lewat" — keduanya punya
+    // daftar peserta yang sudah disamarkan, jadi aman dibagikan
+    const s = d.schedules.find(x => x.id === id) || (d.past || []).find(x => x.id === id);
+    if(!s){ alert('Jadwal ini tidak tampil di website publik (dibatalkan, atau sudah lewat lebih dari 6 sesi) — tidak bisa dibagikan.'); return; }
     TSMCShare.share(s);
   }catch(e){ alert('Gagal menyiapkan kartu: ' + e.message); }
 }
