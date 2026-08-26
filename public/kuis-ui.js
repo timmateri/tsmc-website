@@ -119,9 +119,10 @@
       chip(t('Angin duduk', 'Seat wind'), K.WIND_CN[c.seat] + ' ' + W[c.seat], true),
       chip(t('Angin putaran', 'Round wind'), K.WIND_CN[c.round] + ' ' + W[c.round], true),
     ];
+    // Zimo bernilai di kedua aturan, jadi chip-nya selalu tampil.
+    out.push(chip(t('Cara menang', 'How it was won'), c.zimo ? 'Zimo' : 'Ron', c.zimo));
     if (G.mode === 'j2') {
       out.push(chip(t('Nomor kursi', 'Seat number'), String(K.SEAT_NO[c.seat])));
-      out.push(chip(t('Cara menang', 'How it was won'), c.zimo ? 'Zimo' : 'Ron', c.zimo));
       out.push(chip(t('Tangan', 'Hand'),
         c.concealed ? t('Tertutup', 'Concealed') : t('Ada set terbuka', 'Has an open set'), c.concealed));
       out.push(chip(t('Joker dipakai', 'Jokers used'),
@@ -155,7 +156,11 @@
     }).join('');
     const u = unit();
     let note = '';
-    if (res.capped) {
+    if (res.final) {
+      note = '<div class="note">' + t(
+        'Tangan 10 poin ke atas nilainya <b>final</b> — zimo, joker, hand tertutup, pair penutup, dan bunga tidak menambah apa pun.',
+        'Hands worth 10 points and up are <b>final</b> — zimo, jokers, a concealed hand, the closing pair and flowers add nothing.') + '</div>';
+    } else if (res.capped) {
       note = '<div class="note">' + t(
         'Totalnya lebih dari 13, tapi maksimum yang dihitung tetap <b>13 faan</b>.',
         'The total runs past 13, but the maximum that counts is still <b>13 faan</b>.') + '</div>';

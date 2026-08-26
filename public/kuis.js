@@ -33,8 +33,9 @@
     // Warna tangan — DITUMPUK di atas nilai pola.
     // (Modul 02: "All Triplets (3) + Semi Flush (3) + ..." dihitung semua.)
     flush: { semiFlush: 3, fullFlush: 7 },
-    // Poin tambahan — ditumpuk juga.
-    add: { dragonPong: 1, roundWind: 1, seatWind: 1 },
+    // Poin tambahan — ditumpuk juga. Zimo (menang dari ambilan sendiri)
+    // bernilai +1 faan di TSMC.
+    add: { dragonPong: 1, roundWind: 1, seatWind: 1, zimo: 1 },
     cap: 13,      // maksimum dihitung 13 faan
     min: 3,       // minimum boleh menyatakan menang
     unit: 'FAAN',
@@ -58,12 +59,17 @@
       joker: 1, noJoker: 2,
       flowerMatch: 1, seasonOther: 1, seasonMatch: 2,
       lastTile: 1, robKong: 1, buntut: 1,
-      // Set lengkap 4 bunga sewarna (rulebook hal. 3). Dihitung kumulatif di
-      // atas poin per-bunga. Kuis sengaja tidak pernah membagikan set lengkap
-      // sampai panitia memastikan apakah +5 memang menumpuk dengan poin
-      // per-bunga — begitu dipastikan, tinggal naikkan batas bunga di makeCtx.
+      // Set lengkap 4 bunga sewarna (rulebook hal. 3). Keputusan klub:
+      // +5 ini MENGGANTIKAN poin per-bunga untuk warna itu, bukan ditumpuk.
+      // Jadi 4 bunga hitam = 5 poin, bukan 5 + poin bunga yang sesuai kursi.
       flowerSetBlack: 5, flowerSetRed: 5,
     },
+    // TANGAN BESAR = POIN FINAL. Mulai dari Seven Pairs (10) sampai Di Hu,
+    // nilai tangannya tidak menerima poin tambahan apa pun: tidak zimo,
+    // tidak joker, tidak hand tertutup, tidak pair penutup, tidak bunga.
+    // Contoh: Full Colour + pair 2 + tanpa bunga/naga/angin + 1 joker +
+    // tertutup + zimo tetap 10 poin.
+    bigFrom: 10,
     cap: null,    // tidak dipatok limit
     min: 3,
     unit: 'POIN',
@@ -129,10 +135,10 @@
     robKong: ['Mencuri kong', '', 'Robbing the kong', ''],
     buntut: ['Menang dari buntut', 'tile pengganti kong atau bunga',
       'Win on a replacement tile', 'drawn after a kong or a flower'],
-    flowerSetBlack: ['Set bunga hitam', 'satu set lengkap 4 bunga hitam',
-      'Full black flower set', 'all four black flowers'],
-    flowerSetRed: ['Set bunga merah', 'satu set lengkap 4 bunga merah',
-      'Full red flower set', 'all four red flowers'],
+    flowerSetBlack: ['Set bunga hitam', '4 bunga hitam lengkap — menggantikan poin per-bunga',
+      'Full black flower set', 'all four black flowers — replaces the per-flower points'],
+    flowerSetRed: ['Set bunga merah', '4 bunga merah lengkap — menggantikan poin per-bunga',
+      'Full red flower set', 'all four red flowers — replaces the per-flower points'],
   };
 
   // ==========================================================
@@ -269,6 +275,7 @@
     if (fl) lines.push({ key: fl, value: FAAN.flush[fl] });
 
     honorPongLines(hand, FAAN.add).forEach((l) => lines.push(l));
+    if (hand.ctx.zimo) lines.push({ key: 'zimo', value: FAAN.add.zimo });
 
     let total = lines.reduce((a, l) => a + l.value, 0);
     let capped = false;
@@ -289,6 +296,14 @@
     const shape = bestShape(keys, (k) => (J2.shape[k] ? J2.shape[k][col] : 0));
     const dual = !!(J2.shape[shape.key] && J2.shape[shape.key][0] !== J2.shape[shape.key][1]);
     lines.push({ key: shape.key, value: shape.value, dual: dual });
+
+    // Tangan besar (10 poin ke atas): nilainya FINAL. Tidak ada satu pun
+    // poin tambahan yang ditumpuk — zimo, joker, tertutup, pair penutup,
+    // bunga, semuanya tidak berlaku. Instant point dari kong tetap dibayar
+    // terpisah saat kongnya terjadi, jadi tidak ikut dihitung di sini.
+    if (J2.shape[shape.key] && J2.shape[shape.key][0] >= J2.bigFrom) {
+      return { total: shape.value, lines: lines, capped: false, final: true, rules: J2 };
+    }
 
     honorPongLines(hand, J2.add).forEach((l) => lines.push(l));
 
@@ -316,14 +331,19 @@
       if (parts[0] === 'flower') { if (n === seatNo) fm++; }
       else if (parts[0] === 'season') { if (n === seatNo) sm++; else so++; }
     });
-    if (fm) lines.push({ key: 'flowerMatch', n: fm, value: J2.add.flowerMatch * fm });
-    if (so) lines.push({ key: 'seasonOther', n: so, value: J2.add.seasonOther * so });
-    if (sm) lines.push({ key: 'seasonMatch', n: sm, value: J2.add.seasonMatch * sm });
-    // Set lengkap 4 bunga sewarna — kumulatif di atas poin per-bunga.
+    // Set lengkap 4 bunga sewarna dihitung SEBAGAI GANTI poin per-bunga
+    // warna itu — bukan ditumpuk. Warna yang tidak lengkap tetap dihitung
+    // satu per satu seperti biasa.
     const nBlack = flowers.filter((f) => f.indexOf('flower:') === 0).length;
     const nRed = flowers.filter((f) => f.indexOf('season:') === 0).length;
     if (nBlack === 4) lines.push({ key: 'flowerSetBlack', value: J2.add.flowerSetBlack });
-    if (nRed === 4) lines.push({ key: 'flowerSetRed', value: J2.add.flowerSetRed });
+    else if (fm) lines.push({ key: 'flowerMatch', n: fm, value: J2.add.flowerMatch * fm });
+    if (nRed === 4) {
+      lines.push({ key: 'flowerSetRed', value: J2.add.flowerSetRed });
+    } else {
+      if (so) lines.push({ key: 'seasonOther', n: so, value: J2.add.seasonOther * so });
+      if (sm) lines.push({ key: 'seasonMatch', n: sm, value: J2.add.seasonMatch * sm });
+    }
 
     if (ctx.lastTile) lines.push({ key: 'lastTile', value: J2.add.lastTile });
     if (ctx.robKong) lines.push({ key: 'robKong', value: J2.add.robKong });
@@ -565,16 +585,19 @@
       lastTile: false, robKong: false, buntut: false,
     };
     ctx.seatNo = SEAT_NO[ctx.seat];
-    if (mode !== 'j2') return ctx;                     // FAAN: cara menang tidak bernilai
-
+    // Zimo bernilai di kedua aturan: +1 faan di TSMC, +1 poin di J2.
     if (level >= 2) ctx.zimo = Math.random() < 0.35;
+    // Sisanya khusus J2: joker, bunga, dan cara menang lain tidak dipakai TSMC.
+    if (mode !== 'j2') return ctx;
+
     if (level >= 3) {
       ctx.jokers = Math.random() < 0.45 ? 1 + rnd(2) : 0;
       if (Math.random() < 0.55) {
         // Satu set mahjong hanya punya SATU keping tiap bunga — tidak boleh kembar.
-        // Maksimal 3 supaya tidak pernah terbentuk set lengkap 4 bunga sewarna
-        // (aturan "set bunga +5" belum dipakai di kuis; lihat catatan di RULES).
-        ctx.flowers = pickN(FLOWER_DECK, 1 + rnd(3));
+        // Maksimal 5 keping: set lengkap 4 bunga sewarna sudah bisa keluar,
+        // tapi tetap jauh dari 7 keping yang di meja berarti instant win
+        // (kondisi itu tidak dimodelkan sebagai soal di kuis).
+        ctx.flowers = pickN(FLOWER_DECK, 1 + rnd(5));
       }
     }
     if (level >= 5) {

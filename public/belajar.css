@@ -232,6 +232,9 @@ table.faan .fv2.minus{color:var(--red)}
 .calc .line{display:flex;justify-content:space-between;gap:12px;font-size:14.5px;
   padding:7px 12px;background:var(--cream);border-radius:9px}
 .calc .line b.v{color:var(--green);font-family:'DM Serif Display',serif;font-size:17px}
+/* baris bonus yang TIDAK berlaku (mis. pada tangan besar J2 yang poinnya final) */
+.calc .line.off{background:#F1F0EA;color:var(--mut);opacity:.85}
+.calc .line.off b.v{color:var(--mut)}
 .calc .tot{display:flex;justify-content:space-between;align-items:center;background:var(--green);
   color:#fff;border-radius:9px;padding:10px 12px;font-weight:800}
 .calc .tot b{font-family:'DM Serif Display',serif;font-size:24px}
